@@ -3,10 +3,10 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day ? Part 1
+// Advent of Code Day <day> Part 1
 
 mod soln;
-pub use soln::???;
+pub use soln::soln;
 
 fn main() {
 }

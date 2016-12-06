@@ -1,3 +1,2 @@
-# Day ?: Title
+# Day <day>: Part Two
 
-Your puzzle answer was ???.

@@ -15,7 +15,11 @@ then
     exit 1
 fi
 
-DAY=day"$1"
+case "$1" in
+    [1-9]) DAY=day"0$1" ;;
+    [1-3][0-9]) DAY=day"$1" ;;
+    *) echo "mkday: bad day $1" >&2; exit 1 ;;
+esac
 
 mkdir $DAY
 if [ $? -ne 0 ]
@@ -23,10 +27,15 @@ then
     echo "mkday: directory cannot be created, giving up" >&2
     exit 1
 fi
-cd $DAY
-cp ../template/*.rs ../template/*.md ../template/Cargo.toml .
+
+cd template
+for f in *.rs *.md Cargo.toml
+do
+    sed "s=<day>=$1=g" <$f >../$DAY/$f
+done
+
+cd ../$DAY
 for i in 1 2
 do
     ln -s target/debug/part${i} part${i}
 done
-

@@ -1,5 +1,5 @@
-# Advent of Code 2016: Day ?
-Copyright © 2016 Bart Massey
+# Advent of Code 2016: Day <day>
+Copyright (c) 2016 Bart Massey
 
 ---
 
