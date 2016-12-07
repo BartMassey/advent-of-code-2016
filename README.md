@@ -33,6 +33,10 @@ The goals of these solutions are to:
 I learned a ton of Rust and a little bit of software
 engineering I should already have known writing these.
 
+There's also some engineering infrastructure in the form of
+the `template` directory and the `mkday.sh` shell script.
+This sped up each day's setup considerably.
+
 These solutions deserve a much more thorough top-level
 description than I have the energy to write at this point.
 I will revise this file in the indefinite future.
