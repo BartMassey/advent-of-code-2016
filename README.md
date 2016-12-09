@@ -34,8 +34,13 @@ I learned a ton of Rust and a little bit of software
 engineering I should already have known writing these.
 
 There's also some engineering infrastructure in the form of
-the `template` directory and the `mkday.sh` shell script.
-This sped up each day's setup considerably.
+the `template` directory and the `mkday.sh` and
+`process-aoc.sh` shell scripts.  This sped up each day's
+setup considerably. At the beginning of day 34 I would "sh
+mkday.sh 34". At the end of the day I would select and
+copy the page source of the day 34 AoC page and then "xclipb
+-out | sh ../process-aoc.sh" to get markdown into the
+problem files for posterity.
 
 These solutions deserve a much more thorough top-level
 description than I have the energy to write at this point.
