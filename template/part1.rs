@@ -6,7 +6,8 @@
 // Advent of Code Day <day> Part 1
 
 mod soln;
-pub use soln::soln;
+use soln::soln;
 
 fn main() {
+    soln();
 }

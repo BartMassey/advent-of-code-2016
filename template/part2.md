@@ -1,2 +1,0 @@
-# Day <day>: Part Two
-

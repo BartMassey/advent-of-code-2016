@@ -5,3 +5,9 @@
 
 // Advent of Code Day <day> Part 2
 
+mod soln;
+use soln::soln;
+
+fn main() {
+    soln();
+}

@@ -29,7 +29,7 @@ then
 fi
 
 cd template
-for f in *.rs *.md Cargo.toml
+for f in *
 do
     sed "s=<day>=$1=g" <$f >../$DAY/$f
 done
@@ -39,3 +39,4 @@ for i in 1 2
 do
     ln -s target/debug/part${i} part${i}
 done
+echo $1 >.day
