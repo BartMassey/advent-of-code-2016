@@ -35,8 +35,5 @@ do
 done
 
 cd ../$DAY
-for i in 1 2
-do
-    ln -s target/debug/part${i} part${i}
-done
+ln -s target/debug/soln soln
 echo $1 >.day

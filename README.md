@@ -8,12 +8,12 @@ involved profusely for their excellent work. Thanks also to
 `relsqui` for pointing me at this last year.
 
 For each solution, I have included commented and cleaned-up
-Rust code. The solution files will always be `part1.rs` and
-`part2.rs`, which will normally refer to a `soln.rs`
-library in the same directory. There is a `README.md`
-in every problem directory containing descriptions and
-comments. I have also included the problem descriptions
-(`part1.md` and `part2.md`) and my specific
+Rust code. The solution will be in a file named `soln.rs`,
+which can be run as "./soln 1 <input.txt" or "./soln 2
+<input.txt" to get the part 1 or part 2 solution. There is a
+`README.md` in every problem directory containing
+descriptions and comments. I have also included the problem
+descriptions (`part1.md` and `part2.md`) and my specific
 `input.txt` for posterity.
 
 I assume you have Rust running on a fast-ish UNIX box with a
@@ -34,13 +34,13 @@ I learned a ton of Rust and a little bit of software
 engineering I should already have known writing these.
 
 There's also some engineering infrastructure in the form of
-the `template` directory and the `mkday.sh` and
-`process-aoc.sh` shell scripts.  This sped up each day's
-setup considerably. At the beginning of day 34 I would "sh
-mkday.sh 34". At the end of the day I would select and
-copy the page source of the day 34 AoC page and then "xclipb
--out | sh ../process-aoc.sh" to get markdown into the
-problem files for posterity.
+the `template` directory, the `mkday.sh` and
+`process-aoc.sh` shell scripts and the `libaoc` crate.  This
+sped up each day's setup considerably. At the beginning of
+day 34 I would "sh mkday.sh 34". At the end of the day I
+would select and copy the page source of the day 34 AoC page
+and then "xclipb -out | sh ../process-aoc.sh" to get
+markdown into the problem files for posterity.
 
 These solutions deserve a much more thorough top-level
 description than I have the energy to write at this point.
