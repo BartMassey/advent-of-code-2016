@@ -6,7 +6,7 @@ TMPDIR=/tmp/process-aoc.$$
 trap "rm -rf $TMPDIR" 0 1 2 3 15
 mkdir $TMPDIR
 DAY=`cat .day`
-tidy -q -asxml | awk '
+tidy -q -asxml 2>/dev/null | awk '
   /^<article class="day-desc">$/ {
       part += 1;
       outfile = tmpdir "/part" part ".xhtml";
