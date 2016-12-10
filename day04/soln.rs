@@ -5,10 +5,11 @@
 
 // Advent of Code Day 4
 
-extern crate regex;
-
 use std::io;
 use std::io::prelude::*;
+
+extern crate regex;
+extern crate aoc;
 
 fn name_checksum(room_name: &str) -> String {
     // Set up state.
@@ -64,7 +65,9 @@ fn name_decrypt(room_name: &str, sector_id: u32) -> String {
     result.iter().cloned().collect::<String>()
 }
 
-pub fn soln(decrypt: bool) {
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
+    let decrypt = !part1;
     // Set up the regex for room encryption.
     let room_pattern = regex::Regex::new(r"^(.*)-(\d+)\[(.*)\]$").unwrap();
     // Set up state.

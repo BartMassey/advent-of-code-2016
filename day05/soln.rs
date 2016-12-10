@@ -8,10 +8,13 @@
 // Portions borrowed from
 // https://gist.github.com/gkbrk/2e4835e3a17b3fb6e1e7
 
+// The hardcoded room code.
+static ROOM_CODE: &'static str = "wtnhxymk";
+
+extern crate aoc;
 extern crate crypto;
 
 use self::crypto::digest::Digest;
-use std;
 use std::io::Write;
 use std::io::stdout;
 
@@ -39,13 +42,15 @@ pub fn cinema_string(marquee: &[char]) {
 // Find the password matching the room code, using the
 // algorithm of part 2 of the problem if "positional" is
 // true.
-pub fn soln(room_code: &str, positional: bool) {
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
+    let positional = !part1;
     // Set up the password storage.
     let mut password = ['.'; 8];
     cinema_string(&password);
     // Set up the rest of the state.
     let mut hasher = crypto::md5::Md5::new();
-    let prefix = room_code.as_bytes();
+    let prefix = ROOM_CODE.as_bytes();
     let mut count = 0;
     // This loop should never finish.
     for i in 0..std::u64::MAX {

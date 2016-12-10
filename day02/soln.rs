@@ -8,6 +8,8 @@
 use std::io;
 use std::io::prelude::*;
 
+extern crate aoc;
+
 // Take a starting point and a line of traversal instructions
 // and return the ending position.
 fn walk_line(board: &Vec<Vec<char>>, n_start: (usize, usize),
@@ -41,4 +43,25 @@ pub fn print_code(board: &Vec<Vec<char>>) {
         print!("{}", board[n.1][n.0]);
     }
     print!("\n");
+}
+
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
+    // It's gross, but it works.
+    let board = if part1 {
+        vec![ vec!['.', '.', '.', '.', '.'],
+              vec!['.', '1', '2', '3', '.'],
+              vec!['.', '4', '5', '6', '.'],
+              vec!['.', '7', '8', '9', '.'],
+              vec!['.', '.', '.', '.', '.']]
+    } else {
+        vec![vec!['.', '.', '.', '.', '.', '.', '.'],
+             vec!['.', '.', '.', '1', '.', '.', '.'],
+             vec!['.', '.', '2', '3', '4', '.', '.'],
+             vec!['.', '5', '6', '7', '8', '9', '.'],
+             vec!['.', '.', 'A', 'B', 'C', '.', '.'],
+             vec!['.', '.', '.', 'D', '.', '.', '.'],
+             vec!['.', '.', '.', '.', '.', '.', '.']]
+    };
+    print_code(&board);
 }

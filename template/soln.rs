@@ -3,7 +3,10 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day <day>
+// Advent of Code Day <day>.
 
-pub fn soln() {
+extern crate aoc;
+
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
 }

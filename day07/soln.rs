@@ -9,6 +9,8 @@ use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
 
+extern crate aoc;
+
 // Return true iff given segment has an ABBA.
 fn segment_abba(segment: &str) -> bool {
     let c: Vec<char> = segment.chars().collect();
@@ -21,7 +23,7 @@ fn segment_abba(segment: &str) -> bool {
 }
 
 // Return true iff the given string supports TLS.
-pub fn supports_tls(line: String) -> bool {
+fn supports_tls(line: String) -> bool {
     // Set up state. has_abba is true iff an
     // ABBA has been seen outside brackets.
     let mut has_abba = false;
@@ -80,7 +82,7 @@ fn segment_abas(segment: &str, flip: bool, abas: &mut HashSet<String>) {
 // and one of flipped hypernet ABAs. Intersect
 // at the end. Intersect-as-we-go would allow
 // short-circuit on success.
-pub fn supports_ssl(line: String) -> bool {
+fn supports_ssl(line: String) -> bool {
     // Set up state.
     let mut supernet_abas = HashSet::new();
     let mut hypernet_abas = HashSet::new();
@@ -110,7 +112,13 @@ pub fn supports_ssl(line: String) -> bool {
 
 // Count and print the number of lines on stdin for which
 // the given test function returns true.
-pub fn soln(tester: fn(String) -> bool) {
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
+    let tester: fn(String) -> bool = if part1 {
+        supports_tls
+    } else {
+        supports_ssl
+    };
     // Set up state.
     let mut count = 0;
     // Read strings from the input file and process them.

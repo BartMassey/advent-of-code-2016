@@ -9,6 +9,8 @@ use std::io;
 use std::io::prelude::*;
 use std::str;
 
+extern crate aoc;
+
 // Walk a string of bytes, computing the length of its
 // expansion. If recurse is true, include the length of
 // recursive subexpansions as new patterns are encountered.
@@ -67,9 +69,10 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> usize {
 // way to do better, really.  XXX If Unicode were an issue,
 // we should really transform the vector of bytes into a
 // vector of chars before passing it.
-pub fn soln(recurse: bool) {
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
     let mut chars = Vec::new();
     let _ = io::stdin().read_to_end(&mut chars).unwrap();
-    let nemit = parse_expansion(&chars, recurse);
+    let nemit = parse_expansion(&chars, !part1);
     print!("{}\n", nemit);
 }

@@ -4,13 +4,14 @@ Copyright (c) 2016 Bart Massey
 Another problem very reminiscent of one from last year. I
 think all of them are likely to be like that.
 
-Today's problem didn't work very well with my part1/part2
+This problem didn't work very well with my old part1/part2
 program format. The pieces were tightly integrated, and
 besides I couldn't figure out how to get Rust's
 `lazy_static` crate to do what I needed for regexps without
 creating a separate crate or putting the macro include in
-the same file with the main program. Huh. So there's a
-single solution to both parts in soln.rs.
+the same file with the main program. Huh. So for this one I
+put a single solution to both parts in `soln.rs` from the
+beginning.
 
 This was a hard problem for Rust, which always struggles
 with 2D arrays and the like. Ultimately, I think I found a

@@ -9,6 +9,8 @@ use std::io;
 use std::io::prelude::*;
 use std::vec::Vec;
 
+extern crate aoc;
+
 // Return the last index of an element in the input that
 // has maximal value.
 fn max_index(elems: &Vec<usize>) -> usize {
@@ -43,7 +45,8 @@ fn min_index(elems: &Vec<usize>) -> usize {
 }
 
 // Count up and show the answer.
-pub fn soln(use_min: bool) {
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
     // Set up the state.
     let mut inited = false;
     let mut counters = Vec::new();
@@ -72,10 +75,10 @@ pub fn soln(use_min: bool) {
     // and display them.
     for c in counters.iter() {
         let i =
-            if use_min {
-                min_index(&c)
-            } else {
+            if part1 {
                 max_index(&c)
+            } else {
+                min_index(&c)
             };
         print!("{}", (i as u8 + 'a' as u8) as char);
     }

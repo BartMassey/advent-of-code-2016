@@ -5,13 +5,21 @@
 
 // Advent of Code Day 8 Part 1
 
+// Turn on for display tracing.
+const TRACING: bool = false;
+
 // Size of display.
 const X_SIZE: usize = 50;
 const Y_SIZE: usize = 6;
 
+// Size for test instance.
+//const X_SIZE: usize = 7;
+//const Y_SIZE: usize = 3;
+
 use std::io;
 use std::io::prelude::*;
 
+extern crate aoc;
 #[macro_use] extern crate lazy_static;
 extern crate regex;
 
@@ -95,9 +103,10 @@ fn display(m: &Vec<Vec<char>>) {
     }
 }
 
-// Run the instructions, displaying as we go, and
-// then print the number of on pixels at the end.
+// Run the instructions and print the number of on pixels or
+// the pixels themselves at the end.
 fn main() {
+    let (part1, _) = aoc::parseargs();
     // Set up state.
     let mut m = vec![vec!['.';Y_SIZE];X_SIZE];
     let insns: &[fn(&str, &mut Vec<Vec<char>>) -> bool] =
@@ -113,8 +122,10 @@ fn main() {
         for f in insns.iter() {
             if f(&l, &mut m) {
                 processed = true;
-                print!("\n");
-                display(&m);
+                if TRACING {
+                    print!("\n");
+                    display(&m);
+                };
                 break;
             }
         };
@@ -132,7 +143,12 @@ fn main() {
         }
     };
     // Show final answer.
-    print!("\n");
-    display(&m);
-    print!("{}\n", count);
+    if TRACING {
+        print!("\n");
+    };
+    if part1 {
+        print!("{}\n", count);
+    } else {
+        display(&m);
+    };
 }

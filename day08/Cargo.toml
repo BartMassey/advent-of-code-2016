@@ -8,7 +8,7 @@ name = "soln"
 version = "0.1.0"
 authors = ["Bart Massey <bart@cs.pdx.edu>"]
 publish = false
-description = "Solution to Advent of Code 2016 problem."
+description = "Solution to Advent of Code 2016 Day 8."
 repository = "http://github.com/BartMassey/advent-of-code-2016"
 readme = "README.md"
 license = "MIT"
@@ -16,6 +16,9 @@ license = "MIT"
 [[bin]]
 name = "soln"
 path = "soln.rs"
+
+[dependencies.libaoc]
+path = "../libaoc"
 
 [dependencies]
 regex = "0.1"

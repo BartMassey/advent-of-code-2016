@@ -9,6 +9,8 @@ use std::io;
 use std::io::prelude::*;
 use std::collections::HashSet;
 
+extern crate aoc;
+
 // This function probably needs to be split up.  Read the
 // instance description from stdin and walk the route from
 // the origin, returning the endpoint. If stop_short is
@@ -60,7 +62,8 @@ fn traverse(stop_short: bool) -> (i32, i32) {
 
 // Do the traversal, then print the manhattan distance from
 // the origin to the endpoint.
-pub fn show_traverse(stop_short: bool) {
-    let position = traverse(stop_short);
+pub fn main() {
+    let (part1, _) = aoc::parseargs();
+    let position = traverse(!part1);
     print!("{}\n", position.0.abs() + position.1.abs())
 }
