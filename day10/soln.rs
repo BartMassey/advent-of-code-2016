@@ -23,6 +23,7 @@ use std::collections::HashSet;
 
 #[macro_use] extern crate lazy_static;
 extern crate regex;
+extern crate aoc;
 
 lazy_static! {
     static ref VALUE_PAT: regex::Regex =
@@ -75,14 +76,7 @@ fn parse_dest(desc: &str) -> Dest {
 // broken up into functions, but Rust and the problem conspire
 // to make that hard.
 pub fn main() {
-    // Find out whether we're handling part1 or part2.
-    let mut argv = std::env::args();
-    assert!(argv.len() == 2);
-    let part1 = match argv.nth(1).unwrap().parse().unwrap() {
-        1 => true,
-        2 => false,
-        _ => panic!("bad problem number")
-    };
+    let (part1, _) = aoc::parseargs();
     // Set up the instruction table and prepare to set up the rest of the state.
     let mut insns: Vec<Insn> = Vec::new();
     let mut max_bot = 0;
