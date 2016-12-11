@@ -8,15 +8,11 @@
 // Portions borrowed from
 // https://gist.github.com/gkbrk/2e4835e3a17b3fb6e1e7
 
-// The hardcoded room code.
-static ROOM_CODE: &'static str = "wtnhxymk";
-
 extern crate aoc;
 extern crate crypto;
 
 use self::crypto::digest::Digest;
-use std::io::Write;
-use std::io::stdout;
+use std::io::*;
 
 // Given an input between 0 and 15, return the
 // corresponding hex digit.
@@ -35,7 +31,7 @@ fn hex_digit(n: usize) -> char {
 pub fn cinema_string(marquee: &[char]) {
     let marquee_string = marquee.iter().cloned().collect::<String>();
     print!("\r{}", marquee_string);
-    stdout().flush().unwrap();
+    stdout().flush().expect("cinema_string: could not flush stdout");
 }
 
 
@@ -43,14 +39,20 @@ pub fn cinema_string(marquee: &[char]) {
 // algorithm of part 2 of the problem if "positional" is
 // true.
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
-    let positional = !part1;
+    let part = aoc::get_part();
+    let positional = part == 2;
+    let stdin = stdin();
+    let reader = BufReader::new(stdin);
+    let lines = reader.lines().collect::<Vec<Result<String>>>();
+    assert!(lines.len() == 1);
+    let room_code = lines[0].as_ref()
+        .expect("main: could not process room code");
     // Set up the password storage.
     let mut password = ['.'; 8];
     cinema_string(&password);
     // Set up the rest of the state.
     let mut hasher = crypto::md5::Md5::new();
-    let prefix = ROOM_CODE.as_bytes();
+    let prefix = room_code.as_bytes();
     let mut count = 0;
     // This loop should never finish.
     for i in 0..std::u64::MAX {

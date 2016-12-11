@@ -18,9 +18,9 @@ with 2D arrays and the like. Ultimately, I think I found a
 reasonably elegant and extensible solution using function
 pointers for the instructions.
 
-The array dimensions are hardcoded in. I set it for 7x3 for
-the test problem, found a bunch of bugs, and set it to 50x6
-for the actual input.
+The array dimensions are passed as extra arguments. Use "7
+3" for the test problem (with which I found a bunch of bugs)
+and "50 6" for the actual input.
 
 ---
 

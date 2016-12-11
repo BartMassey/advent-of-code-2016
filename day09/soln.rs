@@ -27,11 +27,14 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> usize {
                     end += 1;
                 }
                 // Grab the "coords" out of the pattern.
-                let target: &str = str::from_utf8(&(*pat)[i+1..end]).unwrap();
+                let target: &str = str::from_utf8(&(*pat)[i+1..end])
+                    .expect("parse_expansion: invalid utf8 in target");
                 let coords = target.split('x').collect::<Vec<&str>>();
                 assert!(coords.len() == 2);
-                let replen: usize = coords[0].parse().unwrap();
-                let repcount: usize = coords[1].parse().unwrap();
+                let replen: usize = coords[0].parse()
+                    .expect("parse_expansion: could not parse replen");
+                let repcount: usize = coords[1].parse()
+                    .expect("parse_expansion: could not parse repcount");
                 // Advance over the pattern.
                 i = end + 1;
                 // Process the target text.
@@ -70,9 +73,10 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> usize {
 // we should really transform the vector of bytes into a
 // vector of chars before passing it.
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
+    let part = aoc::get_part();
     let mut chars = Vec::new();
-    let _ = io::stdin().read_to_end(&mut chars).unwrap();
-    let nemit = parse_expansion(&chars, !part1);
+    let _ = io::stdin().read_to_end(&mut chars)
+        .expect("could not read all of stdin");
+    let nemit = parse_expansion(&chars, part==2);
     print!("{}\n", nemit);
 }

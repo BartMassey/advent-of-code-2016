@@ -8,14 +8,6 @@
 // Turn on for display tracing.
 const TRACING: bool = false;
 
-// Size of display.
-const X_SIZE: usize = 50;
-const Y_SIZE: usize = 6;
-
-// Size for test instance.
-//const X_SIZE: usize = 7;
-//const Y_SIZE: usize = 3;
-
 use std::io;
 use std::io::prelude::*;
 
@@ -26,11 +18,14 @@ extern crate regex;
 // Textual patterns for instructions.
 lazy_static! {
     static ref RECT_PATTERN: regex::Regex =
-        regex::Regex::new(r"^rect (\d+)x(\d+)$").unwrap();
+        regex::Regex::new(r"^rect (\d+)x(\d+)$")
+        .expect("could not compile rect pattern");
     static ref ROTATE_ROW_PATTERN: regex::Regex =
-        regex::Regex::new(r"^rotate row y=(\d+) by (\d+)$").unwrap();
+        regex::Regex::new(r"^rotate row y=(\d+) by (\d+)$")
+        .expect("could not compile row pattern");
     static ref ROTATE_COLUMN_PATTERN: regex::Regex =
-        regex::Regex::new(r"^rotate column x=(\d+) by (\d+)$").unwrap();
+        regex::Regex::new(r"^rotate column x=(\d+) by (\d+)$")
+        .expect("could not compile column pattern");
 }
 
 // Instruction to draw a rectangle. Returns true iff it was
@@ -39,8 +34,12 @@ fn insn_rect(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     match (*self::RECT_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
-            let x: usize = parts.at(1).unwrap().parse().unwrap();
-            let y: usize = parts.at(2).unwrap().parse().unwrap();
+            let x: usize = parts.at(1)
+                .expect("insn_rect: could not find x")
+                .parse().expect("insn_rect: could not parse x");
+            let y: usize = parts.at(2)
+                .expect("insn_rect: could not find y")
+                .parse().expect("insn_rect: could not parse y");
             for i in 0..x {
                 for j in 0..y {
                     m[i][j] = '#';
@@ -57,8 +56,12 @@ fn insn_rotate_row(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     match (*self::ROTATE_ROW_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
-            let y: usize = parts.at(1).unwrap().parse().unwrap();
-            let n: usize = parts.at(2).unwrap().parse().unwrap();
+            let y: usize = parts.at(1)
+                .expect("insn_rotate_row: could not find y")
+                .parse().expect("insn_rotate_row: could not parse y");
+            let n: usize = parts.at(2)
+                .expect("insn_rotate_row: could not find n")
+                .parse().expect("insn_rotate_row: could not parse n");
             let d = m.len();
             for _ in 0..n {
                 let tmp = m[d-1][y];
@@ -78,8 +81,12 @@ fn insn_rotate_column(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     match (*self::ROTATE_COLUMN_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
-            let x: usize = parts.at(1).unwrap().parse().unwrap();
-            let n: usize = parts.at(2).unwrap().parse().unwrap();
+            let x: usize = parts.at(1)
+                .expect("insn_rotate_column: could not find x")
+                .parse().expect("insn_rotate_column: could not parse x");
+            let n: usize = parts.at(2)
+                .expect("insn_rotate_row: could not find n")
+                .parse().expect("insn_rotate_row: could not parse n");
             let d = m[0].len();
             for _ in 0..n {
                 let tmp = m[x][d-1];
@@ -106,16 +113,24 @@ fn display(m: &Vec<Vec<char>>) {
 // Run the instructions and print the number of on pixels or
 // the pixels themselves at the end.
 fn main() {
-    let (part1, _) = aoc::parseargs();
+    let (part, dims) = aoc::get_part_args();
+    assert!(dims.len() == 2);
+    let x_size: usize = dims[0].parse().expect("main: could not parse x_size");
+    let y_size: usize = dims[1].parse().expect("main: could not parse y_size");
     // Set up state.
-    let mut m = vec![vec!['.';Y_SIZE];X_SIZE];
+    let mut m = Vec::new();
+    for _ in 0..x_size {
+        let mut v = Vec::with_capacity(y_size);
+        v.resize(y_size, '.');
+        m.push(v);
+    }
     let insns: &[fn(&str, &mut Vec<Vec<char>>) -> bool] =
         &[insn_rect, insn_rotate_column, insn_rotate_row];
     // Read strings from the input file and process them.
     let stdin = io::stdin();
     let reader = io::BufReader::new(stdin);
     for line in reader.lines() {
-        let l = line.unwrap();
+        let l = line.expect("main: could not read line");
         // Search through the instructions until finding one
         // that works.
         let mut processed = false;
@@ -135,18 +150,18 @@ fn main() {
     };
     // Count up the on pixels.
     let mut count = 0;
-    for x in 0..m.len() {
-        for y in 0..m[0].len() {
+    for x in 0..x_size {
+        for y in 0..y_size {
             if m[x][y] == '#' {
                 count += 1;
             }
         }
     };
-    // Show final answer.
     if TRACING {
         print!("\n");
     };
-    if part1 {
+    // Show final answer.
+    if part == 1 {
         print!("{}\n", count);
     } else {
         display(&m);

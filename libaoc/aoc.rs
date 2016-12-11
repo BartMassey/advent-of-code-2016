@@ -5,16 +5,24 @@
 
 // Library for Advent of Code 2016 solutions.
 
-pub fn parseargs() -> (bool, Vec<String>) {
-    // Find out whether we're handling part1 or part2.
+// Find out whether we're handling part1 or part2.
+pub fn get_part() -> usize {
     let mut argv = std::env::args();
     assert!(argv.len() == 2);
-    let part1 = match argv.nth(1).unwrap().parse().unwrap() {
-        1 => true,
-        2 => false,
-        _ => panic!("bad problem number")
-    };
-    // Pile up the rest and give it back.
-    let rest = argv.collect::<Vec<String>>();
-    (part1, rest)
+    let part = argv.nth(1).expect("get_part: bad part argument")
+               .parse().expect("get_part: part argument is not a number");
+    assert!(part == 1 || part == 2);
+    part
+}
+
+// Find out whether we're handling part1 or part2, and what
+// other arguments have been supplied.
+pub fn get_part_args() -> (usize, Vec<String>) {
+    let mut argv = std::env::args();
+    assert!(argv.len() >= 2);
+    let part = argv.nth(1).expect("get_part_args: bad part argument")
+               .parse().expect("get_part_args: part argument is not a number");
+    assert!(part == 1 || part == 2);
+    let args = argv.collect::<Vec<String>>();
+    (part, args)
 }

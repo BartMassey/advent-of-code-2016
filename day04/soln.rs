@@ -26,7 +26,8 @@ fn name_checksum(room_name: &str) -> String {
     };
     // XXX This is a pretty gross algorithm whose
     // only real merit is avoiding some sorting hassle.
-    let mut m: u32 = *counts.iter().max().unwrap();
+    let mut m: u32 = *counts.iter().max()
+        .expect("name_checksum: could not find max count");
     if m == 0 {
         panic!("maximum is zero");
     }
@@ -66,25 +67,29 @@ fn name_decrypt(room_name: &str, sector_id: u32) -> String {
 }
 
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
-    let decrypt = !part1;
+    let part = aoc::get_part();
+    let decrypt = part == 2;
     // Set up the regex for room encryption.
-    let room_pattern = regex::Regex::new(r"^(.*)-(\d+)\[(.*)\]$").unwrap();
+    let room_pattern = regex::Regex::new(r"^(.*)-(\d+)\[(.*)\]$")
+        .expect("main: could not compile regex");
     // Set up state.
     let mut sector_sum: u32 = 0;
     // Read strings from the input file and process them.
     let stdin = io::stdin();
     let reader = io::BufReader::new(stdin);
     for line in reader.lines() {
-        let l = line.unwrap();
-        let parts = room_pattern.captures(&l).unwrap();
-        let room_name = parts.at(1).unwrap();
+        let l = line.expect("main: could not read line");
+        let parts = room_pattern.captures(&l)
+            .expect("main: could not match line");
+        let room_name = parts.at(1)
+            .expect("main: could not find room name");
         let computed_sum = name_checksum(&room_name);
-        let given_sum = parts.at(3).unwrap();
+        let given_sum = parts.at(3).expect("main: could not find checksum");
         if computed_sum != given_sum {
             continue;
         }
-        let sector_id = parts.at(2).unwrap().parse().unwrap();
+        let sector_id = parts.at(2).expect("main: could not find sector id")
+            .parse().expect("main: could not parse sector id");
         if decrypt {
             print!("{} {}\n", name_decrypt(&room_name, sector_id), sector_id);
             continue;

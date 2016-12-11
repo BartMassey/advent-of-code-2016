@@ -46,7 +46,7 @@ fn min_index(elems: &Vec<usize>) -> usize {
 
 // Count up and show the answer.
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
+    let part = aoc::get_part();
     // Set up the state.
     let mut inited = false;
     let mut counters = Vec::new();
@@ -54,7 +54,7 @@ pub fn main() {
     let stdin = io::stdin();
     let reader = io::BufReader::new(stdin);
     for line in reader.lines() {
-        let l = line.unwrap();
+        let l = line.expect("main: could not read line");
         // Inline initialization: we can't know how long the
         // lines are until we get here.
         if !inited {
@@ -75,7 +75,7 @@ pub fn main() {
     // and display them.
     for c in counters.iter() {
         let i =
-            if part1 {
+            if part == 1 {
                 max_index(&c)
             } else {
                 min_index(&c)

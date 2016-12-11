@@ -22,14 +22,14 @@ fn part1() {
     let reader = io::BufReader::new(stdin);
     let mut count = 0;
     for line in reader.lines() {
-        let strs = line.unwrap();
+        let strs = line.expect("part1: failed to read line");
         let line_strs = strs.split_whitespace().collect::<Vec<_>>();
         if line_strs.len() != 3 {
             panic!("line does not have three lengths");
         };
         let mut tri: [i32; 3] = [0; 3];
         for i in 0..3 {
-            tri[i] = line_strs[i].parse().unwrap();
+            tri[i] = line_strs[i].parse().expect("part1: tri had non-integer");
         };
         if ok_triangle(&mut tri) {
             count += 1;
@@ -49,13 +49,14 @@ fn part2() {
     let stdin = io::stdin();
     let reader = io::BufReader::new(stdin);
     for line in reader.lines() {
-        let strs = line.unwrap();
+        let strs = line.expect("part2: failed to read line");
         let line_strs = strs.split_whitespace().collect::<Vec<_>>();
         if line_strs.len() != 3 {
             panic!("line does not have three lengths");
         };
         for i in 0..3 {
-            buffer[i][index] = line_strs[i].parse().unwrap();
+            buffer[i][index] = line_strs[i].parse()
+                .expect("part2: tri contained non-integer");
         };
         index += 1;
         if index == 3 {
@@ -75,8 +76,8 @@ fn part2() {
 }
 
 pub fn main() {
-    let (is_part1, _) = aoc::parseargs();
-    if is_part1 {
+    let part = aoc::get_part();
+    if part == 1 {
         part1();
     } else {
         part2();

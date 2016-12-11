@@ -63,7 +63,7 @@ fn traverse(stop_short: bool) -> (i32, i32) {
 // Do the traversal, then print the manhattan distance from
 // the origin to the endpoint.
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
-    let position = traverse(!part1);
+    let part = aoc::get_part();
+    let position = traverse(part == 2);
     print!("{}\n", position.0.abs() + position.1.abs())
 }

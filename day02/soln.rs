@@ -39,16 +39,17 @@ pub fn print_code(board: &Vec<Vec<char>>) {
     let stdin = io::stdin();
     let reader = io::BufReader::new(stdin);
     for line in reader.lines() {
-        n = walk_line(board, n, &line.unwrap());
+        n = walk_line(board, n, &line
+                      .expect("print_code: failed to read line"));
         print!("{}", board[n.1][n.0]);
     }
     print!("\n");
 }
 
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
+    let part = aoc::get_part();
     // It's gross, but it works.
-    let board = if part1 {
+    let board = if part == 1 {
         vec![ vec!['.', '.', '.', '.', '.'],
               vec!['.', '1', '2', '3', '.'],
               vec!['.', '4', '5', '6', '.'],

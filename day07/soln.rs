@@ -113,8 +113,8 @@ fn supports_ssl(line: String) -> bool {
 // Count and print the number of lines on stdin for which
 // the given test function returns true.
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
-    let tester: fn(String) -> bool = if part1 {
+    let part = aoc::get_part();
+    let tester: fn(String) -> bool = if part == 1 {
         supports_tls
     } else {
         supports_ssl
@@ -125,7 +125,7 @@ pub fn main() {
     let stdin = io::stdin();
     let reader = io::BufReader::new(stdin);
     for line in reader.lines() {
-        let l = line.unwrap();
+        let l = line.expect("main: could not read line");
         if tester(l) {
             count += 1;
         }

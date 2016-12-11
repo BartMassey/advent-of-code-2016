@@ -8,5 +8,5 @@
 extern crate aoc;
 
 pub fn main() {
-    let (part1, _) = aoc::parseargs();
+    let part = aoc::get_part();
 }

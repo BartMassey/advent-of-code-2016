@@ -16,7 +16,7 @@ untenable. Rust at its best is pretty competitive with C,
 which is nice in this challenge.
 
 Of course, the bonus for part 2 was necessary. So you get
-some cinematics with this one.
+some mild cinematics with this one.
 
 ---
 

@@ -2,7 +2,9 @@
 Copyright (c) 2016 Bart Massey
 
 The first algorithmically interesting problem. Also a giant
-mess for Rust.
+mess for Rust. Run part 1 as "./soln 1 17 61" for the
+production instance, or "./soln 1 2 5" for the test
+instance. Run part 2 without extra arguments.
 
 The problem specification is pretty vague about what to
 expect in the input. Is it possible that a bot could be
@@ -13,10 +15,10 @@ go in a circle forever never getting processed (presumably
 not)?
 
 I didn't like the way the instances were specialized. In the
-first one, I felt compelled to (symbolically) hardcode the
-instance-specific target comparison values, which is
-ugly. In the second one, it would be nice to require some
-function of all the outputs.
+first one, I felt like the instance-specific target
+comparison values should be part of the instance
+description. In the second one, it would be nice to require
+some function of all the outputs.
 
 I am not proud of my code for this problem. It is
 copy-pastey, way too wide and non-modular, and pretty
