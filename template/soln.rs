@@ -9,4 +9,5 @@ extern crate aoc;
 
 pub fn main() {
     let part = aoc::get_part();
+    assert!(part == 1);
 }
