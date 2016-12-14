@@ -15,6 +15,6 @@ license = "MIT"
 
 [lib]
 name = "aoc"
-path = "aoc.rs"
+path = "mod.rs"
 
 [dependencies]

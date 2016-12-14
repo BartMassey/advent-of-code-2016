@@ -3,7 +3,9 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Library for Advent of Code 2016 solutions.
+// Argument handling for Advent of Code 2016 solutions.
+
+use std;
 
 // Find out whether we're handling part1 or part2.
 pub fn get_part() -> usize {
