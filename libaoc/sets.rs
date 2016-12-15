@@ -20,8 +20,7 @@ pub fn make_set<T>(elems: &[T]) -> BTreeSet<T>
 // Consruct the set of all choices of n items from a given
 // set of items.
 pub fn choose<T>(source: &BTreeSet<T>, n: usize)
-  -> BTreeSet<BTreeSet<T>>
-  where T: Clone + Copy + Ord {
+  -> BTreeSet<BTreeSet<T>> where T: Clone + Ord {
     if source.len() < n {
         let empty = BTreeSet::new();
         return empty;
@@ -33,11 +32,11 @@ pub fn choose<T>(source: &BTreeSet<T>, n: usize)
         return r;
     };
     let mut es = source.clone();
-    for e in source {
+    for e in source.into_iter().cloned() {
         es.remove(&e);
         let cs = *Box::new(choose(&es, n-1));
         for mut c in cs {
-            c.insert(*e);
+            c.insert(e.clone());
             r.insert(c);
         }
     };
