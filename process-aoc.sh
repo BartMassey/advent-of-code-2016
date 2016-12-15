@@ -27,7 +27,7 @@ tidy -q -asxml 2>/dev/null | awk '
       if (outfile != "")
           print $0 >> outfile;
       next;
-  }' tmpdir=$TMPDIR
+  }' tmpdir=$TMPDIR &&
 for f in $TMPDIR/part*.xhtml
 do
     OUTFILE=`basename $f .xhtml`.md
