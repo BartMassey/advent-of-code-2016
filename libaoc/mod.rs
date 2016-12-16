@@ -12,3 +12,6 @@ pub use self::args::*;
 
 mod sets;
 pub use self::sets::*;
+
+mod bits;
+pub use self::bits::*;
