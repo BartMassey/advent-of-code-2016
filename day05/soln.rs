@@ -53,12 +53,12 @@ pub fn main() {
     // Set up the rest of the state.
     let mut hasher = crypto::md5::Md5::new();
     let prefix = room_code.as_bytes();
+    hasher.input(prefix);
     let mut count = 0;
     // This loop should never finish.
     for i in 0..std::u64::MAX {
+        let mut hasher = hasher.clone();
         // Get the current hash.
-        hasher.reset();
-        hasher.input(prefix);
         hasher.input(i.to_string().as_bytes());
         let mut output = [0; 16];
         hasher.result(&mut output);
