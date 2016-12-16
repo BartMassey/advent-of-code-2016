@@ -144,8 +144,6 @@ impl PartialEq for State {
     }
 }
 
-// c.f. https://github.com/brandonson/revord-rs/blob/master/src/lib.rs
-
 #[derive(Clone, Debug)]
 struct PQElem {
     cost: usize,
