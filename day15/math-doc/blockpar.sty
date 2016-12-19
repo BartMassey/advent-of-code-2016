@@ -1,0 +1,10 @@
+\parskip=0.5\baselineskip
+\parindent=0pt
+
+\renewenvironment{quotation}
+               {\list{}{\listparindent 0pt%
+                        \itemindent    \listparindent
+                        \rightmargin   \leftmargin
+                        \parsep        \parskip}%
+                \item\relax}
+               {\endlist}

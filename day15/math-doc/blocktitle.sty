@@ -1,0 +1,20 @@
+%%% Copyright © 2010 Bart Massey
+%%% Title in block style
+%%% Section headers shrunk to match title size.
+\RequirePackage{titlesec}
+
+\def\@maketitle{%
+  \newpage
+  \null
+  \let \footnote \thanks
+  {\raggedright
+    {\large \bfseries \@title}\\*[0.5ex]
+    {\begin{tabular}[t]{@{}l}\@author\end{tabular}\\
+    \@date}}%
+  \par \vskip 1.5em}
+
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\large\bfseries}
+\titleformat*{\subsubsection}{\large\bfseries}
+\titleformat*{\paragraph}{\bfseries}
+\titleformat*{\subparagraph}{\bfseries}

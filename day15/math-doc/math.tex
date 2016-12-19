@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage{bigpage}
+\usepackage{blockpar}
+\usepackage{blocktitle}
+\usepackage{amsmath}
+
+\title{Advent of Code Day 15:\\
+  Discs At Christmas}
+\author{Bart Massey}
+\date{18 December 2016}
+
+\begin{document}
+Let us postulate that the time to $t$ to drop through the $i$-th
+disc in a solution to the puzzle is $$
+  t = k_i c_i - q_i - i
+$$
+where $c_i$ is the size of the disk and $q_i$ is the starting
+offset of the disk. The same must be true for disk $i + 1$
+at time $i + 1$, so we have $$
+  t = k_{i+1} c_{i+1} - q_{i+1} - (i + 1)
+$$
+
+Equating these we find that $$\begin{array}{l}
+  k_i c_i - q_i - i = k_{i+1} c_{i+1} - q_{i+1} - (i + 1) \\
+  -k_i c_i + q_i + i + k_{i+1} c_{i+1} - q_{i+1} - (i + 1) = 0 \\
+  k_{i+1} c_{i+1} = k_i c_i - q_i + q_{i+1} + 1 \\
+  k_{i+1} = \dfrac{k_i c_i - q_i + q_{i+1} + 1}{c_{i+1}}
+\end{array}$$
+
+Noting that $k_{i+1}$ must be an integer,
+we find that $$\begin{array}{rclr}
+  k_i c_i - q_i + q_{i+1} + 1 &\equiv& 0 &\mod c_{i+1} \\
+  k_i + c_i^{-1}(q_{i+1} - q_i + 1) &\equiv& 0 &\mod c_{i+1} \\
+  k_i &\equiv& c_i^{-1}(q_i - q_{i+1} - 1) &\mod c_{i+1}
+\end{array}$$
+
+Noting that $t$ must be non-negative, we find that $$\begin{array}{rcl}
+  k_i c_i - q_i - i &\geq& 0 \\
+  k_i c_i &\geq& q_i + i \\
+  k_i &\geq& \dfrac{q_i + i}{c_i}
+\end{array}$$
+
+For the given sample case, we have that $$\begin{array}{rclr}
+  k_1 &\geq& \dfrac{4 + 1}{5} \\
+      &\geq& 1 \\
+  k_1 &\equiv& 1(4 - 1 - 1) &\mod2 \\
+      &\equiv& 0 &\mod2
+\end{array}$$
+so $k_1$ is even and at least $2$. If we take $k_1 = 2$, we have
+that $$\begin{array}{rcl}
+  k_2 &=& \dfrac{2 \cdot 5 - 4 + 1 + 1}{2} \\
+      &=& 4
+\end{array}$$
+Finally, substituting back at time $1$
+we get $$\begin{array}{rclr}
+  t &=& 2 \cdot 5 - 4 - 1 \\
+    &=& 5 \\
+\end{array}$$
+
+\end{document}
