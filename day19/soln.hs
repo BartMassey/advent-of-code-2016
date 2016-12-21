@@ -15,17 +15,16 @@ del i s
     | i >= length s = error "index off end"
     | otherwise = deleteAt i s
 
-exchange :: Int -> (Int -> Int -> Int) -> S.Seq Int -> (Int, [(Int, Int)])
+exchange :: Int -> (Int -> Int -> Int) -> S.Seq Int -> Int
 exchange posn nextElf elves
-    | length elves == 1 = (index elves 0, [])
+    | length elves == 1 = index elves 0
     | otherwise =
         let victor_serial = index elves posn
             victim = nextElf (length elves) posn
             victim_serial = index elves victim
             elves' = del victim elves
             successor = (posn + 1) `mod` length elves in
-        let (result, serials) = exchange successor nextElf elves' in
-        (result, (victor_serial, victim_serial) : serials)
+        exchange successor nextElf elves'
 
 main:: IO ()
 main = do
