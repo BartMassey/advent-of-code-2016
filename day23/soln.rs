@@ -141,8 +141,7 @@ fn step(insns: &mut Vec<Insn>, state: &mut State) {
 }
 
 pub fn main() {
-    let (part, args) = aoc::get_part_args();
-    assert!(part == 1);
+    let args = aoc::get_args();
     assert!(args.len() == 1);
     let key = args[0].parse().expect("invalid key");
     let mut insns: Vec<Insn> = Vec::new();

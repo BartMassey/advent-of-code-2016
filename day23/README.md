@@ -6,8 +6,9 @@ day 11, rather than the correct day 12.
 
 Took quite a bit of refactoring to my day 12 machine,
 actually, to get it to work. I think the result is actually
-better. Still reasonably efficent: 12.3s for part 2 on my
-slow laptop. Not too long to program, either. Yay Rust.
+better. Still reasonably efficent: 9.7s for part 2 when run
+optimized on my slow laptop. Not too long to program,
+either. Yay Rust.
 
 ---
 
