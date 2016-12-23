@@ -28,3 +28,11 @@ pub fn get_part_args() -> (usize, Vec<String>) {
     let args = argv.collect::<Vec<String>>();
     (part, args)
 }
+
+// When both parts are the same.
+pub fn get_args() -> Vec<String> {
+    let mut argv = std::env::args();
+    argv.next();
+    argv.collect::<Vec<String>>()
+}
+
