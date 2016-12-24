@@ -5,8 +5,6 @@
 
 // Advent of Code Day 22.
 
-use std::io;
-use std::io::prelude::*;
 use std::cmp::*;
 use std::collections::{HashSet, BinaryHeap};
 
@@ -77,10 +75,7 @@ fn read_usages() -> Vec<(usize, usize, Usage)> {
             r"^/dev/grid/node-x(\d+)-y(\d+) *\d+T *(\d+)T *(\d+)T *\d+%$")
             .expect("could not compile usage pattern");
     let mut usages = Vec::new();
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let target = line.expect("main: could not read line");
+    for target in aoc::input_lines() {
         if let Some(args) = try_pat(&usage_pat, &target) {
             let mut argv = [0usize;4];
             for i in 0..4 {

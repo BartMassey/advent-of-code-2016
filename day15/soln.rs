@@ -5,9 +5,6 @@
 
 // Advent of Code Day 15.
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate aoc;
 extern crate regex;
 
@@ -17,10 +14,7 @@ fn read_discs() -> Vec<(isize, isize)> {
       .expect("main: could not compile disc pattern");
     let mut discs = Vec::new();
     let mut ndiscs = 0;
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let target = line.expect("main: could not read line");
+    for target in aoc::input_lines() {
         let parts = disc_pat.captures(&target)
             .expect("malformed line");
         let disc_number: isize = parts.at(1)

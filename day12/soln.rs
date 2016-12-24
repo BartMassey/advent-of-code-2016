@@ -5,9 +5,6 @@
 
 // Advent of Code Day 12.
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate aoc;
 
 enum Opnd {
@@ -92,10 +89,7 @@ fn step(state: &mut State, insn: &Insn) {
 
 pub fn main() {
     let mut insns: Vec<Insn> = Vec::new();
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let target = line.expect("main: could not read line");
+    for target in aoc::input_lines() {
         let words = target.split_whitespace().collect::<Vec<&str>>();
         let insn =
             match words[0] {

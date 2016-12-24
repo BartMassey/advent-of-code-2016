@@ -9,8 +9,6 @@
 const TRACE: bool = false;
 
 use std::cmp::*;
-use std::io;
-use std::io::prelude::*;
 use std::collections::HashSet;
 
 #[macro_use] extern crate lazy_static;
@@ -88,10 +86,7 @@ pub fn main() {
     let mut max_bot = 0;
     let mut max_output = 0;
     // Read strings from the input file and process them.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let l = line.expect("main: could not read line");
+    for l in aoc::input_lines() {
         // Parse the instruction and add it to the instruction table.
         match (*self::VALUE_PAT).captures(&l) {
             None => (),

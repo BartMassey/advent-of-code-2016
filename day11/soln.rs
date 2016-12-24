@@ -5,8 +5,6 @@
 
 // Advent of Code Day 11.
 
-use std::io;
-use std::io::prelude::*;
 use std::collections::{BTreeSet, BinaryHeap};
 use std::iter::*;
 use std::cmp::*;
@@ -189,10 +187,7 @@ fn read_start_state() -> State {
     let floors: Vec<&str> = vec!["first", "second", "third", "fourth"];
     let mut floors0: Vec<BTreeSet<Dev>> = Vec::new();
     let mut floor = 0;
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let target = line.expect("main: could not read line");
+    for target in aoc::input_lines() {
         assert!(floor <= 3);
         floors0.push(BTreeSet::new());
         if floor == 3 {

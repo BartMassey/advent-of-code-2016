@@ -8,9 +8,6 @@
 // Turn on for display tracing.
 const TRACING: bool = false;
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate aoc;
 #[macro_use] extern crate lazy_static;
 extern crate regex;
@@ -127,10 +124,7 @@ fn main() {
     let insns: &[fn(&str, &mut Vec<Vec<char>>) -> bool] =
         &[insn_rect, insn_rotate_column, insn_rotate_row];
     // Read strings from the input file and process them.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let l = line.expect("main: could not read line");
+    for l in aoc::input_lines() {
         // Search through the instructions until finding one
         // that works.
         let mut processed = false;

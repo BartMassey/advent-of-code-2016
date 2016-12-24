@@ -7,9 +7,6 @@
 
 const SHOW: bool = false;
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate aoc;
 extern crate regex;
 extern crate permutohedron;
@@ -95,10 +92,7 @@ fn read_insns() -> Vec<Insn> {
         regex::Regex::new(r"^move position ([0-9]+) to position ([0-9]+)$")
         .expect("could not compile mov pattern");
     let mut insns = Vec::new();
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let target = line.expect("main: could not read line");
+    for target in aoc::input_lines() {
         if SHOW {
             print!("{}\n", target);
         };

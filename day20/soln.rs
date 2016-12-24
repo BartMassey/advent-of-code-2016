@@ -5,18 +5,13 @@
 
 // Advent of Code Day 20.
 
-use std::io;
-use std::io::prelude::*;
 use std::cmp::*;
 
 extern crate aoc;
 
 fn read_ranges() -> Vec<(u64, u64)> {
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
     let mut result = Vec::new();
-    for line in reader.lines() {
-        let target = line.expect("could not read line");
+    for target in aoc::input_lines() {
         let desc = target.split('-').collect::<Vec<&str>>();
         let start = desc[0].parse().expect("could not parse start");
         let end = desc[1].parse().expect("could not parse end");

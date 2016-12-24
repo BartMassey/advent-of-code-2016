@@ -7,9 +7,6 @@
 
 const SHOW: bool = false;
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate aoc;
 
 fn ca_step(patv: &[bool]) -> bool {
@@ -81,11 +78,9 @@ pub fn main() {
     let (_, args) = aoc::get_part_args();
     assert!(args.len() == 1);
     let nrows = args[0].parse().expect("could not parse nrows");
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    let mut line_reader = reader.lines();
-    let row0 = line_reader.next().unwrap().expect("could not read row");
-    match line_reader.next() {
+    let mut lines = aoc::input_lines();
+    let row0 = lines.next().expect("could not read row");
+    match lines.next() {
         Some(_) => { panic!("more than one row"); },
         None => ()
     };
