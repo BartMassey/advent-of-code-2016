@@ -15,3 +15,6 @@ pub use self::sets::*;
 
 mod bits;
 pub use self::bits::*;
+
+mod lines;
+pub use self::lines::*;
