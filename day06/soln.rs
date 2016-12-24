@@ -5,10 +5,6 @@
 
 // Advent of Code Day 6
 
-use std::io;
-use std::io::prelude::*;
-use std::vec::Vec;
-
 extern crate aoc;
 
 // Return the last index of an element in the input that
@@ -51,10 +47,7 @@ pub fn main() {
     let mut inited = false;
     let mut counters = Vec::new();
     // Read strings from the input file and process them.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let l = line.expect("main: could not read line");
+    for l in aoc::input_lines() {
         // Inline initialization: we can't know how long the
         // lines are until we get here.
         if !inited {

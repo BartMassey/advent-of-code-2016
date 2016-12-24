@@ -6,8 +6,6 @@
 // Advent of Code Day 7
 
 use std::collections::HashSet;
-use std::io;
-use std::io::prelude::*;
 
 extern crate aoc;
 
@@ -122,10 +120,7 @@ pub fn main() {
     // Set up state.
     let mut count = 0;
     // Read strings from the input file and process them.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let l = line.expect("main: could not read line");
+    for l in aoc::input_lines() {
         if tester(l) {
             count += 1;
         }

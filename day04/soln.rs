@@ -5,9 +5,6 @@
 
 // Advent of Code Day 4
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate regex;
 extern crate aoc;
 
@@ -75,10 +72,7 @@ pub fn main() {
     // Set up state.
     let mut sector_sum: u32 = 0;
     // Read strings from the input file and process them.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let l = line.expect("main: could not read line");
+    for l in aoc::input_lines() {
         let parts = room_pattern.captures(&l)
             .expect("main: could not match line");
         let room_name = parts.at(1)

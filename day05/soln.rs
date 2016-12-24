@@ -8,11 +8,12 @@
 // Portions borrowed from
 // https://gist.github.com/gkbrk/2e4835e3a17b3fb6e1e7
 
+use std::io::*;
+
 extern crate aoc;
 extern crate crypto;
 
 use self::crypto::digest::Digest;
-use std::io::*;
 
 // Given an input between 0 and 15, return the
 // corresponding hex digit.
@@ -41,12 +42,9 @@ pub fn cinema_string(marquee: &[char]) {
 pub fn main() {
     let part = aoc::get_part();
     let positional = part == 2;
-    let stdin = stdin();
-    let reader = BufReader::new(stdin);
-    let lines = reader.lines().collect::<Vec<Result<String>>>();
+    let lines = aoc::input_lines().collect::<Vec<String>>();
     assert!(lines.len() == 1);
-    let room_code = lines[0].as_ref()
-        .expect("main: could not process room code");
+    let room_code = &lines[0];
     // Set up the password storage.
     let mut password = ['.'; 8];
     cinema_string(&password);

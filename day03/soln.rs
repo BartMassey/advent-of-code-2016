@@ -5,9 +5,6 @@
 
 // Advent of Code Day 3
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate aoc;
 
 fn ok_triangle(tri: &mut[i32; 3]) -> bool {
@@ -18,11 +15,8 @@ fn ok_triangle(tri: &mut[i32; 3]) -> bool {
 // Process the triangle specs in the obvious way.
 fn part1() {
     // Read strings from the input file and process them.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
     let mut count = 0;
-    for line in reader.lines() {
-        let strs = line.expect("part1: failed to read line");
+    for strs in aoc::input_lines() {
         let line_strs = strs.split_whitespace().collect::<Vec<_>>();
         if line_strs.len() != 3 {
             panic!("line does not have three lengths");
@@ -46,10 +40,7 @@ fn part2() {
     let mut buffer = [[0i32; 3]; 3];
     // Read strings from the input file and process them.
     // Group lines into threes and process each group.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        let strs = line.expect("part2: failed to read line");
+    for strs in aoc::input_lines() {
         let line_strs = strs.split_whitespace().collect::<Vec<_>>();
         if line_strs.len() != 3 {
             panic!("line does not have three lengths");
