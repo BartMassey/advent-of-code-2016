@@ -5,9 +5,6 @@
 
 // Advent of Code Day 2
 
-use std::io;
-use std::io::prelude::*;
-
 extern crate aoc;
 
 // Take a starting point and a line of traversal instructions
@@ -31,16 +28,13 @@ fn walk_line(board: &Vec<Vec<char>>, n_start: (usize, usize),
     return n
 }
 
-// Print the bathroom code for the instance on stdin.
+// Print the bathroom code for the instance on stdout.
 pub fn print_code(board: &Vec<Vec<char>>) {
     let c = board.len() / 2 + 1;
     let mut n = (c, c);
     // Read strings from the input file and process them.
-    let stdin = io::stdin();
-    let reader = io::BufReader::new(stdin);
-    for line in reader.lines() {
-        n = walk_line(board, n, &line
-                      .expect("print_code: failed to read line"));
+    for line in aoc::input_lines() {
+        n = walk_line(board, n, &line);
         print!("{}", board[n.1][n.0]);
     }
     print!("\n");
