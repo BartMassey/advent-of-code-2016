@@ -10,11 +10,11 @@ case.
 
 * Part 1:
 
-        cargo run -- 1 <input.txt
+        cargo run 1 <input.txt
 
 * Part 2:
 
-        cargo run -- 2 <input.txt
+        cargo run 2 <input.txt
 
 ---
 
