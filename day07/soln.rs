@@ -3,13 +3,13 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 7
+//! Advent of Code Day 7.
 
 use std::collections::HashSet;
 
 extern crate aoc;
 
-// Return true iff given segment has an ABBA.
+/// Return true iff given segment has an ABBA.
 fn segment_abba(segment: &str) -> bool {
     let c: Vec<char> = segment.chars().collect();
     for i in 0usize .. c.len() - 3 {
@@ -20,7 +20,7 @@ fn segment_abba(segment: &str) -> bool {
     return false;
 }
 
-// Return true iff the given string supports TLS.
+/// Return true iff the given string supports TLS.
 fn supports_tls(line: String) -> bool {
     // Set up state. has_abba is true iff an
     // ABBA has been seen outside brackets.
@@ -55,9 +55,9 @@ fn supports_tls(line: String) -> bool {
     has_abba || segment_abba(&segment)
 }
 
-// Return the ABAs contained in the given segment, as a set
-// of two-character strings. If flip is true, the strings will
-// be in reverse order.
+/// Return the ABAs contained in the given segment, as a set
+/// of two-character strings. If flip is true, the strings will
+/// be in reverse order.
 fn segment_abas(segment: &str, flip: bool, abas: &mut HashSet<String>) {
     let c: Vec<char> = segment.chars().collect();
     for i in 0usize .. c.len() - 2 {
@@ -75,17 +75,18 @@ fn segment_abas(segment: &str, flip: bool, abas: &mut HashSet<String>) {
     }
 }
 
-// Return true if the given string supports SSL.
-// Strategy: Keep two sets, one of supernet ABAs
-// and one of flipped hypernet ABAs. Intersect
-// at the end. Intersect-as-we-go would allow
-// short-circuit on success.
+/// Return true if the given string supports SSL.
+/// Strategy: Keep two sets, one of supernet ABAs
+/// and one of flipped hypernet ABAs. Intersect
+/// at the end. Intersect-as-we-go would allow
+/// short-circuit on success.
 fn supports_ssl(line: String) -> bool {
     // Set up state.
     let mut supernet_abas = HashSet::new();
     let mut hypernet_abas = HashSet::new();
     let mut in_brackets = false;
     let mut segment = String::new();
+
     // Same cases as TLS.
     for c in line.chars() {
         if c == '[' {
@@ -102,14 +103,15 @@ fn supports_ssl(line: String) -> bool {
             segment.push(c);
         }
     };
+
     // Clean up and return result.
     assert!(!in_brackets);
     segment_abas(&segment, false, &mut supernet_abas);
     !supernet_abas.is_disjoint(&hypernet_abas)
 }
 
-// Count and print the number of lines on stdin for which
-// the given test function returns true.
+/// Count and print the number of lines on stdin for which
+/// the given test function returns true.
 pub fn main() {
     let part = aoc::get_part();
     let tester: fn(String) -> bool = if part == 1 {

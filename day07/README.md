@@ -8,6 +8,16 @@ the two parts.
 Seems like an inordinate amount of code for such a simple
 problem.
 
+## Usage
+
+* Part 1:
+
+        cargo run 1 <input.txt
+
+* Part 2:
+
+        cargo run 2 <input.txt
+
 ---
 
 This program is licensed under the "MIT License".
