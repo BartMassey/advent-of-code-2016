@@ -3,49 +3,51 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 6
+//! Advent of Code Day 6.
 
 extern crate aoc;
 
-// Return the last index of an element in the input that
-// has maximal value.
+/// Return the first index of an element in the input that
+/// has maximal value. Input must have at least one element.
 fn max_index(elems: &Vec<usize>) -> usize {
-    let mut m = 0;
-    let mut m_i = -1;
-    for i in 0..elems.len() {
-        if elems[i] >= m {
+    let mut m = elems[0];
+    let mut m_i = 0;
+    for i in 1..elems.len() {
+        if elems[i] > m {
             m = elems[i];
-            m_i = i as isize;
+            m_i = i;
         }
     };
-    m_i as usize
+    m_i
 }
 
-// Return the last index of an element in the input that has
-// minimal nonzero value.
+/// Return the first index of an element in the input that
+/// has minimal nonzero value. Input must have at least one element.
 fn min_index(elems: &Vec<usize>) -> usize {
-    let mut m = 0;
-    let mut m_i = -1;
-    for i in 0..elems.len() {
+    let mut m = elems[0];
+    let mut m_i = 0;
+    for i in 1..elems.len() {
         if elems[i] > 0 {
             if m == 0 {
                 m = elems[i];
             };
-            if elems[i] <= m {
+            if elems[i] < m {
                 m = elems[i];
-                m_i = i as isize;
+                m_i = i;
             }
         }
     };
-    m_i as usize
+    m_i
 }
 
-// Count up and show the answer.
+/// Count up and show the answer.
 pub fn main() {
     let part = aoc::get_part();
+
     // Set up the state.
     let mut inited = false;
     let mut counters = Vec::new();
+
     // Read strings from the input file and process them.
     for l in aoc::input_lines() {
         // Inline initialization: we can't know how long the
@@ -56,6 +58,7 @@ pub fn main() {
             };
             inited = true;
         };
+
         // Bump the relevant counters.
         let mut j = 0;
         for c in l.chars() {
@@ -64,6 +67,7 @@ pub fn main() {
             j += 1;
         }
     };
+
     // Find the appropriate characters from the counters
     // and display them.
     for c in counters.iter() {
