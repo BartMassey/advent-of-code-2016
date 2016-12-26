@@ -8,7 +8,18 @@ Regex package, which is pretty nice.
 Part two is a bit weak, as it isn't clear there's any way in
 advance to programmatically find the answer. I cheated and
 just printed all the decryptions of valid room names and
-grepped for "north".
+grepped for "north". Knowing that this search works, I could
+modify the Rust to do the search...but I won't.
+
+## Usage
+
+* Part 1:
+
+        cargo run 1 <input.txt
+
+* Part 2 (UNIX):
+
+        cargo run 2 <input.txt | grep north | awk '{print $NF}'
 
 ---
 

@@ -3,11 +3,12 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 4
+// Advent of Code Day 4.
 
 extern crate regex;
 extern crate aoc;
 
+/// Return the "checksum" of the given room name.
 fn name_checksum(room_name: &str) -> String {
     // Set up state.
     let mut sum = ['.'; 5];
@@ -50,6 +51,7 @@ fn name_checksum(room_name: &str) -> String {
     sum.iter().cloned().collect::<String>()
 }
 
+/// Return the decryption of the given name.
 fn name_decrypt(room_name: &str, sector_id: u32) -> String {
     let mut result = Vec::<char>::new();
     for c in room_name.chars() {
@@ -63,14 +65,19 @@ fn name_decrypt(room_name: &str, sector_id: u32) -> String {
     result.iter().cloned().collect::<String>()
 }
 
+/// Process the input and solve the specified problem.
 pub fn main() {
     let part = aoc::get_part();
+    assert!(part == 1 || part == 2);
     let decrypt = part == 2;
+
     // Set up the regex for room encryption.
     let room_pattern = regex::Regex::new(r"^(.*)-(\d+)\[(.*)\]$")
         .expect("main: could not compile regex");
+
     // Set up state.
     let mut sector_sum: u32 = 0;
+
     // Read strings from the input file and process them.
     for l in aoc::input_lines() {
         let parts = room_pattern.captures(&l)
@@ -84,13 +91,16 @@ pub fn main() {
         }
         let sector_id = parts.at(2).expect("main: could not find sector id")
             .parse().expect("main: could not parse sector id");
+
+        // Handle part 2 by printing all the decryptions.
         if decrypt {
             print!("{} {}\n", name_decrypt(&room_name, sector_id), sector_id);
-            continue;
         }
         sector_sum += sector_id;
-    }
+    };
+
+    // Handle part 1 by printing the sum.
     if !decrypt {
         print!("{}\n", sector_sum);
-    }
+    };
 }
