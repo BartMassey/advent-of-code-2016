@@ -3,7 +3,7 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 1
+//! Advent of Code Day 1.
 
 use std::io;
 use std::io::prelude::*;
@@ -11,13 +11,14 @@ use std::collections::HashSet;
 
 extern crate aoc;
 
-// This function probably needs to be split up.  Read the
-// instance description from stdin and walk the route from
-// the origin, returning the endpoint. If stop_short is
-// true, stop at the first point at which the path
-// self-intersects and return that as the endpoint, failing
-// if the path does not self-intersect.
-fn traverse(stop_short: bool) -> (i32, i32) {
+/// Read the instance description from stdin and walk the
+/// route from the origin, returning the endpoint. If
+/// `stop_short` is true, stop at the first point at which the
+/// path self-intersects and return that as the endpoint,
+/// failing if the path does not self-intersect.
+///
+/// This function probably needs to be split up.
+fn traverse(stop_short: bool) -> (isize, isize) {
     // North, West, East, South.
     let directions = [(0, 1), (-1, 0), (0, -1), (1, 0)];
 
@@ -41,7 +42,8 @@ fn traverse(stop_short: bool) -> (i32, i32) {
             'R' => (facing + 3) % 4,
             _ => panic!("bad direction")
         };
-        let step: i32 = (&t[1..]).parse().unwrap();
+        let step: usize = (&t[1..]).parse().unwrap();
+
         // Walk the line from current position to new.
         for _ in 0..step {
             position.0 += directions[facing].0;
@@ -60,8 +62,8 @@ fn traverse(stop_short: bool) -> (i32, i32) {
     position
 }
 
-// Do the traversal, then print the manhattan distance from
-// the origin to the endpoint.
+/// Do the traversal, then print the manhattan distance from
+/// the origin to the endpoint.
 pub fn main() {
     let part = aoc::get_part();
     let position = traverse(part == 2);

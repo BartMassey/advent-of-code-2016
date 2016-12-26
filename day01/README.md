@@ -12,6 +12,16 @@ tracing a path. I was confused by the problem description
 the first time: did not realize that "location" included all
 the steps along the path and not just its endpoints.
 
+## Usage
+
+* Part 1:
+
+        cargo run -- 1 <input.txt
+
+* Part 2:
+
+        cargo run -- 2 <input.txt
+
 ---
 
 This program is licensed under the "MIT License".
