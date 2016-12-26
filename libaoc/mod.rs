@@ -3,9 +3,16 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Library for Advent of Code 2016 solutions.
+//! Library for Advent of Code 2016 solutions.
+//!
+//! This library contains support routines for the Advent of
+//! Code 2016 Rust solutions. An attempt has been made to put
+//! common code here rather than copy-pasting. In addition,
+//! material of possible general use has been put here rather
+//! than burying it in a solution.
 
-// c.f. http://stackoverflow.com/questions/22596920/
+// For an explanation of the structure of this file, see
+// http://stackoverflow.com/questions/22596920/
 
 mod args;
 pub use self::args::*;

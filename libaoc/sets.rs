@@ -3,22 +3,33 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Set operations for Advent of Code 2016 solutions.
+//! Set operations for Advent of Code 2016 solutions.
+//!
+//! These are specifically `std::collections::BTreeSet`
+//! operations, because `std::collections::HashSet` is not
+//! hashable (why?) and thus cannot be contained in a
+//! `HashSet`.
+//! 
+//! It would nice to have a generic `std::collections::Set`
+//! trait to parameterize the stuff that doesn't care.
 
 use std::collections::BTreeSet;
 
-// Make a set from a slice.
+/// Make a set from a slice.
 pub fn make_set<T>(elems: &[T]) -> BTreeSet<T>
   where T: Clone + Ord {
+      elems.iter().cloned().collect()
+}
+/*
     let mut s = BTreeSet::new();
     for v in elems {
         s.insert((*v).clone());
     };
     s
-}
+*/
 
-// Consruct the set of all choices of n items from a given
-// set of items.
+/// Consruct the set of all choices of `n` items from a given
+/// set of items.
 pub fn choose<T>(source: &BTreeSet<T>, n: usize)
   -> BTreeSet<BTreeSet<T>> where T: Clone + Ord {
     if source.len() < n {
@@ -44,6 +55,8 @@ pub fn choose<T>(source: &BTreeSet<T>, n: usize)
 }
 
 
+/// Consruct the set of all choices of `0..n` items from a given
+/// set of items.
 pub fn choose_le<T>(source: &BTreeSet<T>, n: usize)
   -> BTreeSet<BTreeSet<T>> where T: Clone + Ord {
     let mut r = choose(&source, 0);
@@ -60,15 +73,18 @@ pub fn choose_le<T>(source: &BTreeSet<T>, n: usize)
     use std::collections::BTreeSet;
     use super::*;
 
+    /// Make a set of sets from a slice of slices.
     fn make_set_set<T>(elems: &[&[T]]) -> BTreeSet<BTreeSet<T>>
-      where T: Copy + Clone + Ord {
+    where T: Copy + Clone + Ord {
+        // There should be an implementation of this
+        // using `collect()`, but I can't find it.
         let mut s = BTreeSet::new();
         for v in elems {
             s.insert(make_set(v));
         };
         s
     }
-
+    
     #[test] fn choose_zero() {
         let s = make_set(&[1, 2, 3]);
         let cs = choose(&s, 0);
@@ -105,7 +121,7 @@ pub fn choose_le<T>(source: &BTreeSet<T>, n: usize)
             &[1, 2], &[1, 3], &[1, 4],
             &[2, 3], &[2, 4],
             &[3, 4]
-            ]);
+        ]);
         assert!(cs == t);
     }
 

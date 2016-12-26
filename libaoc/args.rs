@@ -3,11 +3,12 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Argument handling for Advent of Code 2016 solutions.
+//! Argument handling for Advent of Code 2016 solutions.
 
 use std;
 
-// Find out whether we're handling part1 or part2.
+/// Find out whether we're handling part 1 or part 2.
+/// Fail if extra arguments are passed.
 pub fn get_part() -> usize {
     let mut argv = std::env::args();
     assert!(argv.len() == 2);
@@ -17,8 +18,8 @@ pub fn get_part() -> usize {
     part
 }
 
-// Find out whether we're handling part1 or part2, and what
-// other arguments have been supplied.
+/// Find out whether we're handling part 1 or part 2, and what
+/// other arguments have been supplied.
 pub fn get_part_args() -> (usize, Vec<String>) {
     let mut argv = std::env::args();
     assert!(argv.len() >= 2);
@@ -29,7 +30,8 @@ pub fn get_part_args() -> (usize, Vec<String>) {
     (part, args)
 }
 
-// When both parts are the same.
+/// Get just arguments for a problem where both parts are the same
+/// (i.e., there is no "part" argument).
 pub fn get_args() -> Vec<String> {
     let mut argv = std::env::args();
     argv.next();
