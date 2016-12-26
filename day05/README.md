@@ -18,6 +18,16 @@ which is nice in this challenge.
 Of course, the bonus for part 2 was necessary. So you get
 some mild cinematics with this one.
 
+## Usage
+
+* Part 1:
+
+        cargo run --release 1 <input.txt
+
+* Part 2:
+
+        cargo run --release 2 <input.txt
+
 ---
 
 This program is licensed under the "MIT License".
