@@ -3,10 +3,10 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 5
-
-// Portions borrowed from
-// https://gist.github.com/gkbrk/2e4835e3a17b3fb6e1e7
+//! Advent of Code Day 5.
+//! 
+//! Portions of this code are inspired by.
+//! <http://gist.github.com/gkbrk/2e4835e3a17b3fb6e1e7>.
 
 use std::io::*;
 

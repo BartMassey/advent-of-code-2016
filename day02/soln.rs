@@ -3,7 +3,7 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-/// Advent of Code Day 2.
+//! Advent of Code Day 2.
 
 extern crate aoc;
 
