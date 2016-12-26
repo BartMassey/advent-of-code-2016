@@ -42,6 +42,16 @@ would select and copy the page source of the day 34 AoC page
 and then "xclipb -out | sh ../process-aoc.sh" to get
 markdown into the problem files for posterity.
 
+To generate the full rustdoc for a day, simply run this
+highly intuitive command:
+
+        cargo rustdoc --open -- --no-defaults --passes collapse-docs \
+        --passes unindent-comments --passes strip-priv-imports
+
+See Issue
+[1520](https://github.com/rust-lang/cargo/issues/1520)
+for an explanation.
+
 These solutions deserve a much more thorough top-level
 description than I have the energy to write at this point.
 I will revise this file in the indefinite future.
@@ -53,4 +63,3 @@ and I'll try to make it right.
 This work is licensed under the "MIT License".  Please see
 the file `COPYING` in the source distribution of this software
 for license terms.
-
