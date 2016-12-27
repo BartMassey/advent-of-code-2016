@@ -10,7 +10,7 @@ The answer for each part was obtained in 3ms realtime (more
 or less), with 0ms user time, using the debug version of the
 solution.
 
-# Usage
+## Usage
 
 Part 1:
 

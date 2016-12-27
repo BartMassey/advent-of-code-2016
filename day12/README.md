@@ -14,7 +14,7 @@ Rust's performance was helpful here: 40ms for part 2.
 Note that this machine was copy-pasted, cleaned up and
 generalized for later problems.
 
-# Usage
+## Usage
 
 * Part 1:
 

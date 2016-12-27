@@ -55,7 +55,7 @@ and part 2 was still running after 20m. With A\*, part 1
 took 0.3s and part 2 took 82s. That latter number is longer
 than I'd normally like, but I'll take it.
 
-# Usage
+## Usage
 
 * Part 1:
 

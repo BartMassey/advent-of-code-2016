@@ -28,7 +28,7 @@ I actually ended up giving up for the night and finishing in
 the morning: probably four hours' total effort. It felt like
 Rust was 70% of the time sink here.
 
-# Usage
+## Usage
 
 Run part 1 with arguments "2 5" for the test instance.
 
