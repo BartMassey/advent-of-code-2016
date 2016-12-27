@@ -60,6 +60,11 @@ I am a novice Rust programmer. Feedback and pull requests
 are extremely welcome! Let me know what I should have done,
 and I'll try to make it right.
 
+TODO: Pull out A\*, try_part(), assembunny interpreter,
+directions and direction processing.
+
+---
+
 This work is licensed under the "MIT License".  Please see
 the file `COPYING` in the source distribution of this software
 for license terms.
