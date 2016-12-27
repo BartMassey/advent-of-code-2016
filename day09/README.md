@@ -15,6 +15,8 @@ The tests given with the problem were great, and helped spot
 a couple of bugs. I wish the tests of part 2 had been
 counted for me, though.
 
+Part 2 requires 64-bit arithmetic.
+
 Rust has no equivalent of `getchar()`! Let me say that
 again, for emphasis: **Rust has no equivalent of
 `getchar()`!!** There is no reasonable way to ask for the
@@ -24,6 +26,16 @@ horrible, except that it is **only in unstable.** Yes,
 that's right: iterating over the chars of a textfile is an
 unstable feature, because reasons. I don't think Rust is
 really ready for primetime yet.
+
+## Usage
+
+* Part 1:
+
+        cargo run 1 <input.txt
+
+* Part 2:
+
+        cargo run 2 <input.txt
 
 ---
 

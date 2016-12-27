@@ -3,7 +3,7 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 9
+//! Advent of Code Day 9.
 
 use std::io;
 use std::io::prelude::*;
@@ -11,13 +11,16 @@ use std::str;
 
 extern crate aoc;
 
-// Walk a string of bytes, computing the length of its
-// expansion. If recurse is true, include the length of
-// recursive subexpansions as new patterns are encountered.
-fn parse_expansion(pat: &[u8], recurse: bool) -> usize {
+/// Walk a string of bytes, returning the length of its
+/// expansion. If recurse is true, include the length of
+/// recursive subexpansions as new patterns are encountered.
+fn parse_expansion(pat: &[u8], recurse: bool) -> u64 {
+    // Set up state.
     let nchars = pat.len();
-    let mut nemit = 0;
+    let mut nemit = 0u64;
     let mut i = 0;
+
+    // Walk over the characters.
     while i < nchars {
         match (*pat)[i] as char {
             '(' => {
@@ -26,6 +29,7 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> usize {
                 while (*pat)[end] as char != ')' {
                     end += 1;
                 }
+
                 // Grab the "coords" out of the pattern.
                 let target: &str = str::from_utf8(&(*pat)[i+1..end])
                     .expect("parse_expansion: invalid utf8 in target");
@@ -35,19 +39,22 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> usize {
                     .expect("parse_expansion: could not parse replen");
                 let repcount: usize = coords[1].parse()
                     .expect("parse_expansion: could not parse repcount");
+
                 // Advance over the pattern.
                 i = end + 1;
+
                 // Process the target text.
                 match recurse {
                     false => {
-                        nemit += replen * repcount;
+                        nemit += replen as u64 * repcount as u64;
                     },
                     true => {
                         let subemit =
                             parse_expansion(&(*pat)[i..i + replen], recurse);
-                        nemit += subemit * repcount;
+                        nemit += subemit * repcount as u64;
                     }
                 };
+
                 // Advance over the target text.
                 i += replen;
             },
