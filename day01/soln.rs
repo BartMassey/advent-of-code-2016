@@ -67,5 +67,5 @@ fn traverse(stop_short: bool) -> (isize, isize) {
 pub fn main() {
     let part = aoc::get_part();
     let position = traverse(part == 2);
-    println!("{}", position.0.abs() + position.1.abs())
+    println!("{}", position.0.abs() + position.1.abs());
 }
