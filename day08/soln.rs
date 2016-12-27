@@ -3,16 +3,16 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 8 Part 1
+//! Advent of Code Day 8.
 
-// Turn on for display tracing.
+/// Turn on for display tracing.
 const TRACING: bool = false;
 
 extern crate aoc;
 #[macro_use] extern crate lazy_static;
 extern crate regex;
 
-// Textual patterns for instructions.
+/// Textual patterns for instructions.
 lazy_static! {
     static ref RECT_PATTERN: regex::Regex =
         regex::Regex::new(r"^rect (\d+)x(\d+)$")
@@ -25,18 +25,21 @@ lazy_static! {
         .expect("could not compile column pattern");
 }
 
-// Instruction to draw a rectangle. Returns true iff it was
-// chosen.
+/// Try for instruction to draw a rectangle. Returns true
+/// iff successful.
 fn insn_rect(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     match (*self::RECT_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
+            // Parse arguments.
             let x: usize = parts.at(1)
                 .expect("insn_rect: could not find x")
                 .parse().expect("insn_rect: could not parse x");
             let y: usize = parts.at(2)
                 .expect("insn_rect: could not find y")
                 .parse().expect("insn_rect: could not parse y");
+
+            // Fill rectangle.
             for i in 0..x {
                 for j in 0..y {
                     m[i][j] = '#';
@@ -47,18 +50,21 @@ fn insn_rect(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     true
 }
 
-// Instruction to rotate a row right. Returns true iff it
-// was chosen.
+/// Try for instruction to rotate a row right. Returns true
+/// iff successful.
 fn insn_rotate_row(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     match (*self::ROTATE_ROW_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
+            // Parse arguments.
             let y: usize = parts.at(1)
                 .expect("insn_rotate_row: could not find y")
                 .parse().expect("insn_rotate_row: could not parse y");
             let n: usize = parts.at(2)
                 .expect("insn_rotate_row: could not find n")
                 .parse().expect("insn_rotate_row: could not parse n");
+
+            // Rotate row.
             let d = m.len();
             for _ in 0..n {
                 let tmp = m[d-1][y];
@@ -72,18 +78,21 @@ fn insn_rotate_row(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     true
 }
 
-// Instruction to rotate a column down. Returns true iff it
-// was chosen.
+/// Try for instruction to rotate a column down. Returns
+/// true iff successful.
 fn insn_rotate_column(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     match (*self::ROTATE_COLUMN_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
+            // Parse arguments.
             let x: usize = parts.at(1)
                 .expect("insn_rotate_column: could not find x")
                 .parse().expect("insn_rotate_column: could not parse x");
             let n: usize = parts.at(2)
-                .expect("insn_rotate_row: could not find n")
-                .parse().expect("insn_rotate_row: could not parse n");
+                .expect("insn_rotate_column: could not find n")
+                .parse().expect("insn_rotate_column: could not parse n");
+
+            // Rotate column.
             let d = m[0].len();
             for _ in 0..n {
                 let tmp = m[x][d-1];
@@ -97,7 +106,7 @@ fn insn_rotate_column(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
     true
 }
 
-// Display the given screen.
+/// Display the given screen.
 fn display(m: &Vec<Vec<char>>) {
     for y in 0..m[0].len() {
         for x in 0..m.len() {
@@ -107,13 +116,16 @@ fn display(m: &Vec<Vec<char>>) {
     }
 }
 
-// Run the instructions and print the number of on pixels or
-// the pixels themselves at the end.
+/// Run the instructions and print the number of on pixels or
+/// the pixels themselves at the end.
 fn main() {
     let (part, dims) = aoc::get_part_args();
     assert!(dims.len() == 2);
+
+    // Parse arguments.
     let x_size: usize = dims[0].parse().expect("main: could not parse x_size");
     let y_size: usize = dims[1].parse().expect("main: could not parse y_size");
+
     // Set up state.
     let mut m = Vec::new();
     for _ in 0..x_size {
@@ -123,6 +135,7 @@ fn main() {
     }
     let insns: &[fn(&str, &mut Vec<Vec<char>>) -> bool] =
         &[insn_rect, insn_rotate_column, insn_rotate_row];
+
     // Read strings from the input file and process them.
     for l in aoc::input_lines() {
         // Search through the instructions until finding one
@@ -142,7 +155,8 @@ fn main() {
             panic!("undentified instruction");
         }
     };
-    // Count up the on pixels.
+
+    // Count up and report the on pixels.
     let mut count = 0;
     for x in 0..x_size {
         for y in 0..y_size {
@@ -152,11 +166,12 @@ fn main() {
         }
     };
     if TRACING {
-        print!("\n");
+        println!("");
     };
+
     // Show final answer.
     if part == 1 {
-        print!("{}\n", count);
+        println!("{}", count);
     } else {
         display(&m);
     };
