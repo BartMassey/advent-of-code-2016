@@ -8,6 +8,7 @@
 /// Given an input between 0 and 15, return the
 /// corresponding hex digit. This is substantially
 /// faster than `std::char::from_digit()`.
+#[inline]
 pub fn hex_digit(n: u8) -> char {
     let d =
         if n <= 9 {
@@ -19,6 +20,7 @@ pub fn hex_digit(n: u8) -> char {
 }
 
 /// Convert a byte vector to a hexadecimal string.
+#[inline]
 pub fn hex_string(bytes: &[u8]) -> String {
     let mut s = String::new();
     for i in 0..bytes.len() {

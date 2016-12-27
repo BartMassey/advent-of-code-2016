@@ -11,6 +11,7 @@
 /// This is "popcount_4" there, modified for 64-bit.
 /// This code will be slower than it needs to be on
 /// narrower inputs.
+#[inline]
 pub fn popcount<T: Into<u64>>(x0: T) -> usize {
     let mut x: u64 = x0.into();
     let m1 = 0x5555555555555555;
