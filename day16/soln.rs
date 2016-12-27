@@ -3,10 +3,12 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 16.
+//! Advent of Code Day 16.
 
 extern crate aoc;
 
+/// Run one dragon-curve step and return the resulting
+/// string.
 fn fill_step(src: String) -> String {
     let mut dst = src.clone();
     dst.push('0');
@@ -34,9 +36,10 @@ fn test_fill_step() {
     };
 }
 
+/// Return the "checksum" of some data.
 pub fn checksum(src: String) -> String {
     let mut sum = src.clone();
-    loop {
+    while sum.len() & 1 == 0 {
         let mut new_sum = String::new();
         let sum_chars = sum.chars().collect::<Vec<char>>();
         let nchars = sum_chars.len();
@@ -52,9 +55,6 @@ pub fn checksum(src: String) -> String {
             new_sum.push(c);
         };
         sum = new_sum;
-        if sum.len() & 1 == 1 {
-            break;
-        }
     };
     sum 
 }
@@ -64,14 +64,21 @@ fn test_checksum() {
     assert!(checksum("110010110100".to_string()) == "100".to_string());
 }
 
+/// Run the fill-and-checksum on the given inputs.
 pub fn main() {
-    let args = std::env::args().collect::<Vec<String>>();
-    assert!(args.len() == 3);
-    let fill: usize = args[1].parse().expect("could not parse fill");
-    let mut data = args[2].to_string();
+    let args = aoc::get_args();
+    assert!(args.len() == 2);
+    let fill: usize = args[0].parse().expect("could not parse fill");
+    let mut data = args[1].to_string();
+
+    // Fill to specified size or more.
     while data.len() < fill {
         data = fill_step(data);
     };
+
+    // Truncate the fill to specified size.
     let data = &data[0..fill].to_string();
+
+    // Checksum.
     println!("{}", checksum(data.to_string()));
 }

@@ -81,3 +81,5 @@ The first disk you have to fill has length `272`. Using the initial
 state in your puzzle input, *what is the correct checksum*?
 
 Your puzzle answer was `00000100100001100`.
+
+Your puzzle input was `11011110011011101`.
