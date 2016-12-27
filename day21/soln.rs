@@ -3,8 +3,9 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 21.
+//! Advent of Code Day 21.
 
+/// Turn on to trace solutions.
 const SHOW: bool = false;
 
 extern crate aoc;
@@ -13,19 +14,30 @@ extern crate permutohedron;
 
 use permutohedron::Heap;
 
+/// Instructions.
 #[derive(Debug)]
 enum Insn {
+    /// Swap at given indices.
     SwPos(usize, usize),
+    /// Swap given characters.
     SwChar(char, char),
+    /// Rotate left
     RotL(usize),
+    /// Rotate right by given amount.
     RotR(usize),
+    /// Rotate based on position of given character.
     RotPos(char),
+    /// Reverse the range bounded by the given indices.
     Rev(usize, usize),
+    /// Move the character at the given source position
+    /// to the given destination position.
     Mov(usize, usize)
 }
 
 use self::Insn::*;
 
+/// If the given pattern matches the given target, return a
+/// vector of its submatches (parts).
 fn try_pat(pat: &regex::Regex, target: &str) -> Option<Vec<String>> {
     match pat.captures(target) {
         Some(parts) =>  {
@@ -41,6 +53,8 @@ fn try_pat(pat: &regex::Regex, target: &str) -> Option<Vec<String>> {
     }
 }
 
+/// Return the position of the given character in the given
+/// slice. The character must be present to win.
 fn find_char(c: char, v: &[char]) -> usize {
     for i in 0..v.len() {
         if v[i] == c {
@@ -50,6 +64,7 @@ fn find_char(c: char, v: &[char]) -> usize {
     panic!("find_char(): off end");
 }
 
+/// Rotate the given slice to the left *r* times.
 fn rotate_left(r: usize, chars: &mut Vec<char>) {
     for _ in 0..r {
         let n = chars.len();
@@ -61,6 +76,7 @@ fn rotate_left(r: usize, chars: &mut Vec<char>) {
     }
 }
 
+/// Rotate the given slice to the right *r* times.
 fn rotate_right(r: usize, chars: &mut Vec<char>) {
     for _ in 0..r {
         let n = chars.len();
@@ -72,7 +88,9 @@ fn rotate_right(r: usize, chars: &mut Vec<char>) {
     }
 }
 
+/// Read the input instructions from `stdin`, parse and return them.
 fn read_insns() -> Vec<Insn> {
+    /// Set up instruction patterns.
     let swpos_pat =
         regex::Regex::new(r"^swap position ([0-9]+) with position ([0-9]+)$")
         .expect("could not compile swpos pattern");
@@ -91,11 +109,15 @@ fn read_insns() -> Vec<Insn> {
     let mov_pat =
         regex::Regex::new(r"^move position ([0-9]+) to position ([0-9]+)$")
         .expect("could not compile mov pattern");
+
+    // Set up state and process lines.
     let mut insns = Vec::new();
     for target in aoc::input_lines() {
         if SHOW {
             println!("{}", target);
         };
+
+        // Try to find and translate a matching instruction.
         if let Some(args) = try_pat(&swpos_pat, &target) {
             let p1 = args[0].parse::<usize>().unwrap();
             let p2 = args[1].parse::<usize>().unwrap();
@@ -136,19 +158,29 @@ fn read_insns() -> Vec<Insn> {
             insns.push(Mov(p1, p2));
             continue;
         };
+
+        // Didn't work.
         panic!("could not read instruction");
     };
     insns
 }
 
+/// Run the sequence `insns` of instructions on the
+/// sequence of characters in `chars0`. On exit,
+/// `chars0` will contain the result.
 fn run_insns(insns: &Vec<Insn>, chars0: &mut Vec<char>) {
+    // Make a copy of the input for scratch.
     let mut chars = chars0.clone();
+
+    // Run each instruction.
     for insn in insns {
         if SHOW {
             println!("{}: {:?}",
                    chars.iter().cloned().collect::<String>(),
                    insn);
         };
+
+        // Interpreter dispatch.
         match *insn {
             SwPos(p1, p2) => {
                 let tmp = chars[p1];
@@ -199,18 +231,27 @@ fn run_insns(insns: &Vec<Insn>, chars0: &mut Vec<char>) {
             }
         };
     };
+
+    // Save the result.
     *chars0 = chars;
 }
 
+/// Solve the problem.
 pub fn main() {
     let (part, args) = aoc::get_part_args();
     assert!(part == 1 || part == 2);
+
+    // Set up state.
     let insns = read_insns();
     let mut chars = args[0].chars().collect::<Vec<char>>();
+
     if part == 1 {
+        // Run the permutation forward.
         run_insns(&insns, &mut chars);
         println!("{}", chars.into_iter().collect::<String>());
     } else {
+        // Run every possible permutation forward and see
+        // what sticks.
         let mut heap_chars = chars.clone();
         let perms = Heap::new(&mut heap_chars);
         for p in perms {
