@@ -25,3 +25,6 @@ pub use self::bits::*;
 
 mod lines;
 pub use self::lines::*;
+
+mod hex;
+pub use self::hex::*;
