@@ -9,8 +9,8 @@ most-popular `crypto` crate properly (although it seems
 quite nice).
 
 This sort of problem is always CPU-intensive.  When compiled
-with "cargo build --release", part 1 ran in 1.6 seconds,
-part 2 in 4.8 seconds on my 3.5 GHz i7-4770K (Haswell). When
+with "cargo build --release", part 1 ran in 1.7 seconds,
+part 2 in 4.9 seconds on my 3.5 GHz i7-4770K (Haswell). When
 compiled without "--release", performance was
 untenable. Rust at its best is pretty competitive with C,
 which is nice in this challenge.

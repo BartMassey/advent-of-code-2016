@@ -9,7 +9,6 @@
 //! <http://gist.github.com/gkbrk/2e4835e3a17b3fb6e1e7>.
 
 use std::io::*;
-use std::char::from_digit;
 
 extern crate aoc;
 extern crate crypto;
@@ -81,8 +80,7 @@ pub fn main() {
         }
 
         // Update and display the password.
-        password[posn] =
-            from_digit(digit as u32, 16).expect("bad hex digit");
+        password[posn] = aoc::hex_digit(digit as u8);
         cinema_string(&password);
 
         // If we have all the characters, it's over.
