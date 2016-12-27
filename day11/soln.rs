@@ -3,7 +3,20 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 11.
+//! Advent of Code Day 11.
+
+/// Turn this on for a more verbose solution.
+const VERBOSE: bool = false;
+
+/// For input checking and processing, it is convenient
+/// to hardcode the floor count.
+/// 
+/// It would be reasonably straightforward to get rid of
+/// this constant, but harder if buggy inputs were to be
+/// excluded. In particular, one would probably need to
+/// build a cardinal to ordinal string converter that would,
+/// for example, code 21 as "twenty-first".
+const NFLOORS: usize = 4;
 
 use std::collections::{BTreeSet, BinaryHeap};
 use std::iter::*;
@@ -12,13 +25,18 @@ use std::cmp::*;
 extern crate aoc;
 extern crate regex;
 
+/// Kind of device.
 #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
 enum Dev {
+    /// Generator with given material name.
     Gen(String),
+    /// Microchip with given material name.
     Chip(String)
 }
 
-// Returns true iff the contents can be left together without incident.
+/// Returns true iff the floor contents can be left together
+/// without incident. *Idea:* either there are no generators,
+/// or every chip is protected by its generator.
 fn contents_are_safe(contents: &BTreeSet<Dev>) -> bool {
     let mut gens = BTreeSet::new();
     let mut chips = BTreeSet::new();
@@ -32,17 +50,18 @@ fn contents_are_safe(contents: &BTreeSet<Dev>) -> bool {
 }
 
 
-// Based on https://doc.rust-lang.org/std/collections/binary_heap
-
-#[derive(Clone, Debug, PartialOrd, Ord)]
+/// Problem state.
+#[derive(Clone, Debug, PartialOrd, Ord, Eq, PartialEq)]
 struct State {
+    /// Current floor.
     location: usize,
+    /// Contents of floors.
     floors: Vec<BTreeSet<Dev>>
 }
 
 impl State {
 
-    // Initial state.
+    /// Initial state for given problem.
     fn start(floors: Vec<BTreeSet<Dev>>) -> Self {
         State {
             location: 0,
@@ -50,38 +69,51 @@ impl State {
         }
     }
 
-    fn floor_numbers(&self, dirn: isize) -> Option<(usize, usize)> {
+    /// Check whether the specified traversal is possible.
+    /// If so, return current and next floor numbers.
+    fn try_move(&self, dirn: isize) -> Option<(usize, usize)> {
         let src = self.location;
         let dest = src as isize + dirn;
         if dest < 0 || dest >= self.floors.len() as isize {
             return None;
         };
-        assert!(dest >= 0 && dest < self.floors.len() as isize);
         Some((src, dest as usize))
     }
         
 
-    // 1. Grab specified elevator contents from current floor.
-    // 2. Move in specified direction to next floor.
-    // 3. Drop the contents of the elevator on the new floor.
-    // If the traverse is legal, return the state resulting from these operations.
-    fn try_traverse(&self, dirn: isize, grab: &BTreeSet<Dev>) -> Option<State> {
-        if grab.is_empty() {
-            return None;
-        };
+    /// 1. Grab specified elevator contents from current floor.
+    /// 2. Move in specified direction to next floor.
+    /// 3. Drop the contents of the elevator on the new floor.
+    ///
+    /// If the traverse is legal, return the state resulting
+    /// from these operations.
+    fn try_traverse(&self, dirn: isize, grab: &BTreeSet<Dev>)
+    -> Option<State> {
+        // Can't move off either end of the elevator shaft.
         let (src, dest) =
-            match self.floor_numbers(dirn) {
+            match self.try_move(dirn) {
                 Some(ns) => ns,
                 None => { return None; }
             };
+
+        // Can't move with an empty elevator.
+        if grab.is_empty() {
+            return None;
+        };
+
+        // Can't move if we leave the source floor unsafe.
         let new_src = self.floors[src].difference(grab).cloned().collect();
         if !contents_are_safe(&new_src) {
             return None;
         };
+
+        // Can't move if we leave the destination floor unsafe.
         let new_dest = self.floors[dest].union(grab).cloned().collect();
         if !contents_are_safe(&new_dest) {
             return None;
         };
+
+        // Return the state resulting from the traversal.
         let mut new_floors = self.floors.clone();
         new_floors[src] = new_src;
         new_floors[dest] = new_dest;
@@ -92,17 +124,21 @@ impl State {
         Some(new_state)
     }
 
-    // Return the set of states that can result from legal traversals
-    // from the current state.
+    /// Return the set of states that can result from legal traversals
+    /// from the current state.
     fn traversals(&self) -> BTreeSet<State> {
+        // Try moving both down and up.
         let mut ts = BTreeSet::new();
         for dirn in [-1, 1].iter() {
-            let src =
-                match self.floor_numbers(*dirn) {
-                    Some((src, _)) => src,
-                    None => continue
-                };
-            for grab in aoc::choose_le(&self.floors[src], 2) {
+            // Precheck for efficiency to avoid working
+            // through all possible grabs on an illegal
+            // traversal.
+            if let None = self.try_move(*dirn) {
+                continue;
+            };
+            // Try all possible grabs for traversal in
+            // given direction.
+            for grab in aoc::choose_le(&self.floors[self.location], 2) {
                 match self.try_traverse(*dirn, &grab) {
                     Some(t) => assert!(ts.insert(t)),
                     None => ()
@@ -112,36 +148,48 @@ impl State {
         ts
     }
 
+    /// Check whether the current state has the right
+    /// contents.
     fn is_goal(&self) -> bool {
+        // Have to be on the top floor.
         if self.location != self.floors.len() - 1 {
             return false;
         }
+
+        // Have to have all the stuff on the top floor.
         for i in 0..self.floors.len()-1 {
             if !self.floors[i].is_empty() {
                 return false;
             }
         }
+
         return true;
     }
 
+    /// Admissible heuristic for remaining number
+    /// of traversals to solve the problem.
+    ///
+    /// *Idea:* Except for the last batch of stuff,
+    /// everything can move only individually, by way of
+    /// carrying to the top floor with something else in the
+    /// elevator, then carrying that something down to pick
+    /// up the next thing.
+    ///
+    /// This isn't quite right, because moves could involve
+    /// shuffling stuff around on the way up and down, but
+    /// that doesn't actually lengthen the required
+    /// distance.
     fn hcost(&self) -> usize {
         let mut dists = 0;
-        for i in 0..self.floors.len()-1 {
-            dists += (3 - i) * self.floors[i].len();
+        let nfloors = self.floors.len();
+        for i in 0..nfloors-1 {
+            dists += (nfloors - i - 1) * self.floors[i].len();
         };
-        max(0, 2 * (dists as isize - 4)) as usize
+        max(0, 2 * (dists as isize - nfloors as isize)) as usize
     }
 }
 
-impl Eq for State {}
-
-impl PartialEq for State {
-    fn eq(&self, other: &State) -> bool {
-        self.location == other.location &&
-        self.floors == other.floors
-    }
-}
-
+/// A\* search node for given state.
 #[derive(Clone, Debug)]
 struct PQElem {
     cost: usize,
@@ -150,19 +198,31 @@ struct PQElem {
 }
 
 impl PartialEq for PQElem {
+    /// From the search point of view, two nodes are
+    /// the same if their heuristic cost and actual
+    /// cost are both the same.
     fn eq(&self, other: &PQElem) -> bool {
         other.fcost == self.fcost && other.cost == self.cost
     }
 }
 
+/// It would be nice to just derive this from `PartialEq`,
+/// but Rust derive does the other thing.
 impl Eq for PQElem {}
 
 impl PQElem {
+    /// We artificially set the heuristic cost of the start
+    /// state to zero. This is highly optimistic, but this
+    /// node will be immediately be closed and replaced by
+    /// its properly-heuristic-costed children during the
+    /// search, so it doesn't matter.
     fn start(state: &State) -> PQElem {
         PQElem{cost: 0, fcost: 0, state: state.clone()}
     }
 }
 
+/// It would be nice to just derive this from `Ord`,
+/// but Rust derive does the other thing.
 impl PartialOrd for PQElem {
     fn partial_cmp(&self, other: &PQElem) -> Option<Ordering> {
         Some(self.cmp(&other))
@@ -170,6 +230,10 @@ impl PartialOrd for PQElem {
 }
 
 impl Ord for PQElem {
+    /// A node is better than another if its heuristic
+    /// cost is smaller. Ties are broken by preferring
+    /// nodes with larger confirmed cost, since these
+    /// are farther along the path to a solution.
     fn cmp(&self, other: &PQElem) -> Ordering {
         match other.fcost.cmp(&self.fcost) {
             Ordering::Equal =>
@@ -179,33 +243,57 @@ impl Ord for PQElem {
     }
 }
 
+/// Pull in the problem description.
 fn read_start_state() -> State {
+    // Set up the patterns needed to parse the description.
     let device_pat = regex::Regex::new(r"an? ([-a-z]+) ([a-z]+)")
         .expect("main: could not compile device pattern");
     let compatible_pat = regex::Regex::new(r"^([a-z]+)(-compatible)?$")
         .expect("main: could not compile compatible pattern");
     let floors: Vec<&str> = vec!["first", "second", "third", "fourth"];
+    assert!(floors.len() == NFLOORS);
+
+    // Set up the state.
     let mut floors0: Vec<BTreeSet<Dev>> = Vec::new();
     let mut floor = 0;
+
+    // Walk over the target description, placing things as
+    // specified.
     for target in aoc::input_lines() {
-        assert!(floor <= 3);
+        // Start the new floor.
         floors0.push(BTreeSet::new());
-        if floor == 3 {
-            assert!(target == "The fourth floor contains nothing relevant.");
+
+        // Check for top floor (or greater).
+        assert!(floor < NFLOORS);
+        if floor == NFLOORS - 1 {
+            let top_floor =
+                format!("The {} floor contains nothing relevant.",
+                        floors[NFLOORS - 1]);
+            assert!(target == top_floor);
             continue;
         };
+
+        // Get the list of stuff on the floor.
         let floor_pat =
-            regex::Regex::new(&format!(r"^The {} floor contains .*\.$", floors[floor]))
-            .expect("main: could not compile floor pattern");
+            regex::Regex::new(&format!(
+                r"^The {} floor contains .*\.$", floors[floor]
+            )).expect("main: could not compile floor pattern");
         assert!(floor_pat.is_match(&target));
+
+        // Add all the stuff on the floor.
         for parts in device_pat.captures_iter(&target) {
+            // Get the device type and class.
             let dev_desc = parts.at(1)
                 .expect("main: could not find device description");
-            let dev_mat = String::from(compatible_pat.captures(&dev_desc)
-                                       .expect("main: could not parse device description")
-                                       .at(1).expect("main: could not find device description"));
+            let dev_mat = String::from(
+                compatible_pat.captures(&dev_desc)
+                .expect("main: could not parse device description")
+                .at(1).expect("main: could not find device description")
+            );
             let dev_class = parts.at(2)
-                .expect("main: could not find device class");
+                            .expect("main: could not find device class");
+
+            // Build the device.
             let dev =
                 if dev_class == "generator" {
                     Dev::Gen(dev_mat)
@@ -214,6 +302,8 @@ fn read_start_state() -> State {
                 } else {
                     panic!("main: unknown device")
                 };
+
+            // Put the device on the floor.
             if !floors0[floor].insert(dev) {
                 panic!("main: device inserted twice");
             }
@@ -223,6 +313,7 @@ fn read_start_state() -> State {
     State::start(floors0)
 }
 
+// Try the test traversal given with the problem.
 #[test]
 fn test1() {
     let hydrogen = String::from("hydrogen");
@@ -252,7 +343,8 @@ fn test1() {
         let (dirn, ref grab) = *step;
         match state.try_traverse(dirn, grab) {
             Some(next_state) => { state = next_state; },
-            None => { panic!(format!("could not traverse {} {:?} in state {:?}", dirn, *grab, state)); }
+            None => { panic!(format!("bad traverse {} {:?} in state {:?}",
+                                     dirn, *grab, state)); }
         };
     };
     if !state.is_goal() {
@@ -260,18 +352,30 @@ fn test1() {
     };
 }
 
+/// Grab the input, run the A\* search, show the result.
 pub fn main() {
+    // Set up the state.
     let state0 = read_start_state();
     let mut stop_list = BTreeSet::new();
     let mut pq = BinaryHeap::new();
+
+    // Push the start state and run A\*.
     pq.push(PQElem::start(&state0));
     loop {
         match pq.pop() {
             Some(PQElem{cost: gcost, fcost: _, state}) => {
+                // If we're done, stop.
                 if state.is_goal() {
-                    println!("cost {} for {:?}", gcost, state);
+                    if VERBOSE {
+                        println!("cost {} for {:?}", gcost, state);
+                    } else {
+                        println!("{}", gcost);
+                    }
                     return;
                 };
+
+                // If we've discovered a new state, push
+                // its neighbors.
                 match stop_list.insert(state.clone()) {
                     false => { continue; },
                     true => {
@@ -279,7 +383,11 @@ pub fn main() {
                             if !stop_list.contains(&next_state) {
                                 let hcost = state.hcost();
                                 let gcost = gcost + 1;
-                                pq.push(PQElem{fcost: gcost + hcost, cost: gcost, state: next_state});
+                                pq.push(PQElem{
+                                    fcost: gcost + hcost,
+                                    cost: gcost,
+                                    state: next_state
+                                });
                             }
                         }
                     }

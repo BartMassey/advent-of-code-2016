@@ -6,26 +6,25 @@ going to estimate I put 20 effort-hours into this one.
 
 First of all, the spec for this one is quite fiddly. The
 details of what constitutes a legal move / state are really
-hard to follow. I really ended up co-developing my
-understanding of the problem along with the solution, which
-is never a great idea. The worked example for this problem
-was absolutely necessary: without it I never would have got
-the code right.
+hard to follow. I ended up co-developing my understanding of
+the problem along with the solution, which is never a great
+idea. The worked example for this problem was absolutely
+necessary: without it I never would have got the code right.
 
 Secondly, doing an algorithm of any complexity with Rust is
 hard anyway. This was my first really serious tangle with
 the borrow checker: I got to clarify all the places where
-`clone()`, `copy()`, constructors and refs could make Rust
-OK with what I was doing.
+`clone()`, copying, constructors and refs could make Rust OK
+with what I was doing.
 
 Sets in Rust are the usual mess, or maybe a little more
 so. The two set types in `std::collections` are `HashSet`
 and `BTreeSet`. I started using the former, but at some
 point I needed a set of sets (gasp!) and unfortunately
 `HashSets` will not themselves hash. Why? I'm guessing
-because ordering and implementors not realizing that you can
-just exclusive-or the element hashes together. So `BTreeSet`
-it was.
+because ordering: implementors haven't realized that
+you can just exclusive-or the element hashes together. So
+`BTreeSet` it was.
 
 I wrote my usual algorithm for choosing all subsets of size
 less than or equal to *n* from a given set. It was quite
@@ -51,9 +50,20 @@ telling me that I had a reasonable understanding of the
 rules (found a bunch of bugs that way) and that my code
 would run.
 
-Using Dijkstra's algorithm, `./soln <input1.txt` finished in
-54s on my box and part 2 was still running after 20m. With
-A\*, part 1 took 0.3s and part 2 took 76s.
+Using Dijkstra's algorithm, part 1 finished in 54s on my box
+and part 2 was still running after 20m. With A\*, part 1
+took 0.3s and part 2 took 82s. That latter number is longer
+than I'd normally like, but I'll take it.
+
+# Usage
+
+* Part 1:
+
+        cargo run --release <input1.txt
+
+* Part 2:
+
+        cargo run --release <input2.txt
 
 ---
 
