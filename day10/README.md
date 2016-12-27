@@ -2,9 +2,7 @@
 Copyright (c) 2016 Bart Massey
 
 The first algorithmically interesting problem. Also a giant
-mess for Rust. Run part 1 as "./soln 1 17 61" for the
-production instance, or "./soln 1 2 5" for the test
-instance. Run part 2 without extra arguments.
+mess for Rust. 
 
 The problem specification is pretty vague about what to
 expect in the input. Is it possible that a bot could be
@@ -29,6 +27,18 @@ long time.
 I actually ended up giving up for the night and finishing in
 the morning: probably four hours' total effort. It felt like
 Rust was 70% of the time sink here.
+
+# Usage
+
+Run part 1 with arguments "2 5" for the test instance.
+
+* Part 1:
+
+        cargo run 1 17 61 <input.txt
+
+* Part 2:
+
+        cargo run 2 <input.txt
 
 ---
 
