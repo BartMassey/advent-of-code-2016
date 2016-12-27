@@ -59,6 +59,16 @@ demanded.
 I'm quite sure there's an O(1) solution here using nothing
 but mathematics. But life is too short. I'm moving on.
 
+## Usage
+
+Part 1:
+
+        cargo run 1 3018458
+
+Part 2:
+
+        cargo run 2 3018458
+
 ---
 
 This program is licensed under the "MIT License".
