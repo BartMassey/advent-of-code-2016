@@ -21,6 +21,17 @@ See the prototype `soln.py` and the LaTeX document in the
 
 I think I'm going to cry.
 
+## Usage
+
+Part 1:
+
+        cargo run --release 1
+
+
+Part 2:
+
+        cargo run --release 2
+
 ---
 
 This program is licensed under the "MIT License".

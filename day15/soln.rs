@@ -3,18 +3,26 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 15.
+//! Advent of Code Day 15.
 
 extern crate aoc;
 extern crate regex;
 
+/// Read the disc descriptions, returning
+/// a vector of positions/start pairs.
 fn read_discs() -> Vec<(isize, isize)> {
+    // Set up the matching.
     let disc_pat = regex::Regex::new(
-      r"^Disc #([0-9]+) has ([0-9]+) positions; at time=0, it is at position ([0-9]+).$")
-      .expect("main: could not compile disc pattern");
+        r"^Disc #([0-9]+) has ([0-9]+) positions; at time=0, it is at position ([0-9]+).$"
+    ).expect("main: could not compile disc pattern");
+
+    // Set up the state.
     let mut discs = Vec::new();
     let mut ndiscs = 0;
+
+    // Process the disc descriptions.
     for target in aoc::input_lines() {
+        // Parse the description.
         let parts = disc_pat.captures(&target)
             .expect("malformed line");
         let disc_number: isize = parts.at(1)
@@ -29,12 +37,16 @@ fn read_discs() -> Vec<(isize, isize)> {
         if disc_number != ndiscs + 1 {
             panic!("unexpected disc number");
         };
+
+        // Save the disc info.
         discs.push((disc_positions, disc_start));
         ndiscs += 1;
     };
     discs
 }
 
+/// At the given start time `t0`, try to drop the ball
+/// through all the discs and return success or failure.
 fn search(discs: &Vec<(isize, isize)>, t0: isize) -> bool {
     for j in 0..discs.len() {
         let (cj, qj) = discs[j];
@@ -47,6 +59,7 @@ fn search(discs: &Vec<(isize, isize)>, t0: isize) -> bool {
     true
 }
 
+/// Solve the problem.
 pub fn main() {
     let discs = read_discs();
     for t in 0..std::isize::MAX {
@@ -55,5 +68,5 @@ pub fn main() {
             return;
         }
     };
-    println!("no solution found");
+    panic!("no solution found");
 }
