@@ -8,6 +8,16 @@ made it clear that just doing a complete search would be
 plenty fast. Oh well. Instantaneous answer for part 1, 10ms
 for part 2.
 
+## Usage
+
+Part 1:
+
+        cargo run --release 1 qzthpkfp
+
+Part 2:
+
+        cargo run --release 2 qzthpkfp
+
 ---
 
 This program is licensed under the "MIT License".

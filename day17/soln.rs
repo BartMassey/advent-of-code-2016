@@ -3,7 +3,7 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 17.
+//! Advent of Code Day 17.
 
 extern crate crypto;
 use self::crypto::digest::Digest;
@@ -11,60 +11,85 @@ use self::crypto::md5::Md5;
 
 extern crate aoc;
 
+/// State of exploration.
 #[derive(Clone)]
 enum Explo {
+    /// Finished without finding a path.
     Finished,
+    /// Stopped early.
     Stopped,
+    /// Finished with the given path.
     Completed(String)
 }
 
 use self::Explo::*;
 
-fn open_doors(hasher0: &Md5) -> Vec<bool> {
+/// Store true in `doors` for each of up, down, left, right
+/// iff the given hasher shows that door open.
+fn open_doors(hasher0: &Md5, doors: &mut[bool;4]) {
+    // Run a clone of the hasher (to terminate here).
     let mut hasher = (*hasher0).clone();
     let mut output = [0; 16];
     hasher.result(&mut output);
+
+    // Match up nybbles of the hash with doors.
     let nybbles = [(output[0] >> 4) & 0xf, output[0] & 0xf,
                    (output[1] >> 4) & 0xf, output[1] & 0xf];
-    let mut result = Vec::new();
-    for nybble in nybbles.iter() {
-        if *nybble >= 11 {
-            result.push(true);
+    for d in 0..4 {
+        if nybbles[d] >= 11 {
+            doors[d] = true;
         } else {
-            result.push(false);
+            doors[d] = false;
         }
     };
-    result
 }
 
 #[test]
 fn test_open_doors() {
     let mut hasher = crypto::md5::Md5::new();
     hasher.input("hijkl".as_bytes());
-    assert!(open_doors(&hasher) == vec![true, true, true, false]);
+    let mut doors = [false;4];
+    open_doors(&hasher, &mut doors);
+    assert!(doors == [true, true, true, false]);
 }
 
-fn dfid(hasher0: &Md5, limit: usize, posn: (isize, isize),
+/// Depth-First search for a path to a given location. The
+/// goal position is `posn`, the path to this point is
+/// `path`. Search will be for a longest path if
+/// `find_longest` is true: otherwise it will be for the
+/// first-found path of depth `limit` or less.
+fn dfs(hasher0: &Md5, limit: usize, posn: (isize, isize),
         path: String, find_longest: bool) -> Explo {
+    // Stop at the goal.
     if posn == (3, 3) {
         return Completed(path);
     };
+
+    // Stop if depth limited.
     if !find_longest && limit == 0 {
         return Stopped;
     }
+
+    // Set up the state and check the doors.
     let (x, y) = posn;
     let dirns = [
         ('U', (0, -1), 0),
         ('D', (0, 1), 1),
         ('L', (-1, 0), 2),
         ('R', (1, 0), 3) ];
-    let doors = open_doors(hasher0);
+    let mut doors = [false;4];
+    open_doors(hasher0, &mut doors);
     let mut result = Finished;
     let mut found_longest = false;
+
+    // Traverse each open door recursively.
     for &(dirn, (dx, dy), door) in dirns.iter() {
+        // If the door is closed, give up.
         if !doors[door] {
             continue;
         };
+
+        // If the next position is clipped, give up.
         let next_x = x + dx;
         if next_x < 0 || next_x >= 4 {
             continue;
@@ -73,61 +98,86 @@ fn dfid(hasher0: &Md5, limit: usize, posn: (isize, isize),
         if next_y < 0 || next_y >= 4 {
             continue;
         };
+
+        // Call recursively to explore continuation in this
+        // direction.
         let mut hasher = (*hasher0).clone();
         hasher.input(&[dirn as u8]);
         let mut next_path = path.clone();
         next_path.push(dirn);
-        let subresult = dfid(&hasher, limit - 1,
+        let subresult = dfs(&hasher, limit - 1,
                              (next_x, next_y), next_path, find_longest);
+
+        // Combine the subsearch result with the existing
+        // status to get an updated status.
         match subresult {
+            // Only shortest-path search is depth-limited.
             Stopped => {
                 if !find_longest || !found_longest {
                     result = Stopped;
                 }
             },
+
+            // Fit the new path in with the old.
             Completed(new_path) => {
                 if find_longest {
                     match result.clone() {
+                        // Use longer path for find longest.
                         Completed(old_path) => {
                             if new_path.len() >= old_path.len() {
                                 result = Completed(new_path);
                                 found_longest = true;
                             }
                         },
+
+                        // Found first path.
                         _ => {
                             result = Completed(new_path);
                             found_longest = true;
                         }
                     }
                 } else {
+                    // If find-longest is false, return
+                    // first path found.
                     return Completed(new_path);
                 }
             },
+
+            // Nothing to do with a closed-off subsearch.
             Finished => ()
         };
     };
     result
 }
 
+/// Search for a solution.
 pub fn main() {
     let (part, args) = aoc::get_part_args();
     assert!(args.len() == 1);
     let passcode = args[0].as_bytes();
+
+    // Set up state.
     let mut hasher0 = crypto::md5::Md5::new();
     hasher0.input(passcode);
+
+    // For part 2, do a single search for longest path.
     if part == 2 {
-        match dfid(&hasher0, 0, (0, 0), "".to_string(), true) {
-            Completed(soln) => { println!("longest {}", soln.len()); },
+        match dfs(&hasher0, 0, (0, 0), "".to_string(), true) {
+            Completed(soln) => { println!("{}", soln.len()); },
             Finished => { println!("no solution exists"); },
             Stopped => { panic!("stopped in longest"); }
         }
         return;
-    }
+    };
+
+    // For part 1, use Depth-First Iterative Deepening to
+    // find a shortest path.
+    assert!(part == 1);
     for limit in 0..std::usize::MAX {
-        let result = dfid(&hasher0, limit, (0, 0), "".to_string(), false);
+        let result = dfs(&hasher0, limit, (0, 0), "".to_string(), false);
         match  result {
             Completed(soln) =>  {
-                println!("solution {}", soln);
+                println!("{}", soln);
                 return;
             },
             Finished => {
@@ -137,5 +187,5 @@ pub fn main() {
             _ => ()
         };
     };
-    print!("exploration too shallow");
+    panic!("exploration too shallow");
 }
