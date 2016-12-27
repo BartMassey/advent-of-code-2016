@@ -3,12 +3,16 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 20.
+//! Advent of Code Day 20.
 
 use std::cmp::*;
 
 extern crate aoc;
 
+/// Parse each range and return them as a vector of
+/// inclusive start-end tuples. `u32` would probably be
+/// sufficient here, but paranoia dictates not worrying
+/// about strange end cases.
 fn read_ranges() -> Vec<(u64, u64)> {
     let mut result = Vec::new();
     for target in aoc::input_lines() {
@@ -20,30 +24,34 @@ fn read_ranges() -> Vec<(u64, u64)> {
     result
 }
 
+/// Walk over the ranges merging adjacent and overlapping
+/// ranges into single ranges. After the call, the ranges
+/// are merged and in sorted order.
 fn merge_ranges(ranges: &mut Vec<(u64, u64)>) {
-    let mut result = Vec::new();
-    ranges.sort();
-    let mut cur_range = None;
-    for &(left, right) in ranges.iter() {
-        match cur_range {
-            None => {
-                cur_range = Some((left, right));
-            },
-            Some((cur_left, cur_right)) => {
-                if left > cur_right + 1 {
-                    result.push((cur_left, cur_right));
-                    cur_range = Some((left, right));
-                } else {
-                    cur_range = Some((cur_left, max(cur_right, right)));
-                }
-            }
-        }
+    // Set up state. That clone is expensive, but life
+    // is hard.
+    let mut old_ranges = ranges.clone();
+    *ranges = Vec::new();
+    old_ranges.sort();
+    let mut range_iter = old_ranges.iter();
+    let mut cur_range =
+        match range_iter.next() {
+            None => return,
+            Some(range) => range.clone()
+        };
+
+    // Try to merge each successive range with the current
+    // range.
+    for &(left, right) in range_iter  {
+        let (cur_left, cur_right) = cur_range;
+        if left > cur_right + 1 {
+            ranges.push((cur_left, cur_right));
+            cur_range = (left, right);
+        } else {
+            cur_range = (cur_left, max(cur_right, right));
+        };
     };
-    match cur_range {
-        None => (),
-        Some(r) => result.push(r)
-    };
-    *ranges = result;
+    ranges.push(cur_range);
 }
 
 #[test]
@@ -62,17 +70,25 @@ fn test_merge_ranges() {
     }
 }
 
+/// Run the problem.
 pub fn main() {
     let part = aoc::get_part();
+
+    // Read and merge the ranges.
     let mut ranges = read_ranges();
     merge_ranges(&mut ranges);
+
+    // Show the answer.
     if part == 1 {
         println!("{}", ranges[0].1 + 1);
     } else {
+        // Add up the gaps.
         let mut count = 0;
         for i in 0..ranges.len()-1 {
             count += ranges[i+1].0 - ranges[i].1 - 1;
         };
+
+        // Don't forget the gap at the end.
         count += 4294967295 - ranges[ranges.len()-1].1;
         println!("{}", count);
     };

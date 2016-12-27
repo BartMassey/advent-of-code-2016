@@ -6,6 +6,16 @@ have, because Rust and because I'm slow. A careful unit test
 helped find some bugs. About 10ms for each part, compiled
 for debugging.
 
+## Usage
+
+Part 1:
+
+        cargo run 1 <input.txt
+
+Part 2:
+
+        cargo run 2 <input.txt
+
 ---
 
 This program is licensed under the "MIT License".
