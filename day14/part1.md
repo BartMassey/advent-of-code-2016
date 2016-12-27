@@ -49,4 +49,6 @@ key.
 Given the actual salt in your puzzle input, *what index* produces your
 `64`th one-time pad key?
 
+Your puzzle input was `ngcjuoqr`.
+
 Your puzzle answer was `18626`.

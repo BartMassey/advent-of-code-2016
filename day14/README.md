@@ -17,12 +17,21 @@ the code, but it wasn't doing the right thing with the
 wrapped hasher: it was mutating a copy rather than the
 original. Some unit tests and careful thought later I
 corrected the implementation by boxing the hasher. The final
-solution then came in at 13s, which seems surprisingly
+solution then came in at 18s, which seems surprisingly
 reasonable, considering.
 
 Took a lot more debugging time than I really had.
-Still three days behind. Will catch up day after tomorrow
-when I have some free time.
+Was still three days behind at this point.
+
+## Usage
+
+* Part 1:
+
+        cargo run --release 1 ngcjuoqr
+
+* Part 2:
+
+        cargo run --release 2 ngcjuoqr
 
 ---
 

@@ -3,44 +3,28 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 14.
+//! Advent of Code Day 14.
 
 extern crate aoc;
 extern crate crypto;
 
 use self::crypto::digest::Digest;
     
+/// "Stretched" hasher for part 2.
 enum StretchedMd5  {
     Hasher(Box<crypto::md5::Md5>)
 }
 
 impl StretchedMd5 {
+    /// Just box up a plain old hasher.
     fn new() -> StretchedMd5 {
         StretchedMd5::Hasher(Box::new(crypto::md5::Md5::new()))
     }
 }
 
-// Given an input between 0 and 15, return the
-// corresponding hex digit.
-fn hex_digit(n: usize) -> char {
-    let d =
-        if n <= 9 {
-            n as u8 + '0' as u8
-        } else {
-            n as u8 - 10 + 'a' as u8
-        };
-    d as char
-}
-
-fn hex_string(output: &[u8]) -> String {
-    let mut s = String::new();
-    for i in 0..output.len() {
-        s.push(hex_digit((output[i] >> 4) as usize));
-        s.push(hex_digit((output[i] & 0xf) as usize));
-    };
-    s
-}
-
+/// This "stretched" MD5 `Digest` is implemented in
+/// terms of the standard `Md5`. All the extra work
+/// is done in the result.
 impl Digest for StretchedMd5 {
     fn input(&mut self, src: &[u8]) {
         let &mut StretchedMd5::Hasher(ref mut h) = self;
@@ -62,12 +46,14 @@ impl Digest for StretchedMd5 {
         h.block_size()
     }
 
+    /// Run the underlying MD5 hasher 2017 times to
+    /// produce the stretched hash.
     fn result(&mut self, out: &mut [u8]) {
         let &mut StretchedMd5::Hasher(ref mut h) = self;
         h.result(out);
         for _ in 0..2016 {
             h.reset();
-            let s = hex_string(&out);
+            let s = aoc::hex_string(&out);
             let out_hex = &(s.as_bytes());
             h.input(out_hex);
             h.result(out);
@@ -75,20 +61,35 @@ impl Digest for StretchedMd5 {
     }
 }
 
+/// Look for `reps` consecutive repetitions of a `target`
+/// digit in a given `hash`. If `target` is `None`,
+/// repetitions of any digit count.
 fn has_repeat(hash: &[u8;16], target: Option<u8>, reps: usize) -> Option<u8> {
+    // Split up the input bytes into digits.
     let mut nybbles = [0u8; 32];
     for i in 0..16 {
         let j = i << 1;
         nybbles[j] = (hash[i] >> 4) & 0xf;
         nybbles[j+1] = hash[i] & 0xf;
     };
+
+    // Look for repetitions of target. O(*mn*) where
+    // *m* is the size of the input and *n* is the
+    // desired repetition count.
     for i in 0..32-reps {
+
+        // Look for repetitions at position *i*.
+        // Implemented as a function to allow early return
+        // for convenience.
         let has_reps = || {
+            // Identify or select starting value.
             let b0 =
                 match target {
                     Some(b) => b,
                     None => nybbles[i]
                 };
+
+            // Check for consecutive matches of value.
             for j in 0..reps {
                 if nybbles[i+j] != b0 {
                     return false;
@@ -96,6 +97,8 @@ fn has_repeat(hash: &[u8;16], target: Option<u8>, reps: usize) -> Option<u8> {
             };
             true
         };
+        
+        // Wrap the answer.
         if has_reps() {
             return Some(nybbles[i]);
         };
@@ -108,6 +111,7 @@ mod test_has_repeat {
 
     use crypto::digest::Digest;
     use crypto::md5;
+    use super::aoc;
 
     fn make_hash(i: usize, output: &mut [u8;16]) {
         let mut hasher = md5::Md5::new();
@@ -151,22 +155,24 @@ mod test_has_repeat {
     fn check_stretched_md5() {
         let mut output = [0u8;16];
         make_hash(0, &mut output);
-        if super::hex_string(&output) != "577571be4de9dcce85a041ba0410f29f" {
-            panic!(super::hex_string(&output));
+        if aoc::hex_string(&output) != "577571be4de9dcce85a041ba0410f29f" {
+            panic!(aoc::hex_string(&output));
         };
         make_stretched_hash(0, &mut output);
-        if super::hex_string(&output) != "a107ff634856bb300138cac6568c0f24" {
-            panic!(super::hex_string(&output));
+        if aoc::hex_string(&output) != "a107ff634856bb300138cac6568c0f24" {
+            panic!(aoc::hex_string(&output));
         };
         assert!(has_rep_stretched(0, None, 3) == None);
     }
 }
 
-
+/// Run the problem.
 pub fn main() {
     let (part, args) = aoc::get_part_args();
     assert!(args.len() == 1);
     let k = &(args[0].as_bytes());
+
+    // Set up state.
     let mut n: isize = 64;
     let mut hasher: Box<Digest> =
         if part == 1 {
@@ -178,7 +184,10 @@ pub fn main() {
         };
     let mut output = [0;16];
     let mut hashbuf: Vec<[u8;16]> = Vec::new();
+
+    // This loop should never finish.
     for i in 0..std::usize::MAX {
+        // If hash is not already cached, cache it.
         if i >= hashbuf.len() {
             hasher.reset();
             hasher.input(k);
@@ -188,9 +197,13 @@ pub fn main() {
         } else {
             output = hashbuf[i];
         }
+
+        // If we've found a repetition, look ahead up to 1001
+        // steps for another of the same.
         if let Some(rep) = has_repeat(&output, None, 3) {
             let mut output = [0;16];
             for j in 1..1001 {
+                // If hash is not already cached, cache it.
                 if i + j >= hashbuf.len() {
                     hasher.reset();
                     hasher.input(k);
@@ -199,17 +212,20 @@ pub fn main() {
                     hashbuf.push(output);
                 } else {
                     output = hashbuf[i + j];
-                }
-                if let Some(_) = has_repeat(&output, Some(rep), 5) {
-                    // println!("{} {} {} {}", n, i, i+j, rep);
+                };
+
+                // If we've found the second repeat, process it.
+                if let Some(xrep) = has_repeat(&output, Some(rep), 5) {
+                    assert!(xrep == rep);
                     n -= 1;
                     if n == 1 {
                         println!("{}", i);
                         return;
-                    }
+                    };
                     break;
-                }
-            }
+                };
+            };
         };
     };
+    panic!("no solution found");
 }
