@@ -77,7 +77,7 @@ pub fn main() {
         match pq.pop() {
             Some(PQElem{cost: g, fcost: _, state}) => {
                 if state == goal {
-                    print!("cost {} for {:?}\n", g, state);
+                    println!("cost {} for {:?}", g, state);
                     return;
                 };
                 match stop_list.insert(state) {
@@ -108,7 +108,7 @@ pub fn main() {
             },
             None => {
                 if part == 2 {
-                    print!("{}\n", stop_list.len());
+                    println!("{}", stop_list.len());
                     return;
                 };
                 panic!("found no solution");

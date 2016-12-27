@@ -128,5 +128,5 @@ pub fn main() {
         let pc = state.pc;
         step(&mut state, &insns[pc]);
     };
-    print!("{}\n", state.regs[0]);
+    println!("{}", state.regs[0]);
 }

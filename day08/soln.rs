@@ -112,7 +112,7 @@ fn display(m: &Vec<Vec<char>>) {
         for x in 0..m.len() {
             print!("{}", m[x][y]);
         };
-        print!("\n");
+        println!("");
     }
 }
 
@@ -145,7 +145,7 @@ fn main() {
             if f(&l, &mut m) {
                 processed = true;
                 if TRACING {
-                    print!("\n");
+                    println!("");
                     display(&m);
                 };
                 break;

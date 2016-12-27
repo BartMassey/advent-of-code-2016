@@ -27,7 +27,7 @@ fn count_ca(row0: &Vec<bool>, nrows: usize) -> usize {
     let mut cur_row = (*row0).clone();
     for _ in 0..nrows {
         if SHOW {
-            print!("{}\n", decode_row(&cur_row));
+            println!("{}", decode_row(&cur_row));
         };
         for b in cur_row.iter() {
             if *b {
@@ -84,5 +84,5 @@ pub fn main() {
         Some(_) => { panic!("more than one row"); },
         None => ()
     };
-    print!("{}\n", count_ca(&encode_row(&row0), nrows));
+    println!("{}", count_ca(&encode_row(&row0), nrows));
 }

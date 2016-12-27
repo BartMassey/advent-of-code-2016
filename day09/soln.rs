@@ -78,5 +78,5 @@ pub fn main() {
     let _ = io::stdin().read_to_end(&mut chars)
         .expect("could not read all of stdin");
     let nemit = parse_expansion(&chars, part==2);
-    print!("{}\n", nemit);
+    println!("{}", nemit);
 }

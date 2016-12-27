@@ -43,7 +43,7 @@ pub fn print_code(board: &Vec<Vec<char>>) {
         n = walk_line(board, n, &line);
         print!("{}", board[n.1][n.0]);
     }
-    print!("\n");
+    println!("");
 }
 
 /// Read the board for the part, returning a nested

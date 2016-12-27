@@ -269,7 +269,7 @@ pub fn main() {
         match pq.pop() {
             Some(PQElem{cost: gcost, fcost: _, state}) => {
                 if state.is_goal() {
-                    print!("cost {} for {:?}\n", gcost, state);
+                    println!("cost {} for {:?}", gcost, state);
                     return;
                 };
                 match stop_list.insert(state.clone()) {

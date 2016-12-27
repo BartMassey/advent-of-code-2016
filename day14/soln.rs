@@ -201,10 +201,10 @@ pub fn main() {
                     output = hashbuf[i + j];
                 }
                 if let Some(_) = has_repeat(&output, Some(rep), 5) {
-                    // print!("{} {} {} {}\n", n, i, i+j, rep);
+                    // println!("{} {} {} {}", n, i, i+j, rep);
                     n -= 1;
                     if n == 1 {
-                        print!("{}\n", i);
+                        println!("{}", i);
                         return;
                     }
                     break;

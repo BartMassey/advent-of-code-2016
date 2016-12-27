@@ -94,7 +94,7 @@ fn read_insns() -> Vec<Insn> {
     let mut insns = Vec::new();
     for target in aoc::input_lines() {
         if SHOW {
-            print!("{}\n", target);
+            println!("{}", target);
         };
         if let Some(args) = try_pat(&swpos_pat, &target) {
             let p1 = args[0].parse::<usize>().unwrap();
@@ -145,7 +145,7 @@ fn run_insns(insns: &Vec<Insn>, chars0: &mut Vec<char>) {
     let mut chars = chars0.clone();
     for insn in insns {
         if SHOW {
-            print!("{}: {:?}\n",
+            println!("{}: {:?}",
                    chars.iter().cloned().collect::<String>(),
                    insn);
         };
@@ -209,7 +209,7 @@ pub fn main() {
     let mut chars = args[0].chars().collect::<Vec<char>>();
     if part == 1 {
         run_insns(&insns, &mut chars);
-        print!("{}\n", chars.into_iter().collect::<String>());
+        println!("{}", chars.into_iter().collect::<String>());
     } else {
         let mut heap_chars = chars.clone();
         let perms = Heap::new(&mut heap_chars);
@@ -217,7 +217,7 @@ pub fn main() {
             let mut pchars = p.clone();
             run_insns(&insns, &mut pchars);
             if chars == pchars {
-                print!("{}\n", p.iter().cloned().collect::<String>());
+                println!("{}", p.iter().cloned().collect::<String>());
                 return;
             };
         };

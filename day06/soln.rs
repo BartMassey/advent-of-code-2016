@@ -79,5 +79,5 @@ pub fn main() {
             };
         print!("{}", (i as u8 + 'a' as u8) as char);
     }
-    print!("\n");
+    println!("");
 }

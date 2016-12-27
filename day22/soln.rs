@@ -172,7 +172,7 @@ fn print_map(s: &State, tiles: &HashSet<(usize, usize)>,
                 print!("#");
             };
         };
-        print!("\n");
+        println!("");
     };
 }
 
@@ -255,14 +255,14 @@ pub fn main() {
         umap[x][y] = u;
     };
     if part == 1 {
-        print!("{}\n", count_viable_pairs(&umap));
+        println!("{}", count_viable_pairs(&umap));
     } else {
         let (start, tiles) = start_info(&umap);
         print_map(&start, &tiles, len_x, len_y);
         if let Some(g) = a_star(&start, &tiles) {
-            print!("{}\n", g);
+            println!("{}", g);
         } else {
-            print!("no solution\n");
+            println!("no solution");
         };            
     };
 }

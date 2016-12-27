@@ -127,5 +127,5 @@ pub fn main() {
             count += 1;
         }
     }
-    print!("{}\n", count);
+    println!("{}", count);
 }

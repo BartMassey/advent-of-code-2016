@@ -94,7 +94,7 @@ pub fn main() {
             Some(PQElem{cost: g, state}) => {
                 if state.visited.len() == goals_len {
                     if part == 1 || state.posn == start_posn {
-                        print!("{}\n", g);
+                        println!("{}", g);
                         return;
                     }
                 };
@@ -126,7 +126,7 @@ pub fn main() {
                 }
             },
             None => {
-                print!("no solution\n");
+                println!("no solution");
                 return;
             }
         }

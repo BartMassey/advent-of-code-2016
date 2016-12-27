@@ -57,7 +57,7 @@ fn test_merge_ranges() {
         (15, 15) ];
     merge_ranges(&mut ranges);
     if ranges != vec![(0,9), (11, 13), (15, 15)] {
-        print!("{:?}\n", ranges);
+        println!("{:?}", ranges);
         panic!("ranges mismatch");
     }
 }
@@ -67,13 +67,13 @@ pub fn main() {
     let mut ranges = read_ranges();
     merge_ranges(&mut ranges);
     if part == 1 {
-        print!("{}\n", ranges[0].1 + 1);
+        println!("{}", ranges[0].1 + 1);
     } else {
         let mut count = 0;
         for i in 0..ranges.len()-1 {
             count += ranges[i+1].0 - ranges[i].1 - 1;
         };
         count += 4294967295 - ranges[ranges.len()-1].1;
-        print!("{}\n", count);
+        println!("{}", count);
     };
 }

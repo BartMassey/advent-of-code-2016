@@ -51,9 +51,9 @@ pub fn main() {
     let discs = read_discs();
     for t in 0..std::isize::MAX {
         if search(&discs, t) {
-            print!("{}\n", t);
+            println!("{}", t);
             return;
         }
     };
-    print!("no solution found\n");
+    println!("no solution found");
 }

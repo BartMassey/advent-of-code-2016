@@ -88,7 +88,7 @@ pub fn main() {
         // If we have all the characters, it's over.
         count += 1;
         if count >= password.len() {
-            print!("\n");
+            println!("");
             return;
         }
     };

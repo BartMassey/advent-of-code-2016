@@ -158,7 +158,7 @@ pub fn main() {
                     }
                     // Check for part 1 solution if needed.
                     if part == 1 && holds[b].contains(&target_low) && holds[b].contains(&target_high) {
-                        print!("{}\n", b);
+                        println!("{}", b);
                         return;
                     }
                     // Run the compare instruction over the current canonical compare.
@@ -170,7 +170,7 @@ pub fn main() {
                                         if holds[bl].insert(*vl) {
                                             changed = true;
                                             if TRACE {
-                                                print!("{} low {} to {}({})\n",
+                                                println!("{} low {} to {}({})",
                                                        b, *vl, bl, holds[bl].len());
                                             }
                                         }
@@ -182,7 +182,7 @@ pub fn main() {
                                             outputs[ql] = Some(*vl);
                                             changed = true;
                                             if TRACE {
-                                                print!("{} low {} to output {}\n",
+                                                println!("{} low {} to output {}",
                                                        b, *vl, ql);
                                             }
                                         }
@@ -193,7 +193,7 @@ pub fn main() {
                                         if holds[bh].insert(*vh) {
                                             changed = true;
                                             if TRACE {
-                                                print!("{} high {} to {}({})\n",
+                                                println!("{} high {} to {}({})",
                                                        b, *vh, bh, holds[bh].len());
                                             }
                                         }
@@ -205,7 +205,7 @@ pub fn main() {
                                             outputs[qh] = Some(*vh);
                                             changed = true;
                                             if TRACE {
-                                                print!("{} high {} to output {}\n",
+                                                println!("{} high {} to output {}",
                                                        b, *vh, qh);
                                             }
                                         }
@@ -223,26 +223,26 @@ pub fn main() {
     // Handle the two parts separately, reporting errors for debugging.
     if part == 1 {
         // Part 1 has definitely failed.
-        print!("no soln found\n");
+        println!("no soln found");
         for b in 0..holds.len() {
             print!("{}:", b);
             for v in holds[b].iter() {
                 print!(" {}", *v);
             };
-            print!("\n");
+            println!("");
         }
     } else {
         // Part 2 may have succeeded.
         match (outputs[0], outputs[1], outputs[2]) {
-            (Some(v1), Some(v2), Some(v3)) => { print!("{}\n", v1 * v2 * v3); },
+            (Some(v1), Some(v2), Some(v3)) => { println!("{}", v1 * v2 * v3); },
             _ => {
                 // Part 2 has definitely failed.
-                print!("no solution found\n");
+                println!("no solution found");
                 for q in 0..outputs.len() {
                     print!("{}: ", q);
                     match outputs[q] {
-                        None => { print!("-\n"); },
-                        Some(v) => { print!("{}\n", v); }
+                        None => { println!("-"); },
+                        Some(v) => { println!("{}", v); }
                     }
                 }
             }

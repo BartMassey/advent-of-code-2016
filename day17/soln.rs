@@ -117,8 +117,8 @@ pub fn main() {
     hasher0.input(passcode);
     if part == 2 {
         match dfid(&hasher0, 0, (0, 0), "".to_string(), true) {
-            Completed(soln) => { print!("longest {}\n", soln.len()); },
-            Finished => { print!("no solution exists\n"); },
+            Completed(soln) => { println!("longest {}", soln.len()); },
+            Finished => { println!("no solution exists"); },
             Stopped => { panic!("stopped in longest"); }
         }
         return;
@@ -127,11 +127,11 @@ pub fn main() {
         let result = dfid(&hasher0, limit, (0, 0), "".to_string(), false);
         match  result {
             Completed(soln) =>  {
-                print!("solution {}\n", soln);
+                println!("solution {}", soln);
                 return;
             },
             Finished => {
-                print!("no solution exists\n");
+                println!("no solution exists");
                 return;
             },
             _ => ()

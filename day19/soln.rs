@@ -36,7 +36,7 @@ pub fn main() {
     let mut living_elves = nelves;
     loop {
         if SHOW {
-            print!("{} {}\n", cur_elf + 1, elves[victim_parent].next_elf + 1);
+            println!("{} {}", cur_elf + 1, elves[victim_parent].next_elf + 1);
         };
         let victim_elf = elves[victim_parent].next_elf;
         assert!(cur_elf != victim_elf);
@@ -56,5 +56,5 @@ pub fn main() {
         };
     };
     assert!(elves[cur_elf].npresents == nelves);
-    print!("{}\n", cur_elf + 1);
+    println!("{}", cur_elf + 1);
 }

@@ -71,22 +71,22 @@ fn step(insns: &mut Vec<Insn>, state: &mut State) {
     match insns[state.pc] {
         Cpy(rc1, Reg(r2)) => {
             if TRACE {
-                print!("{}: cpy {} {}\n", state.pc, rcs(rc1), rcs(Reg(r2)));
+                println!("{}: cpy {} {}", state.pc, rcs(rc1), rcs(Reg(r2)));
             };
             state.regs[r2] = eval(state, rc1);
             state.pc += 1;
         },
         Cpy(rc1, rc2) => {
             if TRACE {
-                print!("{}: cpy* {} {}\n", state.pc, rcs(rc1), rcs(rc2));
+                println!("{}: cpy* {} {}", state.pc, rcs(rc1), rcs(rc2));
             };
             state.pc += 1;
         },
         Add(cnst, Reg(reg)) => {
             if TRACE {
                 match cnst {
-                    1 => print!("{}: inc {}\n", state.pc, rcs(Reg(reg))),
-                    -1 => print!("{}: dec {}\n", state.pc, rcs(Reg(reg))),
+                    1 => println!("{}: inc {}", state.pc, rcs(Reg(reg))),
+                    -1 => println!("{}: dec {}", state.pc, rcs(Reg(reg))),
                     _ => panic!("invalid add")
                 }
             };
@@ -98,7 +98,7 @@ fn step(insns: &mut Vec<Insn>, state: &mut State) {
         },
         JNZ(rc1, rc2) => {
             if TRACE {
-                print!("{}: jnz {} {}\n", state.pc, rcs(rc1), rcs(rc2));
+                println!("{}: jnz {} {}", state.pc, rcs(rc1), rcs(rc2));
             };
             let test = eval(state, rc1);
             if test != 0 {
@@ -112,7 +112,7 @@ fn step(insns: &mut Vec<Insn>, state: &mut State) {
         },
         Tgl(rc) => {
             if TRACE {
-                print!("{}: tgl {}\n", state.pc, rcs(rc));
+                println!("{}: tgl {}", state.pc, rcs(rc));
             };
             let off = eval(state, rc);
             if off == 0 {
@@ -174,5 +174,5 @@ pub fn main() {
     while state.pc < insns.len() {
         step(&mut insns, &mut state);
     };
-    print!("{}\n", state.regs[0]);
+    println!("{}", state.regs[0]);
 }

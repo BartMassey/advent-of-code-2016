@@ -73,5 +73,5 @@ pub fn main() {
         data = fill_step(data);
     };
     let data = &data[0..fill].to_string();
-    print!("{}\n", checksum(data.to_string()));
+    println!("{}", checksum(data.to_string()));
 }

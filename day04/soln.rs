@@ -94,13 +94,13 @@ pub fn main() {
 
         // Handle part 2 by printing all the decryptions.
         if decrypt {
-            print!("{} {}\n", name_decrypt(&room_name, sector_id), sector_id);
+            println!("{} {}", name_decrypt(&room_name, sector_id), sector_id);
         }
         sector_sum += sector_id;
     };
 
     // Handle part 1 by printing the sum.
     if !decrypt {
-        print!("{}\n", sector_sum);
+        println!("{}", sector_sum);
     };
 }
