@@ -2,17 +2,23 @@
 Copyright (c) 2016 Bart Massey
 
 Given that we have an A\* search lying around from the dread
-day 11 solution, this was pretty straightforward.
+day 11 solution, part 1 was pretty straightforward. The
+performance in part 2 showed that Dijkstra would have been
+sufficient.
 
 The answer for each part was obtained in 3ms realtime (more
 or less), with 0ms user time, using the debug version of the
 solution.
 
-I ran this code with
+# Usage
+
+Part 1:
+
         ./soln 1 1352 31 39
-and
+
+Part 2:
+
         ./soln 2 1352 50
-rather than playing fancy games with parsing and constants.
 
 ---
 
