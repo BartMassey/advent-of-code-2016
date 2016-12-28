@@ -62,10 +62,10 @@ pub trait SearchState {
     /// Return true if the given node is a goal node.
     fn is_goal(&self) -> bool;
     
-    /// Return a vector of neighbors of the given state in
-    /// the search space, each annotated with the cost of
-    /// reaching it.
-    fn neighbors(&self) -> Vec<(usize, &Self)>;
+    /// Return an iterator that delivers neighbors of the
+    /// given state in the search space, each annotated with
+    /// the cost of reaching it.
+    fn neighbors(&self) -> Box<Iterator<Item=(usize, &Self)>>;
 
     /// Return an [admissible][1] heuristic cost of reaching
     /// the least-cost goal node from this state. The default
@@ -112,8 +112,7 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
                 match stop_list.insert(state.clone()) {
                     false => { continue; },
                     true => {
-                        for &(ref g_cost, ref next_state)
-                        in state.neighbors().iter() {
+                        for (g_cost, next_state) in state.neighbors() {
                             let h = next_state.hcost();
                             let g = cost + g_cost;
                             let next_path =
