@@ -14,20 +14,23 @@
 // For an explanation of the structure of this file, see
 // http://stackoverflow.com/questions/22596920/
 
-mod args;
+pub mod args;
 pub use self::args::*;
 
-mod sets;
+pub mod sets;
 pub use self::sets::*;
 
-mod bits;
+pub mod bits;
 pub use self::bits::*;
 
-mod lines;
+pub mod lines;
 pub use self::lines::*;
 
-mod hex;
+pub mod hex;
 pub use self::hex::*;
 
-mod astar;
+pub mod astar;
 pub use self::astar::*;
+
+pub mod dirns;
+pub use self::dirns::*;
