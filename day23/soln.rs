@@ -3,33 +3,42 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-// Advent of Code Day 23.
+//! Advent of Code Day 23.
 
-#[cfg(debug_assertions)]
-const TRACE: bool = true;
-#[cfg(not(debug_assertions))]
+/// Set to true to trace execution.
 const TRACE: bool = false;
 
 extern crate aoc;
 
+/// Operand types.
 #[derive(Clone, Copy)]
 enum Opnd {
+    /// Register.
     Reg(usize),
+    /// Constant.
     Const(isize)
 }
 
 use self::Opnd::*;
 
+/// Instruction types.
 #[derive(Clone, Copy)]
 enum Insn {
+    /// Copy left-to-right.
     Cpy(Opnd, Opnd),
+    /// Add left constant to right operand.  Usually
+    /// constant is either 1 (INC) or -1 (DEC).
     Add(isize, Opnd),
+    /// Jump relative with offset given by right operand if
+    /// left operand is nonzero.
     JNZ(Opnd, Opnd),
+    /// Toggle the instruction at given offset.
     Tgl(Opnd)
 }
 
 use self::Insn::*;
 
+/// Parse and construct an operand.
 fn parse_opnd(opnd: &str) -> Opnd {
     match opnd.parse::<isize>() {
         Ok(i) => Const(i),
@@ -43,11 +52,15 @@ fn parse_opnd(opnd: &str) -> Opnd {
     }
 }
 
+/// Machine state.
 struct State {
+    /// Current program counter.
     pc: usize,
+    /// Current register values.
     regs: Vec<isize>
 }
 
+/// Return the value of given operand in given state.
 fn eval(state: &State, opnd: Opnd) -> isize {
     match opnd {
         Reg(r) => state.regs[r],
@@ -55,7 +68,7 @@ fn eval(state: &State, opnd: Opnd) -> isize {
     }
 }
 
-
+/// Make printable string describing operand.
 fn rcs(opnd: Opnd) -> String {
     match opnd {
         Const(c) => c.to_string(),
@@ -67,6 +80,8 @@ fn rcs(opnd: Opnd) -> String {
     }
 }
 
+/// Execute the instruction at the current PC in the given
+/// state.
 fn step(insns: &mut Vec<Insn>, state: &mut State) {
     match insns[state.pc] {
         Cpy(rc1, Reg(r2)) => {
@@ -137,11 +152,16 @@ fn step(insns: &mut Vec<Insn>, state: &mut State) {
     }
 }
 
+/// Read the program and execute it.
 pub fn main() {
     let args = aoc::get_args();
     assert!(args.len() == 1);
     let key = args[0].parse().expect("invalid key");
+
+    // Set up state.
     let mut insns: Vec<Insn> = Vec::new();
+
+    // Parse instructions.
     for target in aoc::input_lines() {
         let words = target.split_whitespace().collect::<Vec<&str>>();
         let insn =
@@ -170,9 +190,13 @@ pub fn main() {
             };
         insns.push(insn);
     };
+
+    // Run the program to completion.
     let mut state = State{pc: 0, regs: vec![key, 0, 0, 0]};
     while state.pc < insns.len() {
         step(&mut insns, &mut state);
     };
+
+    // Show the contents of register a.
     println!("{}", state.regs[0]);
 }
