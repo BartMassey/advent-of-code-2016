@@ -12,12 +12,10 @@ use std::fs::File;
 /// The `std::io::Lines` iterator, wrapped so that
 /// it will `panic!()` on failure rather than returning
 /// a `std::io::Result`.
-#[allow(dead_code)]
 pub struct InputLines<T: Read> {
     lines: Lines<BufReader<T>>
 }
 
-#[allow(dead_code)]
 impl <T: Read> InputLines<T> {
 
     /// Return the wrapped `std::io::Lines` iterator.
@@ -40,14 +38,12 @@ impl <T: Read> Iterator for InputLines<T> {
 }
 
 /// Get a new iterator over lines of `stdin`.
-#[allow(dead_code)]
 pub fn input_lines() -> InputLines<Stdin> {
     InputLines::new(stdin())
 }
 
 /// Get a new iterator over lines of the file with the given filename,
 /// returning an error on failure to open the file.
-#[allow(dead_code)]
 pub fn input_file_lines(filename: &str) -> Result<InputLines<File>> {
     let file = try!(File::open(filename));
     Ok(InputLines::new(file))
