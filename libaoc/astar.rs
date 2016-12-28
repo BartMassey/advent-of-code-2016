@@ -61,10 +61,11 @@ pub trait SearchState {
     /// `SearchState::label()` return `()`.
     type Label: Copy;
 
-    /// Return an iterator that delivers neighbors of the
-    /// given state in the search space, each annotated with
-    /// the cost of reaching it.
-    fn neighbors(&self) -> Box<Iterator<Item=(usize, &Self)>>;
+    /// Type of global information used during the search.
+    /// This information is passed in on start and passed
+    /// to the `SearchGoals::hcost()` and `SearchState::neighbors()`
+    /// methods in case it is needed.
+    type Global;
 
     /// Returns a label for this node as part of the path tracking.
     ///
@@ -74,6 +75,13 @@ pub trait SearchState {
     /// this case is to set `SearchState::Label` to `()` and then have
     /// `label()` return `()`.
     fn label(&self) -> Self::Label;
+
+    /// Return an iterator that delivers neighbors of the
+    /// given state in the search space, each annotated with
+    /// the cost of reaching it. May use the given global
+    /// information to calculate its result.
+    fn neighbors(&self, global: &Self::Global)
+    -> Box<Iterator<Item=(usize, &Self)>>;
 }
 
 pub trait SearchGoals<S: SearchState>  {
@@ -86,9 +94,12 @@ pub trait SearchGoals<S: SearchState>  {
     /// `astar::a_star()`) to degenerate to the special case
     /// of [Dijkstra's Algorithm][2].
     ///
+    /// Arguments are the source state and the global
+    /// information.
+    ///
     /// [1]: http://en.wikipedia.org/wiki/Admissible_heuristic
     /// [2]: https://en.wikipedia.org/wiki/Dijkstra's_algorithm
-    fn hcost(&self, _: &S) -> usize {
+    fn hcost(&self, _: &S, _: &S::Global) -> usize {
         0
     }
 }
@@ -96,16 +107,18 @@ pub trait SearchGoals<S: SearchState>  {
 /// Generic [A\* search][1] for a least-cost path from the
 /// given state to some given goal. The return value is the cost
 /// and path (sequence of states) if a path is found.
-pub fn a_star<S, G>(start: &S, goals: &G, save_path: bool)
+pub fn a_star<S, G>(global: &S::Global, start: &S,
+                         goals: &G, save_path: bool)
 -> Option<(usize, Option<Vec<S::Label>>)>
-where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState,
+where
+S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState,
 G: SearchGoals<S> {
     let mut stop_list = BTreeSet::new();
     let mut pq = BinaryHeap::new();
     pq.push(PQElem{
         state: start.clone(),
         cost: 0,
-        fcost: goals.hcost(&start),
+        fcost: goals.hcost(&start, &global),
         path: if save_path { Some(Vec::new()) } else { None }
     });
     loop {
@@ -117,8 +130,8 @@ G: SearchGoals<S> {
                 match stop_list.insert(state.clone()) {
                     false => { continue; },
                     true => {
-                        for (g_cost, next_state) in state.neighbors() {
-                            let h = goals.hcost(&next_state);
+                        for (g_cost, next_state) in state.neighbors(&global) {
+                            let h = goals.hcost(&next_state, &global);
                             let g = cost + g_cost;
                             let next_path =
                                 match path {
