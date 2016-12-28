@@ -85,8 +85,7 @@ pub fn main() {
         };
 
     // Set up problem state.
-    let (goal_x, goal_y) = goal;
-    let dirns = [(1, 0), (0, 1), (-1, 0), (0, -1)];
+    let grid = aoc::GridBox::new_grid();
     let start = PQElem{cost: 0, fcost: 0, state: (1, 1)};
     let mut stop_list = BTreeSet::new();
     let mut pq = BinaryHeap::new();
@@ -108,25 +107,17 @@ pub fn main() {
                         if part == 2 && g >= max_g {
                             continue;
                         }
-                        let (x, y) = state;
                         // Process neighbor in each direction.
-                        for &(dx, dy) in dirns.iter() {
-                            // Calculate neighbor.
-                            let next_x = x as isize + dx;
-                            let next_y = y as isize + dy;
-                            if next_x < 0 || next_y < 0 {
-                                continue;
-                            }
-                            let next_state =
-                                (next_x as usize, next_y as usize);
+                        for next_state in grid.neighbors(state) {
+                            // Clip on walls.
                             if is_wall(k, next_state) {
                                 continue;
                             }
 
                             // Push the new neighbor.
                             if !stop_list.contains(&next_state) {
-                                let h = (goal_x as isize - next_x).abs()
-                                      + (goal_y as isize - next_y).abs();
+                                let h = aoc::manhattan_distance(
+                                        next_state, goal);
                                 let g = g + 1;
                                 pq.push(PQElem{
                                     fcost: g + h as usize,
