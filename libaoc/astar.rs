@@ -47,9 +47,7 @@ impl <S: SearchState> Ord for PQElem<S> {
     }
 }
 
-/// Trait for nodes in a search space.  The type `G`
-/// represents goal information which is assumed not to
-/// change during search.
+/// Trait for nodes in a search space.
 pub trait SearchState {
     /// Type of state label. The state label is used solely for
     /// tracking and returning the least-cost path.
@@ -62,9 +60,10 @@ pub trait SearchState {
     type Label: Copy;
 
     /// Type of global information used during the search.
-    /// This information is passed in on start and passed
-    /// to the `SearchGoals::hcost()` and `SearchState::neighbors()`
-    /// methods in case it is needed.
+    /// This information is passed in on start and passed to
+    /// the `SearchGoals::hcost()` and
+    /// `SearchState::neighbors()` methods in case it is
+    /// needed. Use `()` if global data is not needed.
     type Global;
 
     /// Returns a label for this node as part of the path tracking.
@@ -72,21 +71,20 @@ pub trait SearchState {
     /// Because default types are unstable, it will be
     /// necessary to define this function even if no path
     /// tracking is needed.  The obvious implementation in
-    /// this case is to set `SearchState::Label` to `()` and then have
-    /// `label()` return `()`.
+    /// this case is to set `SearchState::Label` to `()` and
+    /// then have `label()` return `()`.
     fn label(&self) -> Self::Label;
 
-    /// Return an iterator that delivers neighbors of the
-    /// given state in the search space, each annotated with
-    /// the cost of reaching it. May use the given global
+    /// Return an iterator that delivers neighbors of this
+    /// state in the search space, each annotated with the
+    /// cost of reaching it. May use the given global
     /// information to calculate its result.
     fn neighbors(&self, global: &Self::Global)
     -> Box<Iterator<Item=(usize, &Self)>>;
-}
 
-pub trait SearchGoals<S: SearchState>  {
-    /// Return true if the given state is a goal state.
-    fn is_goal(&self, state: &S) -> bool;
+    /// Return true if this is a goal state,
+    /// given global information.
+    fn is_goal(&self, global: &Self::Global) -> bool;
     
     /// Return an [admissible][1] heuristic cost of reaching
     /// the least-cost goal node from the given state. The default
@@ -99,39 +97,37 @@ pub trait SearchGoals<S: SearchState>  {
     ///
     /// [1]: http://en.wikipedia.org/wiki/Admissible_heuristic
     /// [2]: https://en.wikipedia.org/wiki/Dijkstra's_algorithm
-    fn hcost(&self, _: &S, _: &S::Global) -> usize {
+    fn hcost(&self, _: &Self::Global) -> usize {
         0
     }
 }
 
 /// Generic [A\* search][1] for a least-cost path from the
-/// given state to some given goal. The return value is the cost
+/// given start state to some given goal, using
+/// supplied global data. The return value is the cost
 /// and path (sequence of states) if a path is found.
-pub fn a_star<S, G>(global: &S::Global, start: &S,
-                         goals: &G, save_path: bool)
+pub fn a_star<S>(global: &S::Global, start: &S, save_path: bool)
 -> Option<(usize, Option<Vec<S::Label>>)>
-where
-S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState,
-G: SearchGoals<S> {
+where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
     let mut stop_list = BTreeSet::new();
     let mut pq = BinaryHeap::new();
     pq.push(PQElem{
         state: start.clone(),
         cost: 0,
-        fcost: goals.hcost(&start, &global),
+        fcost: start.hcost(&global),
         path: if save_path { Some(Vec::new()) } else { None }
     });
     loop {
         match pq.pop() {
             Some(PQElem{cost, fcost: _, state, path}) => {
-                if goals.is_goal(&state) {
+                if state.is_goal(&global) {
                     return Some((cost, path));
                 };
                 match stop_list.insert(state.clone()) {
                     false => { continue; },
                     true => {
                         for (g_cost, next_state) in state.neighbors(&global) {
-                            let h = goals.hcost(&next_state, &global);
+                            let h = next_state.hcost(&global);
                             let g = cost + g_cost;
                             let next_path =
                                 match path {
