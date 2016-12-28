@@ -7,11 +7,15 @@ would have almost surely made it. Ah well.
 
 Was a quite straightforward final problem, and an easy Rust
 solution. 16ms. Of course, my solution was heuristic: I
-stopped after 5 correct cycles (10 outputs) and guessed I
+stopped after 10 correct cycles (20 outputs) and guessed I
 was done. Solving this problem properly is
 [harder](https://en.wikipedia.org/wiki/Halting_problem).
 
 Merry Christmas, everyone!
+
+## Usage
+
+        cargo run <input.txt
 
 ---
 
