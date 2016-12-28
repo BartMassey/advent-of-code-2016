@@ -28,3 +28,6 @@ pub use self::lines::*;
 
 mod hex;
 pub use self::hex::*;
+
+mod astar;
+pub use self::astar::*;
