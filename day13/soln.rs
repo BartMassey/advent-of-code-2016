@@ -117,24 +117,16 @@ fn part2(key: usize, max_g: usize) -> usize {
     // Set up the state.
     let grid_box = aoc::GridBox::new_grid();
     let mut fringe = HashSet::new();
-    fringe.insert((0, (1, 1)));
+    fringe.insert((1, 1));
     let mut stop = HashSet::new();
 
     // Keep flooding while there are new nodes to explore.
-    while !fringe.is_empty() {
+    for _ in 0..max_g {
         // Fringe for next round.
         let mut new_fringe = HashSet::new();
 
         // Explore existing fringe.
-        for (g, loc) in fringe {
-            assert!(g <= max_g);
-
-            // Stop if this location is already maximally far.
-            if g == max_g {
-                continue;
-            };
-
-            // Walk over the neighbors.
+        for loc in fringe {
             for nb in aoc::Neighbors::new(grid_box, loc) {
                 // Do not run into walls.
                 if is_wall(key, nb) {
@@ -147,7 +139,7 @@ fn part2(key: usize, max_g: usize) -> usize {
                 };
 
                 // Found a new location.
-                new_fringe.insert((g + 1, nb));
+                new_fringe.insert(nb);
                 stop.insert(nb);
             };
         };

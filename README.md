@@ -60,8 +60,10 @@ I am a novice Rust programmer. Feedback and pull requests
 are extremely welcome! Let me know what I should have done,
 and I'll try to make it right.
 
-TODO: Pull out A\*, try_part(), assembunny interpreter,
+TODO: Pull out try_part(), assembunny interpreter,
 directions and direction processing.
+
+* Assembunny problems: day 12, 
 
 ---
 
