@@ -4,6 +4,11 @@
 // for license terms.
 
 //! A\* for Advent of Code 2016 solutions.
+//!
+//! Note that the memory use here is non-trivial.  There is
+//! a lot of cloning of states. Also, paths are saved
+//! per-state rather than being reconstructed at the end,
+//! which is quite expensive.
 
 use std::cmp::*;
 use std::collections::{BTreeSet, BinaryHeap};
@@ -80,7 +85,7 @@ pub trait SearchState {
     /// cost of reaching it. May use the given global
     /// information to calculate its result.
     fn neighbors(&self, global: &Self::Global)
-    -> Box<Iterator<Item=(usize, &Self)>>;
+    -> Box<Iterator<Item=(usize, Box<Self>)>>;
 
     /// Return true if this is a goal state,
     /// given global information.
@@ -126,7 +131,8 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
                 match stop_list.insert(state.clone()) {
                     false => { continue; },
                     true => {
-                        for (g_cost, next_state) in state.neighbors(&global) {
+                        for nb in state.neighbors(&global) {
+                            let (g_cost, ref next_state) = nb;
                             let h = next_state.hcost(&global);
                             let g = cost + g_cost;
                             let next_path =
@@ -141,10 +147,10 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
                             let neighbor = PQElem {
                                 fcost: g + h,
                                 cost: g,
-                                state: (*next_state).clone(),
+                                state: (**next_state).clone(),
                                 path: next_path
                             };
-                            pq.push(neighbor.clone());
+                            pq.push(neighbor);
                         }
                     }
                 };
