@@ -5,137 +5,183 @@
 
 //! Advent of Code Day 13.
 
-use std::collections::{BTreeSet, BinaryHeap};
-use std::cmp::*;
+use std::collections::HashSet;
 
 extern crate aoc;
 
 /// Return true if there is a wall at the given location.
-fn is_wall(k: usize, (x, y): (usize, usize)) -> bool {
+fn is_wall(k: usize, (x, y): aoc::Point) -> bool {
     let h = x*x + 3*x + 2*x*y + y + y*y + k;
     let hc = aoc::popcount(h as u64);
     return hc & 1 == 1;
 }
 
-/// Node for A\* search.
-#[derive(Clone, Debug)]
-struct PQElem {
-    /// Actual cost.
-    cost: usize,
-    /// Heuristic cost.
-    fcost: usize,
-    /// Underlying state.
-    state: (usize, usize)
+/// Data about the maze itself.
+struct Maze {
+    grid_box: aoc::GridBox,
+    goal: aoc::Point,
+    key: usize,
 }
 
-impl PartialEq for PQElem {
-    /// Two nodes are equal if their costs are equal.
-    fn eq(&self, other: &PQElem) -> bool {
-        other.fcost == self.fcost && other.cost == self.cost
-    }
+/// Location within the maze. Has to be wrapped
+/// so that traits can be implemented on it.
+#[derive(Clone, Eq, PartialEq, PartialOrd, Ord)]
+enum State { Loc((usize, usize)) }
+use self::State::*;
+
+/// Iterator over neighbors in state space.
+struct NeighborStates {
+    key: usize,
+    neighbors: aoc::Neighbors
 }
 
-impl Eq for PQElem {}
-
-impl PartialOrd for PQElem {
-    fn partial_cmp(&self, other: &PQElem) -> Option<Ordering> {
-        Some(self.cmp(&other))
-    }
-}
-
-impl Ord for PQElem {
-    /// Order by least heuristic cost, breaking
-    /// ties by larger actual cost.
-    fn cmp(&self, other: &PQElem) -> Ordering {
-        match other.fcost.cmp(&self.fcost) {
-            Ordering::Equal =>
-                self.cost.cmp(&other.cost),
-            c => c
+impl NeighborStates {
+    /// Make a new iterator over neighbors in state space.
+    fn new(maze: &Maze, state: &State) -> Self {
+        let &Loc(loc) = state;
+        NeighborStates {
+            key: maze.key,
+            neighbors: aoc::Neighbors::new(maze.grid_box, loc)
         }
     }
 }
 
+impl Iterator for NeighborStates {
+    /// Search cost so far, and the neighbor itself.
+    type Item = (usize, Box<State>);
+
+    /// Find the next neighbor in search space.
+    fn next(&mut self) -> Option<(usize, Box<State>)> {
+        loop {
+            match self.neighbors.next() {
+                None => { return None; },
+                Some(nb) => {
+                    if is_wall(self.key, nb) {
+                        continue;
+                    };
+                    return Some((1usize, Box::new(Loc(nb))));
+                }
+            }
+        }
+    }
+}
+        
+impl aoc::SearchState for State {
+    /// We do not use labels here.
+    type Label = ();
+
+    /// The maze data is the global data for this problem.
+    type Global = Maze;
+
+    /// We do not use labels here.
+    fn label(&self) -> () { () }
+
+    /// State-space neighbors iterator.
+    fn neighbors(&self, maze: &Maze)
+    -> Box<Iterator<Item=(usize, Box<State>)>> {
+        Box::new(NeighborStates::new(maze, self))
+    }
+
+    /// Goal state is part of maze data.
+    fn is_goal(&self, maze: &Maze) -> bool {
+        let &Loc(loc) = self;
+        loc == maze.goal
+    }
+
+    /// The heuristic assumes no walls.
+    fn hcost(&self, maze: &Maze) -> usize {
+        let &Loc(loc) = self;
+        aoc::manhattan_distance(loc, maze.goal)
+    }
+}
+
+/// Solve part 1. Strategy: A\* search.
+fn part1(key: usize, goal: (usize, usize)) -> usize {
+    // Set up problem state.
+    let maze = Maze {
+        key: key,
+        goal: goal,
+        grid_box: aoc::GridBox::new_grid()
+    };
+        
+    // Run the A\* search.
+    match aoc::a_star(&maze, &Loc((1, 1)), false) {
+        None => panic!("no solution"),
+        Some((dist, _)) => dist
+    }
+}
+
+/// Solve part 2. Strategy: flood fill with
+/// distance recording.
+fn part2(key: usize, max_g: usize) -> usize {
+    // Set up the state.
+    let grid_box = aoc::GridBox::new_grid();
+    let mut fringe = HashSet::new();
+    fringe.insert((0, (1, 1)));
+    let mut stop = HashSet::new();
+
+    // Keep flooding while there are new nodes to explore.
+    while !fringe.is_empty() {
+        // Fringe for next round.
+        let mut new_fringe = HashSet::new();
+
+        // Explore existing fringe.
+        for (g, loc) in fringe {
+            assert!(g <= max_g);
+
+            // Stop if this location is already maximally far.
+            if g == max_g {
+                continue;
+            };
+
+            // Walk over the neighbors.
+            for nb in aoc::Neighbors::new(grid_box, loc) {
+                // Do not run into walls.
+                if is_wall(key, nb) {
+                    continue;
+                };
+
+                // Do not revisit already-explored locations.
+                if stop.contains(&nb) {
+                    continue;
+                };
+
+                // Found a new location.
+                new_fringe.insert((g + 1, nb));
+                stop.insert(nb);
+            };
+        };
+
+        // Update the fringe.
+        fringe = new_fringe;
+    };
+    stop.len()
+}
+
+
 /// Read the problem description and run the search.
 pub fn main() {
     let (part, args) = aoc::get_part_args();
-    let k = args[0].parse::<usize>().expect("k not a number");
+    let key = args[0].parse::<usize>().expect("key not a number");
 
-    // Get the search set up.
-    let (goal, max_g) =
-        match part {
-            1 => {
-                assert!(args.len() == 3);
-                let goal_x =
-                    args[1].parse::<usize>().expect("x not a number");
-                let goal_y =
-                    args[2].parse::<usize>().expect("y not a number");
-                ((goal_x, goal_y), 0)
-            },
-            2 => {
-                assert!(args.len() == 2);
-                let max_g =
-                    args[1].parse::<usize>().expect("max_g not a number");
-                // We cheat a bit here by making the goal large
-                // and thus hopefully unreachably far away.
-                ((max_g + 1, max_g + 1), max_g)
-            },
-            _ => {
-                panic!("unknown part");
-            }
-        };
-
-    // Set up problem state.
-    let grid = aoc::GridBox::new_grid();
-    let start = PQElem{cost: 0, fcost: 0, state: (1, 1)};
-    let mut stop_list = BTreeSet::new();
-    let mut pq = BinaryHeap::new();
-
-    // Run the A* search.
-    pq.push(start);
-    loop {
-        match pq.pop() {
-            Some(PQElem{cost: g, fcost: _, state}) => {
-                // We should only ever reach the goal in part 1.
-                if state == goal {
-                    assert!(part == 1);
-                    println!("{}", g);
-                    return;
-                };
-                match stop_list.insert(state) {
-                    false => { continue; },
-                    true => {
-                        if part == 2 && g >= max_g {
-                            continue;
-                        }
-                        // Process neighbor in each direction.
-                        for next_state in grid.neighbors(state) {
-                            // Clip on walls.
-                            if is_wall(k, next_state) {
-                                continue;
-                            }
-
-                            // Push the new neighbor.
-                            if !stop_list.contains(&next_state) {
-                                let h = aoc::manhattan_distance(
-                                        next_state, goal);
-                                let g = g + 1;
-                                pq.push(PQElem{
-                                    fcost: g + h as usize,
-                                    cost: g,
-                                    state: next_state
-                                });
-                            }
-                        }
-                    }
-                };
-            },
-            None => {
-                if part == 2 {
-                    println!("{}", stop_list.len());
-                    return;
-                };
-                panic!("found no solution");
-            }
+    match part {
+        1 => {
+            assert!(args.len() == 3);
+            let goal_x =
+                args[1].parse::<usize>().expect("x not a number");
+            let goal_y =
+                args[2].parse::<usize>().expect("y not a number");
+            let n = part1(key, (goal_x, goal_y));
+            println!("{}", n);
+        },
+        2 => {
+            assert!(args.len() == 2);
+            let max_g = args[1].parse::<usize>().expect("max_g not a number");
+            let n = part2(key, max_g);
+            println!("{}", n);
+        },
+        _ => {
+            panic!("unknown part");
         }
     };
 }

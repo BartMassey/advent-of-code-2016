@@ -1,10 +1,8 @@
 # Advent of Code 2016: Day 13
 Copyright (c) 2016 Bart Massey
 
-Given that we have an A\* search lying around from the dread
-day 11 solution, part 1 was pretty straightforward. The
-performance in part 2 showed that Dijkstra would have been
-sufficient.
+Part 1 can be solved via A\* search, though this is probably
+overkill. Part 2 is implemented as a straight flood-fill.
 
 The answer for each part was obtained in 3ms realtime (more
 or less), with 0ms user time, using the debug version of the
@@ -14,11 +12,11 @@ solution.
 
 Part 1:
 
-        ./soln 1 1352 31 39
+        cargo run 1 1352 31 39
 
 Part 2:
 
-        ./soln 2 1352 50
+        cargo run 2 1352 50
 
 ---
 
