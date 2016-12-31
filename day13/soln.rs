@@ -28,43 +28,6 @@ struct Maze {
 #[derive(Clone, Eq, PartialEq, PartialOrd, Ord)]
 enum State { Loc((usize, usize)) }
 use self::State::*;
-
-/// Iterator over neighbors in state space.
-struct NeighborStates {
-    key: usize,
-    neighbors: aoc::Neighbors
-}
-
-impl NeighborStates {
-    /// Make a new iterator over neighbors in state space.
-    fn new(maze: &Maze, state: &State) -> Self {
-        let &Loc(loc) = state;
-        NeighborStates {
-            key: maze.key,
-            neighbors: aoc::Neighbors::new(maze.grid_box, loc)
-        }
-    }
-}
-
-impl Iterator for NeighborStates {
-    /// Search cost so far, and the neighbor itself.
-    type Item = (usize, Box<State>);
-
-    /// Find the next neighbor in search space.
-    fn next(&mut self) -> Option<(usize, Box<State>)> {
-        loop {
-            match self.neighbors.next() {
-                None => { return None; },
-                Some(nb) => {
-                    if is_wall(self.key, nb) {
-                        continue;
-                    };
-                    return Some((1usize, Box::new(Loc(nb))));
-                }
-            }
-        }
-    }
-}
         
 impl aoc::SearchState for State {
     /// We do not use labels here.
@@ -77,9 +40,17 @@ impl aoc::SearchState for State {
     fn label(&self) -> () { () }
 
     /// State-space neighbors iterator.
-    fn neighbors(&self, maze: &Maze)
-    -> Box<Iterator<Item=(usize, Box<State>)>> {
-        Box::new(NeighborStates::new(maze, self))
+    fn neighbors(&self, maze: &Maze) -> Vec<(usize, Box<State>)> {
+        let &Loc(loc) = self;
+        let mut result = Vec::new();
+        let nbs = aoc::Neighbors::new(maze.grid_box, loc);
+        for nb in nbs {
+            if is_wall(maze.key, nb) {
+                continue;
+            };
+            result.push((1usize, Box::new(Loc(nb))));
+        };
+        result
     }
 
     /// Goal state is part of maze data.
