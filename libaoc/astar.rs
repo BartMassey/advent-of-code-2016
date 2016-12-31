@@ -27,13 +27,20 @@ struct PQElem<S:SearchState> {
 }
 
 impl <S: SearchState> PartialEq for PQElem<S> {
+    /// From the search point of view, two nodes are
+    /// the same if their heuristic cost and actual
+    /// cost are both the same.
     fn eq(&self, other: &PQElem<S>) -> bool {
         other.fcost == self.fcost && other.cost == self.cost
     }
 }
 
+/// It would be nice to just derive this from `PartialEq`,
+/// but Rust derive does the other thing.
 impl <S: SearchState> Eq for PQElem<S> {}
 
+/// It would be nice to just derive this from `Ord`,
+/// but Rust derive does the other thing.
 impl <S: SearchState> PartialOrd for PQElem<S> {
     fn partial_cmp(&self, other: &PQElem<S>) -> Option<Ordering> {
         Some(self.cmp(&other))
@@ -41,8 +48,10 @@ impl <S: SearchState> PartialOrd for PQElem<S> {
 }
 
 impl <S: SearchState> Ord for PQElem<S> {
-    /// Break ties in ordering by smallest heuristic cost
-    /// using largest actual cost.
+    /// A node is better than another if its heuristic
+    /// cost is smaller. Ties are broken by preferring
+    /// nodes with larger confirmed cost, since these
+    /// are farther along the path to a solution.
     fn cmp(&self, other: &PQElem<S>) -> Ordering {
         match other.fcost.cmp(&self.fcost) {
             Ordering::Equal =>
@@ -84,8 +93,7 @@ pub trait SearchState {
     /// state in the search space, each annotated with the
     /// cost of reaching it. May use the given global
     /// information to calculate its result.
-    fn neighbors(&self, global: &Self::Global)
-    -> Box<Iterator<Item=(usize, Box<Self>)>>;
+    fn neighbors(&self, global: &Self::Global) -> Vec<(usize, Box<Self>)>;
 
     /// Return true if this is a goal state,
     /// given global information.
