@@ -35,5 +35,4 @@ do
 done
 
 cd ../$DAY
-ln -s target/debug/soln soln
 echo $1 >.day
