@@ -5,9 +5,6 @@
 
 //! Advent of Code Day 11.
 
-/// Turn this on for a more verbose solution.
-const VERBOSE: bool = false;
-
 /// For input checking and processing, it is convenient
 /// to hardcode the floor count.
 /// 
@@ -18,7 +15,7 @@ const VERBOSE: bool = false;
 /// for example, code 21 as "twenty-first".
 const NFLOORS: usize = 4;
 
-use std::collections::{BTreeSet, BinaryHeap};
+use std::collections::BTreeSet;
 use std::iter::*;
 use std::cmp::*;
 
@@ -124,8 +121,8 @@ impl State {
         Some(new_state)
     }
 
-    /// Return the set of states that can result from legal traversals
-    /// from the current state.
+    /// Set of states reachable from this state by legal
+    /// traversal.
     fn traversals(&self) -> BTreeSet<State> {
         // Try moving both down and up.
         let mut ts = BTreeSet::new();
@@ -147,10 +144,27 @@ impl State {
         };
         ts
     }
+}
+
+impl aoc::SearchState for State {
+    /// We do not use labels here.
+    type Label = ();
+
+    /// There is no global data for this problem.
+    type Global = ();
+
+    /// We do not use labels here.
+    fn label(&self) -> () { () }
+
+    /// State-space neighbors.
+    fn neighbors(&self, _: &()) -> Vec<(usize, Box<State>)> {
+        self.traversals().into_iter()
+            .map(move |s|{(1usize, Box::new(s))}).collect()
+    }
 
     /// Check whether the current state has the right
     /// contents.
-    fn is_goal(&self) -> bool {
+    fn is_goal(&self, _: &()) -> bool {
         // Have to be on the top floor.
         if self.location != self.floors.len() - 1 {
             return false;
@@ -179,7 +193,7 @@ impl State {
     /// shuffling stuff around on the way up and down, but
     /// that doesn't actually lengthen the required
     /// distance.
-    fn hcost(&self) -> usize {
+    fn hcost(&self, _: &()) -> usize {
         let mut dists = 0;
         let nfloors = self.floors.len();
         for i in 0..nfloors-1 {
@@ -187,60 +201,7 @@ impl State {
         };
         max(0, 2 * (dists as isize - nfloors as isize)) as usize
     }
-}
 
-/// A\* search node for given state.
-#[derive(Clone, Debug)]
-struct PQElem {
-    cost: usize,
-    fcost: usize,
-    state: State
-}
-
-impl PartialEq for PQElem {
-    /// From the search point of view, two nodes are
-    /// the same if their heuristic cost and actual
-    /// cost are both the same.
-    fn eq(&self, other: &PQElem) -> bool {
-        other.fcost == self.fcost && other.cost == self.cost
-    }
-}
-
-/// It would be nice to just derive this from `PartialEq`,
-/// but Rust derive does the other thing.
-impl Eq for PQElem {}
-
-impl PQElem {
-    /// We artificially set the heuristic cost of the start
-    /// state to zero. This is highly optimistic, but this
-    /// node will be immediately be closed and replaced by
-    /// its properly-heuristic-costed children during the
-    /// search, so it doesn't matter.
-    fn start(state: &State) -> PQElem {
-        PQElem{cost: 0, fcost: 0, state: state.clone()}
-    }
-}
-
-/// It would be nice to just derive this from `Ord`,
-/// but Rust derive does the other thing.
-impl PartialOrd for PQElem {
-    fn partial_cmp(&self, other: &PQElem) -> Option<Ordering> {
-        Some(self.cmp(&other))
-    }
-}
-
-impl Ord for PQElem {
-    /// A node is better than another if its heuristic
-    /// cost is smaller. Ties are broken by preferring
-    /// nodes with larger confirmed cost, since these
-    /// are farther along the path to a solution.
-    fn cmp(&self, other: &PQElem) -> Ordering {
-        match other.fcost.cmp(&self.fcost) {
-            Ordering::Equal =>
-                self.cost.cmp(&other.cost),
-            c => c
-        }
-    }
 }
 
 /// Pull in the problem description.
@@ -354,46 +315,12 @@ fn test1() {
 
 /// Grab the input, run the A\* search, show the result.
 pub fn main() {
-    // Set up the state.
-    let state0 = read_start_state();
-    let mut stop_list = BTreeSet::new();
-    let mut pq = BinaryHeap::new();
-
-    // Push the start state and run A\*.
-    pq.push(PQElem::start(&state0));
-    loop {
-        match pq.pop() {
-            Some(PQElem{cost: gcost, fcost: _, state}) => {
-                // If we're done, stop.
-                if state.is_goal() {
-                    if VERBOSE {
-                        println!("cost {} for {:?}", gcost, state);
-                    } else {
-                        println!("{}", gcost);
-                    }
-                    return;
-                };
-
-                // If we've discovered a new state, push
-                // its neighbors.
-                match stop_list.insert(state.clone()) {
-                    false => { continue; },
-                    true => {
-                        for next_state in state.traversals() {
-                            if !stop_list.contains(&next_state) {
-                                let hcost = state.hcost();
-                                let gcost = gcost + 1;
-                                pq.push(PQElem{
-                                    fcost: gcost + hcost,
-                                    cost: gcost,
-                                    state: next_state
-                                });
-                            }
-                        }
-                    }
-                };
-            },
-            None => { panic!("found no solution"); },
-        }
+    let args = aoc::get_args();
+    assert!(args.len() == 0);
+    let start = read_start_state();
+    match aoc::a_star(&(), &start, false) {
+        None => { panic!("no solution"); },
+        Some((cost, None)) => { println!("{}", cost); },
+        _ => { panic!("internal error: weird astar return"); }
     };
 }
