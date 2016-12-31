@@ -5,18 +5,14 @@
 
 // Advent of Code Day 22.
 
+use std::collections::HashSet;
 use std::cmp::*;
-use std::collections::{HashSet, BinaryHeap};
 
 extern crate aoc;
 extern crate regex;
 
 /// Turn on to show board for part 2.
 const SHOW: bool = false;
-
-/// Four cardinal directions.
-static DIRNS: [(isize, isize);4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
-
 
 /// Disk usage per node.
 #[derive(Clone, Debug)]
@@ -27,9 +23,15 @@ struct Usage {
     avail: usize
 }
 
+/// Board information for search.
+struct Board {
+    grid_box: aoc::GridBox,
+    tiles: HashSet<(usize, usize)>
+}
+
 /// The game state is just the position of the
 /// target data and blank.
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct State {
     /// Position of target data.
     goal_data: (usize, usize),
@@ -37,40 +39,49 @@ struct State {
     blank: (usize, usize),
 }
 
-/// Node in A\* search.
-#[derive(Clone, Debug)]
-struct PQElem {
-    /// Cost so far.
-    cost: usize,
-    /// Total heuristic cost.
-    fcost: usize,
-    /// Actual state.
-    state: State
-}
+impl aoc::SearchState for State {
+    /// No labels.
+    type Label = ();
 
-impl PartialEq for PQElem {
-    fn eq(&self, other: &PQElem) -> bool {
-        other.fcost == self.fcost && other.cost == self.cost
+    /// No global data.
+    type Global = Board;
+
+    /// No labels.
+    fn label(&self) -> () {
+        ()
     }
-}
 
-impl Eq for PQElem {}
-
-impl PartialOrd for PQElem {
-    fn partial_cmp(&self, other: &PQElem) -> Option<Ordering> {
-        Some(self.cmp(&other))
+    /// Neighbors are valid tiles around blank.
+    fn neighbors(&self, global: &Board) -> Vec<(usize, Box<Self>)> {
+        let mut result = Vec::new();
+        for next_blank in global.grid_box.neighbors(self.blank) {
+            if !global.tiles.contains(&next_blank) {
+                continue;
+            };
+            let mut next_goal_data = self.goal_data;
+            if next_blank ==  self.goal_data {
+                next_goal_data = self.blank;
+            };
+            let next_state = State {
+                goal_data: next_goal_data,
+                blank: next_blank
+            };
+            result.push((1, Box::new(next_state)));
+        };
+        result
     }
-}
 
-impl Ord for PQElem {
-    /// Break ties in ordering by smallest heuristic cost
-    /// using largest actual cost.
-    fn cmp(&self, other: &PQElem) -> Ordering {
-        match other.fcost.cmp(&self.fcost) {
-            Ordering::Equal =>
-                self.cost.cmp(&other.cost),
-            c => c
-        }
+    /// Goal is to get the goal data to the upper left corner.
+    fn is_goal(&self, _: &Board) -> bool {
+        self.goal_data == (0, 0)
+    }
+
+    /// An admissible heuristic cost for a state is the cost of
+    /// getting the blank next to the data plus the cost of
+    /// getting the data to the goal.
+    fn hcost(&self, _: &Board) -> usize {
+        aoc::manhattan_distance(self.goal_data, self.blank) +
+        aoc::manhattan_distance(self.goal_data, (0,0))
     }
 }
 
@@ -163,6 +174,7 @@ fn start_info(umap: &Vec<Vec<Usage>>) -> (State, HashSet<(usize, usize)>) {
     // Set up state.
     let len_x = umap.len();
     let len_y = umap[0].len();
+    let grid_box = aoc::GridBox::new(len_x, len_y);
     let mut blank: Option<(usize, usize)> = None;
     let mut tiles: HashSet<(usize, usize)> = HashSet::new();
 
@@ -183,18 +195,10 @@ fn start_info(umap: &Vec<Vec<Usage>>) -> (State, HashSet<(usize, usize)>) {
         // a tile or a wall. Block because early return.
         let is_tile = || {
             // Loop over immediate neighbors.
-            for &(dx, dy) in DIRNS.iter() {
-                // Compute neighbor coordinate.
-                let x0 = x as isize + dx;
-                let y0 = y as isize + dy;
-                if x0 < 0 || x0 >= len_x as isize
-                   || y0 < 0 || y0 >= len_y as isize {
-                    continue;
-                };
-
+            for (x0, y0) in grid_box.neighbors((x, y)) {
                 // Heuristic: If this neighbor could not
                 // accept the data if empty, it is a wall.
-                let u = &umap[x0 as usize][y0 as usize];
+                let u = &umap[x0][y0];
                 if umap[x][y].used > u.used + u.avail {
                     return false;
                 }
@@ -238,67 +242,6 @@ fn print_map(s: &State, tiles: &HashSet<(usize, usize)>,
     };
 }
 
-// Manhattan distance between coordinates.
-fn mh_dist(p1: (usize, usize), p2: (usize, usize)) -> usize {
-    (p1.0 as isize - p2.0 as isize).abs() as usize +
-    (p1.1 as isize - p2.1 as isize).abs() as usize
-}
-
-// An admissible heuristic cost for a state is the cost of
-// getting the blank next to the data plus the cost of
-// getting the data to the goal.
-fn hcost(state: &State) -> usize {
-    max(0,
-        mh_dist(state.goal_data, state.blank) +
-        mh_dist(state.goal_data, (0,0)))
-}
-
-// Generic A\* search.
-fn a_star(start: &State, tiles: &HashSet<(usize, usize)>) -> Option<usize> {
-    let mut stop_list = HashSet::new();
-    let mut pq = BinaryHeap::new();
-    pq.push(PQElem{ state: start.clone(), cost: 0, fcost: hcost(start) });
-    loop {
-        match pq.pop() {
-            Some(PQElem{cost: g, fcost: _, state}) => {
-                if state.goal_data == (0, 0) {
-                    return Some(g);
-                };
-                match stop_list.insert(state.clone()) {
-                    false => { continue; },
-                    true => {
-                        let (x, y) = state.blank;
-                        for &(dx, dy) in DIRNS.iter() {
-                            let next_x = x as isize + dx;
-                            let next_y = y as isize + dy;
-                            let next_blank = (next_x as usize,
-                                              next_y as usize);
-                            if !tiles.contains(&next_blank) {
-                                continue;
-                            };
-                            let mut next_goal_data = state.goal_data;
-                            if next_blank ==  state.goal_data {
-                                next_goal_data = state.blank;
-                            };
-                            let next_state = State {
-                                goal_data: next_goal_data,
-                                blank: next_blank
-                            };
-                            let h = hcost(&next_state);
-                            let g = g + 1;
-                            pq.push(PQElem{fcost: g + h as usize, cost: g,
-                                           state: next_state});
-                        };
-                    }
-                };
-            },
-            None => {
-                return None
-            }
-        }
-    };
-}
-
 // Do the appropriate search through the disc array.
 pub fn main() {
     let part = aoc::get_part();
@@ -337,7 +280,11 @@ pub fn main() {
         if SHOW {
             print_map(&start, &tiles, len_x, len_y);
         };
-        if let Some(g) = a_star(&start, &tiles) {
+        let board = Board {
+            grid_box: aoc::GridBox::new_grid(),
+            tiles: tiles
+        };
+        if let Some((g, _)) = aoc::a_star(&board, &start, false) {
             println!("{}", g);
         } else {
             println!("no solution");
