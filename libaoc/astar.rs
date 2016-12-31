@@ -133,8 +133,17 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
     loop {
         match pq.pop() {
             Some(PQElem{cost, fcost: _, state, path}) => {
+                let next_path =
+                    match path {
+                        None => None,
+                        Some(ref labels) => {
+                            let mut p = labels.clone();
+                            p.push(state.label());
+                            Some(p)
+                        }
+                    };
                 if state.is_goal(&global) {
-                    return Some((cost, path));
+                    return Some((cost, next_path));
                 };
                 match stop_list.insert(state.clone()) {
                     false => { continue; },
@@ -143,20 +152,11 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
                             let (g_cost, ref next_state) = nb;
                             let h = next_state.hcost(&global);
                             let g = cost + g_cost;
-                            let next_path =
-                                match path {
-                                    None => None,
-                                    Some(ref labels) => {
-                                        let mut p = labels.clone();
-                                        p.push(state.label());
-                                        Some(p)
-                                    }
-                                };
                             let neighbor = PQElem {
                                 fcost: g + h,
                                 cost: g,
                                 state: (**next_state).clone(),
-                                path: next_path
+                                path: next_path.clone()
                             };
                             pq.push(neighbor);
                         }
