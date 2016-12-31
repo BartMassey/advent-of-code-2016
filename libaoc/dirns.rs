@@ -61,6 +61,24 @@ impl GridBox {
         };
         Neighbors::new(*self, location)
     }
+
+    /// Return the source location adjusted by the given offset
+    /// iff the dest location is in-bounds.
+    pub fn clip(&self, loc: Point, off: (isize, isize)) -> Option<Point> {
+        let (x, y) = loc;
+        let (dx, dy) = off;
+        let nx = x as isize + dx;
+        let ny = y as isize + dy;
+        if nx < 0 || ny < 0 {
+            return None;
+        }
+        if let &ClipBox((x_size, y_size)) = self {
+            if nx >= x_size as isize || ny >= y_size as isize {
+                return None;
+            }
+        };
+        Some((nx as usize, ny as usize))
+    }
 }
 
 /// Iterator over the neighbors of a point in the four cardinal
@@ -95,18 +113,10 @@ impl Iterator for Neighbors {
     fn next(&mut self) -> Option<Point> {
         loop {
             match self.dirns.next() {
-                Some(&(dx, dy)) => {
-                    let nx = self.loc.0 as isize + dx;
-                    let ny = self.loc.1 as isize + dy;
-                    if nx < 0 || ny < 0 {
-                        continue;
-                    };
-                    if let ClipBox((x_size, y_size)) = self.bounds {
-                        if nx >= x_size as isize || ny >= y_size as isize {
-                            continue;
-                        }
-                    };
-                    return Some((nx as usize, ny as usize));
+                Some(&d) => {
+                    if let Some(n) = self.bounds.clip(self.loc, d) {
+                        return Some(n);
+                    }
                 },
                 None => {
                     return None;
