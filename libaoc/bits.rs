@@ -5,12 +5,19 @@
 
 //! Bit operations for Advent of Code 2016 solutions.
 
-/// Divide-and-conquer with a quaternary stage to reduce
-/// masking and provide mostly power-of-two shifts. See
-/// <http://github.com/BartMassey/popcount> for details.
-/// This is "popcount_4" there, modified for 64-bit.
-/// This code will be slower than it needs to be on
+/// This popcount uses ivide-and-conquer with a quaternary
+/// stage to reduce masking and provide mostly power-of-two
+/// shifts. See <http://github.com/BartMassey/popcount> for
+/// details.  This is "popcount_4" there, modified for
+/// 64-bit.  This code will be slower than it needs to be on
 /// narrower inputs.
+///
+/// # Examples
+///
+/// ```rust
+/// assert_eq!(aoc::popcount(0x5555u64 << 32), 8);
+/// ```
+
 #[inline]
 pub fn popcount<T: Into<u64>>(x0: T) -> usize {
     let mut x: u64 = x0.into();
