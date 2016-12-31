@@ -4,6 +4,10 @@
 // for license terms.
 
 //! Argument handling for Advent of Code 2016 solutions.
+//!
+//! This module is just an AoC-specific argument parser.
+//! It handles part specifiers specially, and provides
+//! some convenience for processing normal arguments.
 
 use std;
 
