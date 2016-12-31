@@ -5,10 +5,77 @@
 
 //! A\* for Advent of Code 2016 solutions.
 //!
-//! Note that the memory use here is non-trivial.  There is
-//! a lot of cloning of states. Also, paths are saved
-//! per-state rather than being reconstructed at the end,
-//! which is quite expensive.
+//! This is a framework for running a standard [A\*
+//! search][1].  To use it, implement the `SearchState`
+//! trait for your search state and call `a_star()`. The
+//! global state for the problem instance is passed
+//! separately, and can be whatever the problem
+//! requires. (For AoC 2016, it's usually some
+//! representation of a maze.) Note that the memory use here
+//! is non-trivial: there is a lot of cloning of states.
+//!
+//! The framework includes support for state labels, so that
+//! the search can report paths rather than just distances.
+//! Labels currently require the `Copy` trait, which is a
+//! bit restrictive, but covers some obvious use cases.
+//! Paths are saved with each state rather than being
+//! reconstructed at the end, which is quite expensive of
+//! memory. (This doesn't matter for AoC 2016, since none of
+//! the A\* problems ask for a path.)
+//!
+//! [1]: http://en.wikipedia.org/wiki/A*_search_algorithm
+//!
+//! # Examples
+//!
+//! ```rust
+//! struct Steps {
+//!     steps: Vec<(usize, Box<Fn(isize) -> isize>)>,
+//!     goal: isize
+//! }
+//!
+//! #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+//! struct State {
+//!     value: isize
+//! }
+//!
+//! impl aoc::SearchState for State {
+//!     type Global = Steps;
+//!     type Label = usize;
+//!     fn label(&self) -> usize {
+//!         self.value as usize
+//!     }
+//!     fn is_goal(&self, global: &Steps) -> bool {
+//!         self.value == global.goal
+//!     }
+//!     fn neighbors(&self, global: &Steps) -> Vec<(usize, Box<State>)> {
+//!         let mut result = Vec::new();
+//!         for &(cost, ref step) in global.steps.iter() {
+//!             let next_state = State{ value: step(self.value) };
+//!             result.push((cost, Box::new(next_state)));
+//!         };
+//!         result
+//!     }
+//!     fn hcost(&self, global: &Steps) -> usize {
+//!         (self.value - global.goal as isize).abs() as usize / 2
+//!     }
+//! }
+//!
+//! let steps = Steps {
+//!     steps: vec![
+//!         (2, Box::new(|n| { n + 1 })),
+//!         (2, Box::new(|n| { n - 1 })),
+//!         (3, Box::new(|n| { n * 2 }))],
+//!     goal: 23
+//! };
+//! let start = State { value: 0 };
+//! match aoc::a_star(&steps, &start, true) {
+//!     Some((cost, path)) => {
+//!         assert_eq!(cost, 17);
+//!         assert_eq!(path, Some(vec![0, 1, 2, 3, 6, 12, 24, 23]));
+//!     },
+//!     None => { panic!("no solution") }
+//! }
+//! ```
 
 use std::cmp::*;
 use std::collections::{BTreeSet, BinaryHeap};
@@ -80,7 +147,8 @@ pub trait SearchState {
     /// needed. Use `()` if global data is not needed.
     type Global;
 
-    /// Returns a label for this node as part of the path tracking.
+    /// Returns a label for this node as part of the path
+    /// tracking.
     ///
     /// Because default types are unstable, it will be
     /// necessary to define this function even if no path
@@ -89,10 +157,15 @@ pub trait SearchState {
     /// then have `label()` return `()`.
     fn label(&self) -> Self::Label;
 
-    /// Return an iterator that delivers neighbors of this
-    /// state in the search space, each annotated with the
-    /// cost of reaching it. May use the given global
-    /// information to calculate its result.
+    /// Return the neighbors of this state in the search
+    /// space, each annotated with the cost of reaching
+    /// it. May use the given global information to
+    /// calculate its result.
+    ///
+    /// This should arguably return an iterator rather than
+    /// a vector so that it can be lazy. However, the
+    /// inconvenience of dealing with Rust iterators
+    /// ultimately made this untenable.
     fn neighbors(&self, global: &Self::Global) -> Vec<(usize, Box<Self>)>;
 
     /// Return true if this is a goal state,
