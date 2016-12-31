@@ -7,19 +7,27 @@ a fantastic exercise, and I thank the author and others
 involved profusely for their excellent work. Thanks also to
 `relsqui` for pointing me at this last year.
 
-For each solution, I have included commented and cleaned-up
-Rust code. The solution will be in a file named `soln.rs`,
-which can be run as "./soln 1 <input.txt" or "./soln 2
-<input.txt" to get the part 1 or part 2 solution. There is a
-`README.md` in every problem directory containing
-descriptions and comments. I have also included the problem
+The solutions are in directories named `day01` through
+`day25`. For each solution, I have included commented and
+cleaned-up Rust code. There is a `README.md` in every
+problem directory containing descriptions, comments and
+usage instructions. I have also included the problem
 descriptions (`part1.md` and `part2.md`) and my specific
 `input.txt` for posterity.
 
+There is also a `libaoc` directory containing a library used
+by all solutions. It includes a mishmash of AoC-specific
+stuff and generally-useful functionality. Please see the
+`libaoc` rustdoc for the details.
+
+There are not many tests written for this code. I regard
+passing both parts of a day's problem as sufficient
+validation, in general.  But more should be there.
+
 I assume you have Rust running on a fast-ish UNIX box with a
 bunch of memory (although most everything should also work
-on other operating systems).  For a few problems you will
-also need to install extra packages using Cargo.
+on other operating systems).  A few problems are dependent
+on common extra packages from Cargo.
 
 The goals of these solutions are to:
 
@@ -56,14 +64,19 @@ These solutions deserve a much more thorough top-level
 description than I have the energy to write at this point.
 I will revise this file in the indefinite future.
 
+There is more refactoring that should be done, and I am
+out of time and energy. Specifically:
+
+* The `try_pat()` function of days 21 and 22 should be
+  pulled to `libaoc` and used in other parts as well.
+
+* The assembunny interpreter of days 12, 21, 23 and 25
+  should be unified and pulled into its own library.
+
 I am a novice Rust programmer. Feedback and pull requests
 are extremely welcome! Let me know what I should have done,
 and I'll try to make it right.
 
-TODO: Pull out try_part(), assembunny interpreter,
-directions and direction processing.
-
-* Assembunny problems: day 12, 
 
 ---
 
