@@ -47,7 +47,9 @@ impl GridBox {
         ClipBox((x_size, y_size))
     }
 
-    /// Create an "unbounded clip box" for neighbor calculations.
+    /// Create an "unbounded clip box" for neighbor
+    /// calculations.  Negative locations will still be
+    /// clipped.
     pub fn new_grid() -> GridBox {
         Unclipped
     }
@@ -63,7 +65,8 @@ impl GridBox {
     }
 
     /// Return the source location adjusted by the given offset
-    /// iff the dest location is in-bounds.
+    /// iff the dest location is in-bounds. This is useful when
+    /// "manual" clipping is needed.
     pub fn clip(&self, loc: Point, off: (isize, isize)) -> Option<Point> {
         let (x, y) = loc;
         let (dx, dy) = off;

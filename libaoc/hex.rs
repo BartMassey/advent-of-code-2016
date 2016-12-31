@@ -4,10 +4,13 @@
 // for license terms.
 
 //! Hexadecimal utilities for Advent of Code 2016 solutions.
+//!
+//! These are not strictly necessary, but provide some
+//! convenience.
 
 /// Given an input between 0 and 15, return the
-/// corresponding hex digit. This is substantially
-/// faster than `std::char::from_digit()`.
+/// corresponding hex digit. This may be faster than
+/// `std::char::from_digit()`.
 #[inline]
 pub fn hex_digit(n: u8) -> char {
     let d =
