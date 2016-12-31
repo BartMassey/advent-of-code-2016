@@ -5,49 +5,66 @@
 
 //! Advent of Code Day 24.
 
-use std::cmp::*;
-use std::collections::{HashSet, BTreeSet, BinaryHeap, HashMap};
+use std::collections::{HashSet, BTreeSet, HashMap};
 
 extern crate aoc;
 
-/// Type of 2D points.
-type Point = (usize, usize);
+/// Map to be explored.
+struct Map {
+    open: HashSet<aoc::Point>,
+    goals: HashMap<aoc::Point, u32>,
+    grid_box: aoc::GridBox,
+    part: usize,
+    start_posn: aoc::Point
+}
 
 /// Problem state.
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct State {
     /// Current position.
-    posn: Point,
+    posn: aoc::Point,
     /// Set of previously-visited positions.
     visited: BTreeSet<u32>
 }
 
-/// A\* / Dijkstra node.
-#[derive(Clone, Debug)]
-struct PQElem {
-    /// Cost to get to this state.
-    cost: usize,
-    /// Problem state.
-    state: State
-}
+impl aoc::SearchState for State {
+    type Label = ();
+    type Global = Map;
 
-impl PartialEq for PQElem {
-    fn eq(&self, other: &PQElem) -> bool {
-        other.cost == self.cost
+    fn label(&self) -> () {
+        ()
     }
-}
 
-impl Eq for PQElem {}
+    fn neighbors(&self, global: &Self::Global) -> Vec<(usize, Box<Self>)> {
+        let mut result = Vec::new();
+        for next_posn in global.grid_box.neighbors(self.posn) {
+            // Can't go through walls.
+            if !global.open.contains(&next_posn) {
+                continue;
+            };
 
-impl PartialOrd for PQElem {
-    fn partial_cmp(&self, other: &PQElem) -> Option<Ordering> {
-        Some(self.cmp(&other))
+            // Add to the visited list if needed.
+            let mut next_visited = self.visited.clone();
+            match global.goals.get(&next_posn) {
+                None => (),
+                Some(d) => {
+                    next_visited.insert(*d);
+                }
+            };
+
+            // Push the neighbor state.
+            let next_state = State{ posn: next_posn,
+                                    visited: next_visited };
+            result.push((1, Box::new(next_state)))
+        };
+        result
     }
-}
 
-impl Ord for PQElem {
-    fn cmp(&self, other: &PQElem) -> Ordering {
-        other.cost.cmp(&self.cost)
+    /// Stop when everything has been visited,
+    /// but in part 2 only when we then get home.
+    fn is_goal(&self, global: &Map) -> bool {
+        self.visited.len() == global.goals.len() &&
+        (global.part == 1 || self.posn == global.start_posn)
     }
 }
 
@@ -57,10 +74,10 @@ pub fn main() {
     let part = aoc::get_part();
 
     // Set up state.
-    let mut open: HashSet<Point> = HashSet::new();
-    let mut goals: HashMap<Point, u32> = HashMap::new();
+    let mut open: HashSet<aoc::Point> = HashSet::new();
+    let mut goals: HashMap<aoc::Point, u32> = HashMap::new();
     let mut goal_labels: BTreeSet<u32> = BTreeSet::new();
-    let mut maybe_start: Option<Point> = None;
+    let mut maybe_start: Option<aoc::Point> = None;
     let mut x = 0;
     let mut y = 0;
     // Process the map.
@@ -92,69 +109,23 @@ pub fn main() {
         x = 0;
         y += 1;
     };
-    let goals_len = goals.len();
     let start_posn = match maybe_start {
         Some(p) => p,
         None => panic!("no start position found")
     };
-    let dirns = [(1, 0), (0, 1), (-1, 0), (0, -1)];
-
-    // Run the Dijkstra (A\*) search.
-    let start = State{ posn: start_posn, visited: BTreeSet::new() };
-    let mut stop_list: HashSet<State> = HashSet::new();
-    let mut pq: BinaryHeap<PQElem> = BinaryHeap::new();
-    pq.push(PQElem{ state: start, cost: 0 } );
-    loop {
-        match pq.pop() {
-            Some(PQElem{cost: g, state}) => {
-                // Stop when everything has been visited,
-                // but in part 2 only when we then get home.
-                if state.visited.len() == goals_len {
-                    if part == 1 || state.posn == start_posn {
-                        println!("{}", g);
-                        return;
-                    }
-                };
-
-                // Process all the neighbors.
-                match stop_list.insert(state.clone()) {
-                    false => { continue; },
-                    true => {
-                        // Search each neighbor in turn.
-                        let (x, y) = state.posn;
-                        for &(dx, dy) in dirns.iter() {
-                            // Find the neighbor location.
-                            let next_x = x as isize + dx;
-                            let next_y = y as isize + dy;
-                            let next_posn = (next_x as usize,
-                                              next_y as usize);
-
-                            // Can't go through walls.
-                            if !open.contains(&next_posn) {
-                                continue;
-                            };
-
-                            // Add to the visited list if needed.
-                            let mut next_visited = state.visited.clone();
-                            match goals.get(&next_posn) {
-                                None => (),
-                                Some(d) => {
-                                    next_visited.insert(*d);
-                                }
-                            };
-
-                            // Push the neighbor state.
-                            let next_state = State{ posn: next_posn,
-                                                    visited: next_visited };
-                            pq.push( PQElem{ state: next_state,
-                                             cost: g + 1 } );
-                        }
-                    }
-                }
-            },
-            None => {
-                panic!("no solution");
-            }
-        }
-    }
+    let map = Map {
+        open: open,
+        goals: goals,
+        grid_box: aoc::GridBox::new_grid(),
+        part: part,
+        start_posn: start_posn
+    };
+    let start_state = State {
+        posn: start_posn,
+        visited: BTreeSet::new()
+    };
+    match aoc::a_star(&map, &start_state, false) {
+        Some((g, _)) => println!("{}", g),
+        None => panic!("no solution")
+    };
 }
