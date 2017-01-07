@@ -13,7 +13,7 @@ extern crate aoc;
 fn is_wall(k: usize, (x, y): aoc::Point) -> bool {
     let h = x*x + 3*x + 2*x*y + y + y*y + k;
     let hc = aoc::popcount(h as u64);
-    return hc & 1 == 1;
+    hc & 1 == 1
 }
 
 /// Data about the maze itself.

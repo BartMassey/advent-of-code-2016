@@ -126,20 +126,19 @@ impl State {
     fn traversals(&self) -> BTreeSet<State> {
         // Try moving both down and up.
         let mut ts = BTreeSet::new();
-        for dirn in [-1, 1].iter() {
+        for dirn in &[-1, 1] {
             // Precheck for efficiency to avoid working
             // through all possible grabs on an illegal
             // traversal.
-            if let None = self.try_move(*dirn) {
+            if self.try_move(*dirn).is_none() {
                 continue;
             };
             // Try all possible grabs for traversal in
             // given direction.
             for grab in aoc::choose_le(&self.floors[self.location], 2) {
-                match self.try_traverse(*dirn, &grab) {
-                    Some(t) => assert!(ts.insert(t)),
-                    None => ()
-                };
+                if let Some(t) = self.try_traverse(*dirn, &grab) {
+                    assert!(ts.insert(t));
+                }
             };
         };
         ts
@@ -176,8 +175,8 @@ impl aoc::SearchState for State {
                 return false;
             }
         }
-
-        return true;
+        
+        true
     }
 
     /// Admissible heuristic for remaining number
@@ -247,7 +246,7 @@ fn read_start_state() -> State {
             let dev_desc = parts.at(1)
                 .expect("main: could not find device description");
             let dev_mat = String::from(
-                compatible_pat.captures(&dev_desc)
+                compatible_pat.captures(dev_desc)
                 .expect("main: could not parse device description")
                 .at(1).expect("main: could not find device description")
             );

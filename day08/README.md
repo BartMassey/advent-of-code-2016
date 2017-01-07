@@ -22,6 +22,11 @@ The array dimensions are passed as extra arguments. Use "7
 
         cargo run 2 50 6 <input.txt
 
+## Notes
+
+[Clippy](http://crates.io/crates/clippy) currently crashes
+trying to process this file. Will revisit someday.
+
 ---
 
 This program is licensed under the "MIT License".

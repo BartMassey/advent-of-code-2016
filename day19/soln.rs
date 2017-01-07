@@ -60,14 +60,10 @@ pub fn main() {
 
         // Set up next victim.
         cur_elf = elves[cur_elf].next_elf;
-        if part == 1 {
+        // To steal "across" for part 2, only advance the
+        // victim parent pointer every other turn.
+        if part == 1 || living_elves & 1 == 0 {
             victim_parent = elves[victim_parent].next_elf;
-        } else {
-            // To steal "across", only advance the victim
-            // parent pointer every other turn.
-            if living_elves & 1 == 0 {
-                victim_parent = elves[victim_parent].next_elf;
-            };
         };
     };
 

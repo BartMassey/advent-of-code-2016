@@ -44,15 +44,12 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> u64 {
                 i = end + 1;
 
                 // Process the target text.
-                match recurse {
-                    false => {
-                        nemit += replen as u64 * repcount as u64;
-                    },
-                    true => {
-                        let subemit =
-                            parse_expansion(&(*pat)[i..i + replen], recurse);
-                        nemit += subemit * repcount as u64;
-                    }
+                if recurse {
+                    let subemit =
+                        parse_expansion(&(*pat)[i..i + replen], true);
+                    nemit += subemit * repcount as u64;
+                } else {
+                    nemit += replen as u64 * repcount as u64;
                 };
 
                 // Advance over the target text.

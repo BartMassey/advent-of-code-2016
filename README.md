@@ -69,6 +69,14 @@ There is more refactoring that should be done. Specifically:
 * The `try_pat()` function of days 21 and 22 should be
   pulled to `libaoc` and used in other parts as well.
 
+I have run everything through
+[Clippy](http://crates.io/crates/clippy) at this point, and
+taken much of its advice. I have generally left idiomatic
+loops alone, as the iterator versions suggested by Clippy
+seem less clear to me. It was gratifying to see the last
+three days' solutions pass Clippy without warning:
+apparently I learned some Rust.
+
 I am a novice Rust programmer. Feedback and pull requests
 are extremely welcome! Let me know what I should have done,
 and I'll try to make it right.

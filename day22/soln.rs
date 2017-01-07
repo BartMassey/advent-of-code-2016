@@ -129,7 +129,7 @@ fn read_usages() -> Vec<(usize, usize, Usage)> {
 /// Use the obvious quadratic algorithm to test each pair
 /// For viability. Pairs are directed, so no need to divide
 /// by two or anything like that.
-fn count_viable_pairs(umap: &Vec<Vec<Usage>>) -> usize {
+fn count_viable_pairs(umap: &[Vec<Usage>]) -> usize {
     // Set up state.
     let len_x = umap.len();
     let len_y = umap[0].len();
@@ -170,7 +170,7 @@ fn count_viable_pairs(umap: &Vec<Vec<Usage>>) -> usize {
 /// detailed in the description of part 2. Return
 /// a starting state and a set of coordinates that
 /// are "wall squares".
-fn start_info(umap: &Vec<Vec<Usage>>) -> (State, HashSet<(usize, usize)>) {
+fn start_info(umap: &[Vec<Usage>]) -> (State, HashSet<(usize, usize)>) {
     // Set up state.
     let len_x = umap.len();
     let len_y = umap[0].len();
@@ -184,7 +184,7 @@ fn start_info(umap: &Vec<Vec<Usage>>) -> (State, HashSet<(usize, usize)>) {
         // An empty disc represents the blank. There can
         // be only one.
         if umap[x][y].used == 0 {
-            if let Some(_) = blank {
+            if blank.is_some() {
                 panic!("two blanks");
             };
             blank = Some((x, y));

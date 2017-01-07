@@ -47,7 +47,7 @@ fn read_discs() -> Vec<(isize, isize)> {
 
 /// At the given start time `t0`, try to drop the ball
 /// through all the discs and return success or failure.
-fn search(discs: &Vec<(isize, isize)>, t0: isize) -> bool {
+fn search(discs: &[(isize, isize)], t0: isize) -> bool {
     for j in 0..discs.len() {
         let (cj, qj) = discs[j];
         let t = t0 + 1 + j as isize;

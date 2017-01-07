@@ -17,7 +17,7 @@ fn segment_abba(segment: &str) -> bool {
             return true;
         }
     }
-    return false;
+    false
 }
 
 /// Return true iff the given string supports TLS.

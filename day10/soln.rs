@@ -95,17 +95,18 @@ fn parse_dest(desc: &str) -> Dest {
 pub fn main() {
     let (part, target) = aoc::get_part_args();
     // Set up parameters.
-    let mut target_low = 0;
-    let mut target_high = 0;
-    if part == 1 {
-        assert!(target.len() == 2);
-        target_low = target[0].parse()
-                     .expect("main: could not parse low target");
-        target_high = target[1].parse()
-                      .expect("main: could not parse high target");
-    } else {
-        assert!(target.len() == 0);
-    }
+    let targets =
+        if part == 1 {
+            assert!(target.len() == 2);
+            let target_low = target[0].parse()
+                             .expect("main: could not parse low target");
+            let target_high = target[1].parse()
+                             .expect("main: could not parse high target");
+            Some((target_low, target_high))
+        } else {
+            assert!(target.len() == 0);
+            None
+        };
 
     // Set up the instruction table and prepare to set up
     // the rest of the state.
@@ -176,7 +177,7 @@ pub fn main() {
     outputs.resize(max_output + 1, None);
 
     // Process the value instructions. They will never be referenced again.
-    for i in insns.iter() {
+    for i in &insns {
         match *i {
             Value(v, Bot(b)) => { let _ = holds[b].insert(v); },
             Value(v, Output(q)) => { outputs[q] = Some(v); },
@@ -197,25 +198,27 @@ pub fn main() {
             // values bot b could hold.  Note that this does
             // the right thing for bots holding 0 or 1
             // values.
-            for vl in holds[b].clone().iter() {
-                for vh in holds[b].clone().iter() {
+            for vl in &holds[b].clone() {
+                for vh in &holds[b].clone() {
                     // Consider only canonical pairs.
                     if *vl >= *vh {
                         continue;
                     }
 
                     // Check for part 1 solution if needed.
-                    if part == 1 && holds[b].contains(&target_low)
-                                 && holds[b].contains(&target_high) {
-                        println!("{}", b);
-                        return;
-                    }
+                    if let Some((target_low, target_high)) = targets {
+                        if holds[b].contains(&target_low)
+                           && holds[b].contains(&target_high) {
+                               println!("{}", b);
+                               return;
+                        }
+                    };
 
                     // Run the compare instruction over the
                     // current canonical compare.
-                    for i in insns.iter() {
-                        match *i {
-                            Compare(b0, ref dl, ref dh) => if b == b0 {
+                    for i in &insns {
+                        if let Compare(b0, ref dl, ref dh) = *i {
+                            if b == b0 {
                                 match *dl {
                                     Bot(bl) => {
                                         if holds[bl].insert(*vl) {
@@ -240,13 +243,14 @@ pub fn main() {
                                     }
                                 };
                                 match *dh {
-                                    Bot(bh) => if holds[bh].len() < 2 {
-                                        if holds[bh].insert(*vh) {
+                                    Bot(bh) => {
+                                        if holds[bh].len() < 2 
+                                           && holds[bh].insert(*vh) {
                                             changed = true;
                                             if TRACE {
                                                 println!("{} high {} to {}({})",
                                                        b, *vh, bh, holds[bh].len());
-                                            }
+                                            };
                                         }
                                     },
                                     Output(qh) => {
@@ -263,8 +267,7 @@ pub fn main() {
                                     }
                                 };
                                 break;
-                            },
-                            _ => ()
+                            }
                         }
                     }
                 }
@@ -280,7 +283,7 @@ pub fn main() {
         if FAILURE_REPORT {
             for b in 0..holds.len() {
                 print!("{}:", b);
-                for v in holds[b].iter() {
+                for v in &holds[b] {
                     print!(" {}", *v);
                 };
                 println!("");

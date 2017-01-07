@@ -46,10 +46,8 @@ pub fn checksum(src: String) -> String {
         assert!(nchars >= 2 && nchars & 1 == 0);
         for i in 0..nchars >> 1 {
             let c = match (sum_chars[i << 1], sum_chars[(i << 1) + 1]) {
-                ('0', '0') => '1',
-                ('0', '1') => '0',
-                ('1', '0') => '0',
-                ('1', '1') => '1',
+                ('0', '0') | ('1', '1') => '1',
+                ('0', '1') | ('1', '0') => '0',
                 _ => panic!("unexpected pair in sum")
             };
             new_sum.push(c);

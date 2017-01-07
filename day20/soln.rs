@@ -37,7 +37,7 @@ fn merge_ranges(ranges: &mut Vec<(u64, u64)>) {
     let mut cur_range =
         match range_iter.next() {
             None => return,
-            Some(range) => range.clone()
+            Some(range) => *range
         };
 
     // Try to merge each successive range with the current

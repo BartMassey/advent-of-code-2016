@@ -20,7 +20,7 @@ fn name_checksum(room_name: &str) -> String {
         if c == '-' {
             continue;
         }
-        counts[c as usize - 'a' as usize] += 1;
+        counts[c as usize - b'a' as usize] += 1;
     };
     // XXX This is a pretty gross algorithm whose
     // only real merit is avoiding some sorting hassle.
@@ -44,7 +44,7 @@ fn name_checksum(room_name: &str) -> String {
             }
             panic!("not enough characters for checksum");
         }
-        sum[nsum] = (found_i as u8 + 'a' as u8) as char;
+        sum[nsum] = (found_i as u8 + b'a') as char;
         counts[found_i] = 0;
         nsum += 1;
     };
@@ -58,8 +58,8 @@ fn name_decrypt(room_name: &str, sector_id: u32) -> String {
         if c == '-' {
             result.push(' ');
         } else {
-            let shift = c as u32 - 'a' as u32 + sector_id;
-            result.push(((shift % 26) as u8 + 'a' as u8) as char);
+            let shift = c as u32 - b'a' as u32 + sector_id;
+            result.push(((shift % 26) as u8 + b'a') as char);
         };
     };
     result.iter().cloned().collect::<String>()
@@ -84,7 +84,7 @@ pub fn main() {
             .expect("main: could not match line");
         let room_name = parts.at(1)
             .expect("main: could not find room name");
-        let computed_sum = name_checksum(&room_name);
+        let computed_sum = name_checksum(room_name);
         let given_sum = parts.at(3).expect("main: could not find checksum");
         if computed_sum != given_sum {
             continue;

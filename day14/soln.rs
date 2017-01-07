@@ -53,7 +53,7 @@ impl Digest for StretchedMd5 {
         h.result(out);
         for _ in 0..2016 {
             h.reset();
-            let s = aoc::hex_string(&out);
+            let s = aoc::hex_string(out);
             let out_hex = &(s.as_bytes());
             h.input(out_hex);
             h.result(out);

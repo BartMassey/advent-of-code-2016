@@ -9,7 +9,7 @@ extern crate aoc;
 
 /// Take a board, a starting point and a line of traversal
 /// instructions and return the ending position.
-fn walk_line(board: &Vec<Vec<char>>, n_start: (usize, usize),
+fn walk_line(board: &[Vec<char>], n_start: (usize, usize),
              insns: &str) -> (usize, usize) {
     let mut n = n_start;
 
@@ -29,11 +29,11 @@ fn walk_line(board: &Vec<Vec<char>>, n_start: (usize, usize),
             n = next_n;
         }
     };
-    return n
+    n
 }
 
 /// Print the bathroom code for the instance.
-pub fn print_code(board: &Vec<Vec<char>>) {
+pub fn print_code(board: &[Vec<char>]) {
     // Set up state.
     let c = board.len() / 2 + 1;
     let mut n = (c, c);

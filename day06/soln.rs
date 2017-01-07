@@ -9,7 +9,7 @@ extern crate aoc;
 
 /// Return the first index of an element in the input that
 /// has maximal value. Input must have at least one element.
-fn max_index(elems: &Vec<usize>) -> usize {
+fn max_index(elems: &[usize]) -> usize {
     let mut m = elems[0];
     let mut m_i = 0;
     for i in 1..elems.len() {
@@ -23,7 +23,7 @@ fn max_index(elems: &Vec<usize>) -> usize {
 
 /// Return the first index of an element in the input that
 /// has minimal nonzero value. Input must have at least one element.
-fn min_index(elems: &Vec<usize>) -> usize {
+fn min_index(elems: &[usize]) -> usize {
     let mut m = elems[0];
     let mut m_i = 0;
     for i in 1..elems.len() {
@@ -60,24 +60,22 @@ pub fn main() {
         };
 
         // Bump the relevant counters.
-        let mut j = 0;
-        for c in l.chars() {
-            let i = (c as u8 - 'a' as u8) as usize;
+        for (j, c) in l.chars().enumerate() {
+            let i = (c as u8 - b'a') as usize;
             counters[j][i] += 1;
-            j += 1;
         }
     };
 
     // Find the appropriate characters from the counters
     // and display them.
-    for c in counters.iter() {
+    for c in &counters {
         let i =
             if part == 1 {
-                max_index(&c)
+                max_index(c)
             } else {
-                min_index(&c)
+                min_index(c)
             };
-        print!("{}", (i as u8 + 'a' as u8) as char);
+        print!("{}", (i as u8 + b'a') as char);
     }
     println!("");
 }

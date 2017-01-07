@@ -39,7 +39,7 @@ fn count_ca(row0: &Vec<bool>, nrows: usize) -> usize {
         };
 
         // Count `true` cells in current row.
-        for b in cur_row.iter() {
+        for b in &cur_row {
             if *b {
                 count += 1;
             }
@@ -73,10 +73,11 @@ fn count_ca(row0: &Vec<bool>, nrows: usize) -> usize {
 /// Turn a row into a string for debugging.
 fn decode_row(row: &[bool]) -> String {
     let mut result = String::new();
-    for b in row.iter() {
-        match b {
-            &true => result.push('.'),
-            &false => result.push('^')
+    for b in row {
+        if *b {
+            result.push('.');
+        } else {
+            result.push('^');
         }
     };
     result
@@ -103,9 +104,8 @@ pub fn main() {
     let nrows = args[0].parse().expect("could not parse nrows");
     let mut lines = aoc::input_lines();
     let row0 = lines.next().expect("could not read row");
-    match lines.next() {
-        Some(_) => { panic!("more than one row"); },
-        None => ()
+    if !lines.next().is_none() {
+        panic!("more than one row");
     };
     println!("{}", count_ca(&encode_row(&row0), nrows));
 }

@@ -27,8 +27,8 @@ use self::Explo::*;
 /// Store true in `doors` for each of up, down, left, right
 /// iff the given hasher shows that door open.
 fn open_doors(hasher0: &Md5, doors: &mut[bool;4]) {
-    // Run a clone of the hasher (to terminate here).
-    let mut hasher = (*hasher0).clone();
+    // Run a copy of the hasher (to terminate here).
+    let mut hasher = *hasher0;
     let mut output = [0; 16];
     hasher.result(&mut output);
 
@@ -98,11 +98,11 @@ fn dfs(grid_box: &aoc::GridBox, hasher0: &Md5,
             Some(next_loc) => {
                 // Call recursively to explore continuation in this
                 // direction.
-                let mut hasher = (*hasher0).clone();
+                let mut hasher = *hasher0;
                 hasher.input(&[dirn as u8]);
                 let mut next_path = path.clone();
                 next_path.push(dirn);
-                let subresult = dfs(&grid_box, &hasher, limit - 1,
+                let subresult = dfs(grid_box, &hasher, limit - 1,
                                     next_loc, next_path, find_longest);
 
                 // Combine the subsearch result with the existing

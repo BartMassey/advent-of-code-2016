@@ -168,7 +168,7 @@ fn read_insns() -> Vec<Insn> {
 /// Run the sequence `insns` of instructions on the
 /// sequence of characters in `chars0`. On exit,
 /// `chars0` will contain the result.
-fn run_insns(insns: &Vec<Insn>, chars0: &mut Vec<char>) {
+fn run_insns(insns: &[Insn], chars0: &mut Vec<char>) {
     // Make a copy of the input for scratch.
     let mut chars = chars0.clone();
 
@@ -183,16 +183,12 @@ fn run_insns(insns: &Vec<Insn>, chars0: &mut Vec<char>) {
         // Interpreter dispatch.
         match *insn {
             SwPos(p1, p2) => {
-                let tmp = chars[p1];
-                chars[p1] = chars[p2];
-                chars[p2] = tmp;
+                chars.swap(p1, p2);
             },
             SwChar(c1, c2) =>  {
                 let p1 = find_char(c1, &chars);
                 let p2 = find_char(c2, &chars);
-                let tmp = chars[p1];
-                chars[p1] = chars[p2];
-                chars[p2] = tmp;
+                chars.swap(p1, p2);
             },
             RotL(r) => {
                 rotate_left(r, &mut chars);

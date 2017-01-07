@@ -47,8 +47,8 @@ pub fn main() {
 
     // This loop should never finish.
     for i in 0..std::usize::MAX {
-        // Clone the partially-run hasher to avoid rehashing.
-        let mut hasher = hasher.clone();
+        // Copy the partially-run hasher to avoid rehashing.
+        let mut hasher = hasher;
 
         // Get the current hash.
         hasher.input(i.to_string().as_bytes());
