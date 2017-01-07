@@ -64,14 +64,10 @@ These solutions deserve a much more thorough top-level
 description than I have the energy to write at this point.
 I will revise this file in the indefinite future.
 
-There is more refactoring that should be done, and I am
-out of time and energy. Specifically:
+There is more refactoring that should be done. Specifically:
 
 * The `try_pat()` function of days 21 and 22 should be
   pulled to `libaoc` and used in other parts as well.
-
-* The assembunny interpreter of days 12, 21, 23 and 25
-  should be unified and pulled into its own library.
 
 I am a novice Rust programmer. Feedback and pull requests
 are extremely welcome! Let me know what I should have done,
