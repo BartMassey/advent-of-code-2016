@@ -150,6 +150,7 @@ pub fn asm<T: Read>(lines: &mut InputLines<T>) -> Vec<Insn> {
 }
 
 /// Execute the instruction at the current pc.
+#[inline(always)]
 pub fn step(insns: &mut Vec<Insn>, state: &mut ExecState) {
     match insns[state.pc] {
         Cpy(rc1, Reg(r2)) => {
