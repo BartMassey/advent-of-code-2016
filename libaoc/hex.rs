@@ -15,9 +15,9 @@
 pub fn hex_digit(n: u8) -> char {
     let d =
         if n <= 9 {
-            n as u8 + '0' as u8
+            n as u8 + b'0'
         } else {
-            n as u8 - 10 + 'a' as u8
+            n as u8 - 10 + b'a'
         };
     d as char
 }
@@ -26,9 +26,9 @@ pub fn hex_digit(n: u8) -> char {
 #[inline]
 pub fn hex_string(bytes: &[u8]) -> String {
     let mut s = String::new();
-    for i in 0..bytes.len() {
-        s.push(hex_digit(bytes[i] >> 4));
-        s.push(hex_digit(bytes[i] & 0xf));
+    for b in bytes {
+        s.push(hex_digit(b >> 4));
+        s.push(hex_digit(b & 0xf));
     };
     s
 }

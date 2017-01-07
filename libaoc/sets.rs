@@ -59,9 +59,9 @@ pub fn choose<T>(source: &BTreeSet<T>, n: usize)
 /// set of items.
 pub fn choose_le<T>(source: &BTreeSet<T>, n: usize)
   -> BTreeSet<BTreeSet<T>> where T: Clone + Ord {
-    let mut r = choose(&source, 0);
+    let mut r = choose(source, 0);
     for i in 1..n+1 {
-        let s = choose(&source, i);
+        let s = choose(source, i);
         r = r.union(&s).cloned().collect();
     };
     r

@@ -57,7 +57,7 @@ impl GridBox {
     /// Return an iterator that will produce the neighbors
     /// of the given location, clipped as needed.
     pub fn neighbors(&self, location: Point) -> Neighbors {
-        if let &ClipBox((x_size, y_size)) = self {
+        if let ClipBox((x_size, y_size)) = *self {
             let (x, y) = location;
             assert!(x < x_size && y < y_size);
         };
@@ -75,7 +75,7 @@ impl GridBox {
         if nx < 0 || ny < 0 {
             return None;
         }
-        if let &ClipBox((x_size, y_size)) = self {
+        if let ClipBox((x_size, y_size)) = *self {
             if nx >= x_size as isize || ny >= y_size as isize {
                 return None;
             }

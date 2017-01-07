@@ -62,6 +62,7 @@ fn parse_opnd(opnd: &str) -> Opnd {
 }
 
 /// Machine state.
+#[derive(Default)]
 pub struct ExecState {
     /// Program counter.
     pub pc: usize,
@@ -83,6 +84,7 @@ impl ExecState {
     }
 }
 
+
 /// Return the value of the given operand in the given
 /// state.
 fn eval(state: &ExecState, opnd: Opnd) -> isize {
@@ -99,7 +101,7 @@ fn rcs(opnd: Opnd) -> String {
         Const(c) => c.to_string(),
         Reg(r) => {
             let mut s = String::new();
-            s.push(('a' as u8 + r as u8) as char);
+            s.push((b'a' + r as u8) as char);
             s
         }
     }
@@ -207,12 +209,12 @@ pub fn step(insns: &mut Vec<Insn>, state: &mut ExecState) {
                 state.pc += 1;
                 return;
             };
-            insns[new_pc] = match &insns[new_pc] {
-                &Add(c, reg) => Add(-c, reg),
-                &Tgl(reg) => Add(1, reg),
-                &Out(rc) => Add(1, rc),
-                &JNZ(rc1, rc2) => Cpy(rc1, rc2),
-                &Cpy(rc1, rc2) => JNZ(rc1, rc2)
+            insns[new_pc] = match insns[new_pc] {
+                Add(c, reg) => Add(-c, reg),
+                Tgl(reg) => Add(1, reg),
+                Out(rc) => Add(1, rc),
+                JNZ(rc1, rc2) => Cpy(rc1, rc2),
+                Cpy(rc1, rc2) => JNZ(rc1, rc2)
             };
             state.pc += 1;
         },

@@ -110,7 +110,7 @@ impl <S: SearchState> Eq for PQElem<S> {}
 /// but Rust derive does the other thing.
 impl <S: SearchState> PartialOrd for PQElem<S> {
     fn partial_cmp(&self, other: &PQElem<S>) -> Option<Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 
@@ -200,12 +200,12 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
     pq.push(PQElem{
         state: start.clone(),
         cost: 0,
-        fcost: start.hcost(&global),
+        fcost: start.hcost(global),
         path: if save_path { Some(Vec::new()) } else { None }
     });
     loop {
         match pq.pop() {
-            Some(PQElem{cost, fcost: _, state, path}) => {
+            Some(PQElem{cost, state, path, ..}) => {
                 let next_path =
                     match path {
                         None => None,
@@ -215,25 +215,24 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
                             Some(p)
                         }
                     };
-                if state.is_goal(&global) {
+                if state.is_goal(global) {
                     return Some((cost, next_path));
                 };
-                match stop_list.insert(state.clone()) {
-                    false => { continue; },
-                    true => {
-                        for nb in state.neighbors(&global) {
-                            let (g_cost, ref next_state) = nb;
-                            let h = next_state.hcost(&global);
-                            let g = cost + g_cost;
-                            let neighbor = PQElem {
-                                fcost: g + h,
-                                cost: g,
-                                state: (**next_state).clone(),
-                                path: next_path.clone()
-                            };
-                            pq.push(neighbor);
-                        }
+                if stop_list.insert(state.clone()) {
+                    for nb in state.neighbors(global) {
+                        let (g_cost, ref next_state) = nb;
+                        let h = next_state.hcost(global);
+                        let g = cost + g_cost;
+                        let neighbor = PQElem {
+                            fcost: g + h,
+                            cost: g,
+                            state: (**next_state).clone(),
+                            path: next_path.clone()
+                        };
+                        pq.push(neighbor);
                     }
+                } else {
+                    continue;
                 };
             },
             None => {
