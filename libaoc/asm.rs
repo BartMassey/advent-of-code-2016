@@ -3,8 +3,12 @@
 // Please see the file COPYING in this distribution
 // for license terms.
 
-//! Full Assembunny interpreter for Advent of Code 2016
+//! Full Assembunny assembler and interpreter for Advent of Code 2016
 //! solutions.
+//!
+//! This is a fairly standard pcode setup. Call `asm()` to assemble
+//! the Assembunny code, and `step()` to run the instruction at the
+//! current program counter.
 
 /// Turn on to trace execution.
 const TRACE: bool = false;
@@ -101,6 +105,10 @@ fn rcs(opnd: Opnd) -> String {
     }
 }
 
+
+/// Assemble an Assembunny program, returning its
+/// instructions.  The input source `lines` are given by an
+/// iterator of type `aoc::lines::InputLines`.
 pub fn asm<T: Read>(lines: &mut InputLines<T>) -> Vec<Insn> {
     /// Input the program.
     let mut insns: Vec<Insn> = Vec::new();
