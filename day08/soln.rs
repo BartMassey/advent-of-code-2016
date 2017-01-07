@@ -107,7 +107,7 @@ fn insn_rotate_column(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
 }
 
 /// Display the given screen.
-fn display(m: &Vec<Vec<char>>) {
+fn display(m: &[Vec<char>]) {
     for y in 0..m[0].len() {
         for x in 0..m.len() {
             print!("{}", m[x][y]);
@@ -133,15 +133,14 @@ fn main() {
         v.resize(y_size, '.');
         m.push(v);
     }
-    let insns: &[fn(&str, &mut Vec<Vec<char>>) -> bool] =
-        &[insn_rect, insn_rotate_column, insn_rotate_row];
+    let insns = [insn_rect, insn_rotate_column, insn_rotate_row];
 
     // Read strings from the input file and process them.
     for l in aoc::input_lines() {
         // Search through the instructions until finding one
         // that works.
         let mut processed = false;
-        for f in insns.iter() {
+        for f in &insns {
             if f(&l, &mut m) {
                 processed = true;
                 if TRACING {
