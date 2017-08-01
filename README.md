@@ -1,7 +1,7 @@
 # Advent Of Code 2016: Tutorial Solutions in Rust
 Copyright (c) 2016 Bart Massey
 
-Herein lie solutions to some of the problems of the 2016
+Herein lie solutions to all of the problems of the 2016
 [Advent of Code](http://adventofcode.com). Advent of Code is
 a fantastic exercise, and I thank the author and others
 involved profusely for their excellent work. Thanks also to
@@ -21,8 +21,8 @@ stuff and generally-useful functionality. Please see the
 `libaoc` rustdoc for the details.
 
 There are not many tests written for this code. I regard
-passing both parts of a day's problem as sufficient
-validation, in general.  But more should be there.
+passing both parts of a day's problem as strong validation.
+But more should be there.
 
 I assume you have Rust running on a fast-ish UNIX box with a
 bunch of memory (although most everything should also work
@@ -45,16 +45,19 @@ There's also some engineering infrastructure in the form of
 the `template` directory, the `mkday.sh` and
 `process-aoc.sh` shell scripts and the `libaoc` crate.  This
 sped up each day's setup considerably. At the beginning of
-day 34 I would "sh mkday.sh 34". At the end of the day I
+day 34 I would "`sh mkday.sh 34`". At the end of the day I
 would select and copy the page source of the day 34 AoC page
-and then "xclipb -out | sh ../process-aoc.sh" to get
-markdown into the problem files for posterity.
+and then
+
+    xclip -selection CLIPBOARD -out | sh ../process-aoc.sh
+
+to get markdown into the problem files for posterity.
 
 To generate the full rustdoc for a day, simply run this
 highly intuitive command:
 
-        cargo rustdoc --open -- --no-defaults --passes collapse-docs \
-        --passes unindent-comments --passes strip-priv-imports
+    cargo rustdoc --open -- --no-defaults --passes collapse-docs \
+      --passes unindent-comments --passes strip-priv-imports
 
 See Issue
 [1520](https://github.com/rust-lang/cargo/issues/1520)
