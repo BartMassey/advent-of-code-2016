@@ -41,6 +41,24 @@ Bart Massey
 
 * Informational / educational
 
+# Let's Do Day 1!
+
+* Part 1 is really straightforward
+
+* Note that there's a lot of fairly ugly boilerplate
+
+  * Reading a line from a file
+
+  * String manipulation and number parsing
+
+# Day 1 Part 2
+
+* Need to detect self-intersection of path
+
+* Rust HashSet is perfect for this
+
+* Note that memory management really isn't an issue here
+
 # Programs + Infrastructure = Solution
 
 * Bunch of related problems means common code
@@ -56,6 +74,15 @@ Bart Massey
 
   * Hexadecimal numbers, iterator over lines of a file
 
+# Assembunny
+
+* Several of the problems require parsing and executing
+  assembly code for a hypothetical machine
+  
+* Extracting the assembler is a big clarity win
+
+* Also allows performance improvements: 318 MAIPS
+
 # Special Setup and Build
 
 * Not written in Rust but in Bourne Shell
@@ -69,7 +96,17 @@ Bart Massey
 * Hopefully reusable for 2017
 
 
-# Rust Issues: Binaries Are Second-Class Citizens
+# The Organization Is Partly A Lie
+
+* I've presented the organization of this stuff as though I
+  chose it in advance
+  
+* In truth, it all grew fairly organically
+
+* In particular, a lot of stuff was split out and cleaned up
+  after the contest was over, in prep for publication
+
+# Rust Issue: Binaries Are Second-Class Citizens
 
 * Cargo support for binaries is limited
 
@@ -85,3 +122,13 @@ Bart Massey
       --passes unindent-comments --passes strip-priv-imports`
 
 * Not great support for end-to-end binary tests
+
+# Final Thoughts
+
+* Rust is ready for this kind of task
+
+* A reasonable person with reasonable Rust knowledge can
+  build quickly and cleanly
+
+* It would be good to have Rust developers sit with newer
+  users and watch them work through an exercise like this
