@@ -20,6 +20,9 @@ by all solutions. It includes a mishmash of AoC-specific
 stuff and generally-useful functionality. Please see the
 `libaoc` rustdoc for the details.
 
+There is a talk in `rust-aoc.p.md` that says some things
+about all this.
+
 There are not many tests written for this code. I regard
 passing both parts of a day's problem as strong validation.
 But more should be there.
