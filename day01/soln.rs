@@ -7,7 +7,6 @@
 
 use std::io;
 use std::io::prelude::*;
-use std::collections::HashSet;
 
 extern crate aoc;
 
@@ -18,7 +17,7 @@ extern crate aoc;
 /// failing if the path does not self-intersect.
 ///
 /// This function probably needs to be split up.
-fn traverse(stop_short: bool) -> (isize, isize) {
+fn traverse() -> (isize, isize) {
     // North, West, East, South.
     let directions = [(0, 1), (-1, 0), (0, -1), (1, 0)];
 
@@ -29,8 +28,6 @@ fn traverse(stop_short: bool) -> (isize, isize) {
 
     // Set up state variables.
     let mut position = (0, 0);
-    let mut trail = HashSet::new();
-    trail.insert(position);
     let mut facing = 0;
 
     // Walk the turns.
@@ -48,17 +45,9 @@ fn traverse(stop_short: bool) -> (isize, isize) {
         for _ in 0..step {
             position.0 += directions[facing].0;
             position.1 += directions[facing].1;
-            if stop_short && trail.contains(&position) {
-                // Trail has self-intersected.
-                return position;
-            }
-            trail.insert(position);
         }
     };
     // Finish up.
-    if stop_short {
-        panic!("did not find self-intersection")
-    };
     position
 }
 
@@ -66,6 +55,7 @@ fn traverse(stop_short: bool) -> (isize, isize) {
 /// the origin to the endpoint.
 pub fn main() {
     let part = aoc::get_part();
-    let position = traverse(part == 2);
+    assert!(part == 1);
+    let position = traverse();
     println!("{}", position.0.abs() + position.1.abs());
 }
