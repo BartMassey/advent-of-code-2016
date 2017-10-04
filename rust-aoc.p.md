@@ -59,6 +59,18 @@ Bart Massey
 
 * Note that memory management really isn't an issue here
 
+# The Rest Of The Days
+
+* Kinds of problems: straight puzzles, simulations,
+  brute-force calculations
+
+* Difficulty from a few minutes to "I don't think I can do
+  this"
+
+* The theming is nice and keeps it interesting
+
+* Nice endgame (on Christmas Day!)
+
 # Programs + Infrastructure = Solution
 
 * Bunch of related problems means common code
