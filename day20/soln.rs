@@ -82,14 +82,15 @@ pub fn main() {
     if part == 1 {
         println!("{}", ranges[0].1 + 1);
     } else {
-        // Add up the gaps.
+        // Add up the blacklisted addresses.
         let mut count = 0;
-        for i in 0..ranges.len()-1 {
-            count += ranges[i+1].0 - ranges[i].1 - 1;
+        for i in 0..ranges.len() {
+            count += ranges[i].1 - ranges[i].0 + 1;
         };
 
-        // Don't forget the gap at the end.
-        count += 4294967295 - ranges[ranges.len()-1].1;
-        println!("{}", count);
+        // The remaining addresses are open. Note that this
+        // only works because `u64` since 4294967296 is
+        // 2**32.
+        println!("{}", 4294967296u64 - count);
     };
 }
