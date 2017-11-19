@@ -112,7 +112,7 @@ fn rcs(opnd: Opnd) -> String {
 /// instructions.  The input source `lines` are given by an
 /// iterator of type `aoc::lines::InputLines`.
 pub fn asm<T: Read>(lines: &mut InputLines<T>) -> Vec<Insn> {
-    /// Input the program.
+    // Input the program.
     let mut insns: Vec<Insn> = Vec::new();
     for target in lines {
         let words = target.split_whitespace().collect::<Vec<&str>>();

@@ -9,7 +9,7 @@ extern crate aoc;
 
 /// Run a program..
 pub fn main() {
-    /// Read the program instructions.
+    // Read the program instructions.
     let mut lines = aoc::input_lines();
     let mut insns = aoc::asm(&mut lines);
 

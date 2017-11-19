@@ -90,7 +90,7 @@ fn rotate_right(r: usize, chars: &mut Vec<char>) {
 
 /// Read the input instructions from `stdin`, parse and return them.
 fn read_insns() -> Vec<Insn> {
-    /// Set up instruction patterns.
+    // Set up instruction patterns.
     let swpos_pat =
         regex::Regex::new(r"^swap position ([0-9]+) with position ([0-9]+)$")
         .expect("could not compile swpos pattern");
