@@ -9,8 +9,8 @@
 const SHOW: bool = false;
 
 extern crate aoc;
-extern crate regex;
 extern crate permutohedron;
+extern crate regex;
 
 use permutohedron::Heap;
 
@@ -31,7 +31,7 @@ enum Insn {
     Rev(usize, usize),
     /// Move the character at the given source position
     /// to the given destination position.
-    Mov(usize, usize)
+    Mov(usize, usize),
 }
 
 use self::Insn::*;
@@ -40,27 +40,27 @@ use self::Insn::*;
 /// vector of its submatches (parts).
 fn try_pat(pat: &regex::Regex, target: &str) -> Option<Vec<String>> {
     match pat.captures(target) {
-        Some(parts) =>  {
+        Some(parts) => {
             let mut v = Vec::new();
             let mut iter = parts.iter();
             iter.next();
             for p in iter {
-                v.push(p.expect("part did not match").to_string());
-            };
+                v.push(p.expect("part did not match").as_str().to_string());
+            }
             Some(v)
-        },
-        None => None
+        }
+        None => None,
     }
 }
 
 /// Return the position of the given character in the given
 /// slice. The character must be present to win.
 fn find_char(c: char, v: &[char]) -> usize {
-    for i in 0..v.len() {
-        if v[i] == c {
+    for (i, &vc) in v.iter().enumerate() {
+        if vc == c {
             return i;
         }
-    };
+    }
     panic!("find_char(): off end");
 }
 
@@ -70,8 +70,8 @@ fn rotate_left(r: usize, chars: &mut Vec<char>) {
         let n = chars.len();
         let tmp = chars[0];
         for i in 1..n {
-            chars[i-1] = chars[i];
-        };
+            chars[i - 1] = chars[i];
+        }
         chars[n - 1] = tmp;
     }
 }
@@ -82,8 +82,8 @@ fn rotate_right(r: usize, chars: &mut Vec<char>) {
         let n = chars.len();
         let tmp = chars[n - 1];
         for i in (1..n).rev() {
-            chars[i] = chars[i-1];
-        };
+            chars[i] = chars[i - 1];
+        }
         chars[0] = tmp;
     }
 }
@@ -91,23 +91,17 @@ fn rotate_right(r: usize, chars: &mut Vec<char>) {
 /// Read the input instructions from `stdin`, parse and return them.
 fn read_insns() -> Vec<Insn> {
     // Set up instruction patterns.
-    let swpos_pat =
-        regex::Regex::new(r"^swap position ([0-9]+) with position ([0-9]+)$")
+    let swpos_pat = regex::Regex::new(r"^swap position ([0-9]+) with position ([0-9]+)$")
         .expect("could not compile swpos pattern");
-    let swchar_pat =
-        regex::Regex::new(r"^swap letter ([a-z]) with letter ([a-z])$")
+    let swchar_pat = regex::Regex::new(r"^swap letter ([a-z]) with letter ([a-z])$")
         .expect("could not compile swchar pattern");
-    let rot_pat =
-        regex::Regex::new(r"^rotate (left|right) ([0-9+]) steps?$")
+    let rot_pat = regex::Regex::new(r"^rotate (left|right) ([0-9+]) steps?$")
         .expect("could not compile rot pattern");
-    let rotpos_pat =
-        regex::Regex::new(r"^rotate based on position of letter ([a-z])$")
+    let rotpos_pat = regex::Regex::new(r"^rotate based on position of letter ([a-z])$")
         .expect("could not compile rotpos pattern");
-    let rev_pat =
-        regex::Regex::new(r"^reverse positions ([0-9]+) through ([0-9]+)$")
+    let rev_pat = regex::Regex::new(r"^reverse positions ([0-9]+) through ([0-9]+)$")
         .expect("could not compile rev pattern");
-    let mov_pat =
-        regex::Regex::new(r"^move position ([0-9]+) to position ([0-9]+)$")
+    let mov_pat = regex::Regex::new(r"^move position ([0-9]+) to position ([0-9]+)$")
         .expect("could not compile mov pattern");
 
     // Set up state and process lines.
@@ -125,8 +119,8 @@ fn read_insns() -> Vec<Insn> {
             continue;
         };
         if let Some(args) = try_pat(&swchar_pat, &target) {
-            let c1 = args[0].chars().nth(0).expect("swchar: op1 error");
-            let c2 = args[1].chars().nth(0).expect("swchar: op1 error");
+            let c1 = args[0].chars().next().expect("swchar: op1 error");
+            let c2 = args[1].chars().next().expect("swchar: op2 error");
             insns.push(SwChar(c1, c2));
             continue;
         };
@@ -142,7 +136,7 @@ fn read_insns() -> Vec<Insn> {
             continue;
         };
         if let Some(args) = try_pat(&rotpos_pat, &target) {
-            let c = args[0].chars().nth(0).expect("rotpos: op1 error");
+            let c = args[0].chars().next().expect("rotpos: op1 error");
             insns.push(RotPos(c));
             continue;
         };
@@ -161,7 +155,7 @@ fn read_insns() -> Vec<Insn> {
 
         // Didn't work.
         panic!("could not read instruction");
-    };
+    }
     insns
 }
 
@@ -175,27 +169,25 @@ fn run_insns(insns: &[Insn], chars0: &mut Vec<char>) {
     // Run each instruction.
     for insn in insns {
         if SHOW {
-            println!("{}: {:?}",
-                   chars.iter().cloned().collect::<String>(),
-                   insn);
+            println!("{}: {:?}", chars.iter().cloned().collect::<String>(), insn);
         };
 
         // Interpreter dispatch.
         match *insn {
             SwPos(p1, p2) => {
                 chars.swap(p1, p2);
-            },
-            SwChar(c1, c2) =>  {
+            }
+            SwChar(c1, c2) => {
                 let p1 = find_char(c1, &chars);
                 let p2 = find_char(c2, &chars);
                 chars.swap(p1, p2);
-            },
+            }
             RotL(r) => {
                 rotate_left(r, &mut chars);
-            },
+            }
             RotR(r) => {
                 rotate_right(r, &mut chars);
-            },
+            }
             RotPos(c) => {
                 let mut p = find_char(c, &chars);
                 if p >= 4 {
@@ -203,30 +195,35 @@ fn run_insns(insns: &[Insn], chars0: &mut Vec<char>) {
                 };
                 p += 1;
                 rotate_right(p, &mut chars);
-            },
+            }
             Rev(p1, p2) => {
                 let tmp = chars.clone();
-                for i in p1..p2+1 {
+                for i in p1..p2 + 1 {
                     chars[i] = tmp[p2 + p1 - i];
-                };
-            },
+                }
+            }
             Mov(p1, p2) => {
-                if p1 < p2 {
-                    let tmp = chars[p1];
-                    for i in p1..p2 {
-                        chars[i] = chars[i + 1];
-                    };
-                    chars[p2] = tmp;
-                } else if p1 > p2 {
-                    let tmp = chars[p1];
-                    for i in (p2..p1).rev() {
-                        chars[i + 1] = chars[i];
-                    };
-                    chars[p2] = tmp;
+                use std::cmp::Ordering;
+                match p1.cmp(&p2) {
+                    Ordering::Less => {
+                        let tmp = chars[p1];
+                        for i in p1..p2 {
+                            chars[i] = chars[i + 1];
+                        }
+                        chars[p2] = tmp;
+                    }
+                    Ordering::Greater => {
+                        let tmp = chars[p1];
+                        for i in (p2..p1).rev() {
+                            chars[i + 1] = chars[i];
+                        }
+                        chars[p2] = tmp;
+                    }
+                    _ => (),
                 }
             }
         };
-    };
+    }
 
     // Save the result.
     *chars0 = chars;
@@ -257,7 +254,7 @@ pub fn main() {
                 println!("{}", p.iter().cloned().collect::<String>());
                 return;
             };
-        };
+        }
         panic!("no password found");
     };
 }
