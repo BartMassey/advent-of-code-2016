@@ -18,8 +18,10 @@ license = "MIT"
 name = "soln"
 path = "soln.rs"
 
+[dependencies]
+md-5 = "0.10.4"
+
 [dependencies.libaoc]
 path = "../libaoc"
 
-[dependencies]
-rust-crypto = "0.2.36"
+[features]

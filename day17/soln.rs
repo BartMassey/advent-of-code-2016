@@ -5,9 +5,8 @@
 
 //! Advent of Code Day 17.
 
-extern crate crypto;
-use self::crypto::digest::Digest;
-use self::crypto::md5::Md5;
+extern crate md5;
+use md5::{Md5, Digest};
 
 extern crate aoc;
 
@@ -28,9 +27,8 @@ use self::Explo::*;
 /// iff the given hasher shows that door open.
 fn open_doors(hasher0: &Md5, doors: &mut [bool; 4]) {
     // Run a copy of the hasher (to terminate here).
-    let mut hasher = *hasher0;
-    let mut output = [0; 16];
-    hasher.result(&mut output);
+    let hasher = hasher0.clone();
+    let output = hasher.finalize();
 
     // Match up nybbles of the hash with doors.
     let nybbles = [
@@ -50,8 +48,8 @@ fn open_doors(hasher0: &Md5, doors: &mut [bool; 4]) {
 
 #[test]
 fn test_open_doors() {
-    let mut hasher = crypto::md5::Md5::new();
-    hasher.input("hijkl".as_bytes());
+    let mut hasher = Md5::new();
+    hasher.update("hijkl".as_bytes());
     let mut doors = [false; 4];
     open_doors(&hasher, &mut doors);
     assert!(doors == [true, true, true, false]);
@@ -105,8 +103,8 @@ fn dfs(
             Some(next_loc) => {
                 // Call recursively to explore continuation in this
                 // direction.
-                let mut hasher = *hasher0;
-                hasher.input(&[dirn as u8]);
+                let mut hasher = hasher0.clone();
+                hasher.update(&[dirn as u8]);
                 let mut next_path = path.clone();
                 next_path.push(dirn);
                 let subresult = dfs(
@@ -169,8 +167,8 @@ pub fn main() {
     let passcode = args[0].as_bytes();
 
     // Set up state.
-    let mut hasher0 = crypto::md5::Md5::new();
-    hasher0.input(passcode);
+    let mut hasher0 = Md5::new();
+    hasher0.update(passcode);
     let grid_box = aoc::GridBox::new(4, 4);
 
     // For part 2, do a single search for longest path.
