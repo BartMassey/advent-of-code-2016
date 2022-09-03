@@ -11,9 +11,9 @@
 use std::io::*;
 
 extern crate aoc;
-extern crate crypto;
+extern crate md5;
 
-use self::crypto::digest::Digest;
+use md5::{Md5, Digest};
 
 /// Pile up the password byte array into a string and return
 /// to the start of the line and show it.
@@ -41,20 +41,19 @@ pub fn main() {
     cinema_string(&password);
 
     // Set up the rest of the state.
-    let mut hasher = crypto::md5::Md5::new();
+    let mut hasher = Md5::new();
     let prefix = room_code.as_bytes();
-    hasher.input(prefix);
+    hasher.update(prefix);
     let mut count = 0;
 
     // This loop should never finish.
     for i in 0..std::usize::MAX {
         // Copy the partially-run hasher to avoid rehashing.
-        let mut hasher = hasher;
+        let mut hasher = hasher.clone();
 
         // Get the current hash.
-        hasher.input(i.to_string().as_bytes());
-        let mut output = [0; 16];
-        hasher.result(&mut output);
+        hasher.update(i.to_string().as_bytes());
+        let output = hasher.finalize();
 
         // If the first five hex digits are not zero, it's uninteresting.
         if output[0] != 0 || output[1] != 0 || (output[2] >> 4) != 0 {

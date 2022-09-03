@@ -6,58 +6,39 @@
 //! Advent of Code Day 14.
 
 extern crate aoc;
-extern crate crypto;
+extern crate md5;
 
-use self::crypto::digest::Digest;
+use md5::{Digest, Md5};
 
 /// "Stretched" hasher for part 2.
-enum StretchedMd5 {
-    Hasher(Box<crypto::md5::Md5>),
-}
+struct StretchedMd5(Md5);
 
 impl StretchedMd5 {
     /// Just box up a plain old hasher.
     fn new() -> StretchedMd5 {
-        StretchedMd5::Hasher(Box::new(crypto::md5::Md5::new()))
-    }
-}
-
-/// This "stretched" MD5 `Digest` is implemented in
-/// terms of the standard `Md5`. All the extra work
-/// is done in the result.
-impl Digest for StretchedMd5 {
-    fn input(&mut self, src: &[u8]) {
-        let &mut StretchedMd5::Hasher(ref mut h) = self;
-        h.input(src);
+        Self(Md5::new())
     }
 
     fn reset(&mut self) {
-        let &mut StretchedMd5::Hasher(ref mut h) = self;
-        h.reset();
+        self.0.reset();
     }
 
-    fn output_bits(&self) -> usize {
-        let &StretchedMd5::Hasher(ref h) = self;
-        h.output_bits()
-    }
-
-    fn block_size(&self) -> usize {
-        let &StretchedMd5::Hasher(ref h) = self;
-        h.block_size()
+    fn update(&mut self, bytes: &[u8]) {
+        self.0.update(bytes);
     }
 
     /// Run the underlying MD5 hasher 2017 times to
     /// produce the stretched hash.
-    fn result(&mut self, out: &mut [u8]) {
-        let &mut StretchedMd5::Hasher(ref mut h) = self;
-        h.result(out);
+    fn finalize_into(self, hash: &mut [u8; 16]) {
+        let mut out = self.0.finalize();
         for _ in 0..2016 {
-            h.reset();
-            let s = aoc::hex_string(out);
+            let mut h = Md5::new();
+            let s = aoc::hex_string(out.as_slice());
             let out_hex = &(s.as_bytes());
-            h.input(out_hex);
-            h.result(out);
+            h.update(out_hex);
+            h.finalize_into(&mut out);
         }
+        hash.copy_from_slice(out.as_slice());
     }
 }
 
@@ -108,15 +89,13 @@ fn has_repeat(hash: &[u8; 16], target: Option<u8>, reps: usize) -> Option<u8> {
 #[cfg(test)]
 mod test_has_repeat {
 
-    use super::aoc;
-    use crypto::digest::Digest;
-    use crypto::md5;
+    use super::*;
 
     fn make_hash(i: usize, output: &mut [u8; 16]) {
-        let mut hasher = md5::Md5::new();
-        hasher.input("abc".to_string().as_bytes());
-        hasher.input(i.to_string().as_bytes());
-        hasher.result(output);
+        let mut hasher = Md5::new();
+        hasher.update("abc".to_string().as_bytes());
+        hasher.update(i.to_string().as_bytes());
+        hasher.md_finalize_into(output);
     }
 
     fn has_rep(i: usize, t: Option<u8>, n: usize) -> Option<u8> {
@@ -139,9 +118,9 @@ mod test_has_repeat {
 
     fn make_stretched_hash(i: usize, output: &mut [u8; 16]) {
         let mut hasher = super::StretchedMd5::new();
-        hasher.input("abc".to_string().as_bytes());
-        hasher.input(i.to_string().as_bytes());
-        hasher.result(output);
+        hasher.update("abc".to_string().as_bytes());
+        hasher.update(i.to_string().as_bytes());
+        hasher.finalize_into(output);
     }
 
     fn has_rep_stretched(i: usize, t: Option<u8>, n: usize) -> Option<u8> {
@@ -165,21 +144,47 @@ mod test_has_repeat {
     }
 }
 
-/// Run the problem.
-pub fn main() {
-    let (part, args) = aoc::get_part_args();
-    assert!(args.len() == 1);
-    let k = &(args[0].as_bytes());
+pub trait MiniDigest {
+    fn md_new() -> Self;
+    fn md_update(&mut self, bytes: &[u8]);
+    fn md_reset(&mut self);
+    fn md_finalize_into(self, hash: &mut [u8; 16]);
+}
 
+impl MiniDigest for Md5 {
+    fn md_new() -> Self {
+        Self::new()
+    }
+    fn md_update(&mut self, bytes: &[u8]) {
+        self.update(bytes);
+    }
+    fn md_reset(&mut self) {
+        self.reset()
+    }
+    fn md_finalize_into(self, hash: &mut [u8; 16]) {
+        let result = self.finalize();
+        hash.copy_from_slice(result.as_slice());
+    }
+}
+
+impl MiniDigest for StretchedMd5 {
+    fn md_new() -> Self {
+        Self::new()
+    }
+    fn md_update(&mut self, bytes: &[u8]) {
+        self.update(bytes);
+    }
+    fn md_reset(&mut self) {
+        self.reset()
+    }
+    fn md_finalize_into(self, hash: &mut [u8; 16]) {
+        self.finalize_into(hash);
+    }
+}
+
+fn solve<T: MiniDigest>(k: &[u8]) {
     // Set up state.
     let mut n: isize = 64;
-    let mut hasher: Box<dyn Digest> = if part == 1 {
-        Box::new(crypto::md5::Md5::new())
-    } else if part == 2 {
-        Box::new(StretchedMd5::new())
-    } else {
-        panic!("unknown part");
-    };
     let mut output = [0; 16];
     let mut hashbuf: Vec<[u8; 16]> = Vec::new();
 
@@ -187,10 +192,10 @@ pub fn main() {
     for i in 0..std::usize::MAX {
         // If hash is not already cached, cache it.
         if i >= hashbuf.len() {
-            hasher.reset();
-            hasher.input(k);
-            hasher.input(i.to_string().as_bytes());
-            hasher.result(&mut output);
+            let mut hasher = T::md_new();
+            hasher.md_update(k);
+            hasher.md_update(i.to_string().as_bytes());
+            hasher.md_finalize_into(&mut output);
             hashbuf.push(output);
         } else {
             output = hashbuf[i];
@@ -203,10 +208,10 @@ pub fn main() {
             for j in 1..1001 {
                 // If hash is not already cached, cache it.
                 if i + j >= hashbuf.len() {
-                    hasher.reset();
-                    hasher.input(k);
-                    hasher.input((i + j).to_string().as_bytes());
-                    hasher.result(&mut output);
+                    let mut hasher = T::md_new();
+                    hasher.md_update(k);
+                    hasher.md_update((i + j).to_string().as_bytes());
+                    hasher.md_finalize_into(&mut output);
                     hashbuf.push(output);
                 } else {
                     output = hashbuf[i + j];
@@ -226,4 +231,18 @@ pub fn main() {
         };
     }
     panic!("no solution found");
+}
+
+/// Run the problem.
+pub fn main() {
+    let (part, args) = aoc::get_part_args();
+    assert!(args.len() == 1);
+    let k = &(args[0].as_bytes());
+    if part == 1 {
+        solve::<Md5>(k);
+    } else if part == 2 {
+        solve::<StretchedMd5>(k);
+    } else {
+        panic!("unknown part");
+    };
 }

@@ -22,4 +22,4 @@ path = "soln.rs"
 path = "../libaoc"
 
 [dependencies]
-rust-crypto = "0.2.36"
+md-5 = "0.10.4"
