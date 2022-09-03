@@ -7,7 +7,7 @@
 
 /// For input checking and processing, it is convenient
 /// to hardcode the floor count.
-/// 
+///
 /// It would be reasonably straightforward to get rid of
 /// this constant, but harder if buggy inputs were to be
 /// excluded. In particular, one would probably need to
@@ -15,11 +15,13 @@
 /// for example, code 21 as "twenty-first".
 const NFLOORS: usize = 4;
 
+use std::cmp::*;
 use std::collections::BTreeSet;
 use std::iter::*;
-use std::cmp::*;
 
 extern crate aoc;
+extern crate captures_at;
+use captures_at::CapturesAtExt;
 extern crate regex;
 
 /// Kind of device.
@@ -28,7 +30,7 @@ enum Dev {
     /// Generator with given material name.
     Gen(String),
     /// Microchip with given material name.
-    Chip(String)
+    Chip(String),
 }
 
 /// Returns true iff the floor contents can be left together
@@ -37,15 +39,14 @@ enum Dev {
 fn contents_are_safe(contents: &BTreeSet<Dev>) -> bool {
     let mut gens = BTreeSet::new();
     let mut chips = BTreeSet::new();
-    for c in contents.into_iter().cloned() {
+    for c in contents.iter().cloned() {
         match c {
             Dev::Gen(name) => gens.insert(name),
-            Dev::Chip(name) => chips.insert(name)
+            Dev::Chip(name) => chips.insert(name),
         };
-    };
+    }
     gens.is_empty() || chips.is_subset(&gens)
 }
-
 
 /// Problem state.
 #[derive(Clone, Debug, PartialOrd, Ord, Eq, PartialEq)]
@@ -53,16 +54,15 @@ struct State {
     /// Current floor.
     location: usize,
     /// Contents of floors.
-    floors: Vec<BTreeSet<Dev>>
+    floors: Vec<BTreeSet<Dev>>,
 }
 
 impl State {
-
     /// Initial state for given problem.
     fn start(floors: Vec<BTreeSet<Dev>>) -> Self {
         State {
             location: 0,
-            floors: floors
+            floors,
         }
     }
 
@@ -76,7 +76,6 @@ impl State {
         };
         Some((src, dest as usize))
     }
-        
 
     /// 1. Grab specified elevator contents from current floor.
     /// 2. Move in specified direction to next floor.
@@ -84,14 +83,14 @@ impl State {
     ///
     /// If the traverse is legal, return the state resulting
     /// from these operations.
-    fn try_traverse(&self, dirn: isize, grab: &BTreeSet<Dev>)
-    -> Option<State> {
+    fn try_traverse(&self, dirn: isize, grab: &BTreeSet<Dev>) -> Option<State> {
         // Can't move off either end of the elevator shaft.
-        let (src, dest) =
-            match self.try_move(dirn) {
-                Some(ns) => ns,
-                None => { return None; }
-            };
+        let (src, dest) = match self.try_move(dirn) {
+            Some(ns) => ns,
+            None => {
+                return None;
+            }
+        };
 
         // Can't move with an empty elevator.
         if grab.is_empty() {
@@ -116,7 +115,7 @@ impl State {
         new_floors[dest] = new_dest;
         let new_state = State {
             location: dest,
-            floors: new_floors
+            floors: new_floors,
         };
         Some(new_state)
     }
@@ -139,8 +138,8 @@ impl State {
                 if let Some(t) = self.try_traverse(*dirn, &grab) {
                     assert!(ts.insert(t));
                 }
-            };
-        };
+            }
+        }
         ts
     }
 }
@@ -153,12 +152,14 @@ impl aoc::SearchState for State {
     type Global = ();
 
     /// We do not use labels here.
-    fn label(&self) -> () { () }
+    fn label(&self) {}
 
     /// State-space neighbors.
     fn neighbors(&self, _: &()) -> Vec<(usize, Box<State>)> {
-        self.traversals().into_iter()
-            .map(move |s|{(1usize, Box::new(s))}).collect()
+        self.traversals()
+            .into_iter()
+            .map(move |s| (1usize, Box::new(s)))
+            .collect()
     }
 
     /// Check whether the current state has the right
@@ -170,12 +171,12 @@ impl aoc::SearchState for State {
         }
 
         // Have to have all the stuff on the top floor.
-        for i in 0..self.floors.len()-1 {
+        for i in 0..self.floors.len() - 1 {
             if !self.floors[i].is_empty() {
                 return false;
             }
         }
-        
+
         true
     }
 
@@ -195,12 +196,11 @@ impl aoc::SearchState for State {
     fn hcost(&self, _: &()) -> usize {
         let mut dists = 0;
         let nfloors = self.floors.len();
-        for i in 0..nfloors-1 {
+        for i in 0..nfloors - 1 {
             dists += (nfloors - i - 1) * self.floors[i].len();
-        };
+        }
         max(0, 2 * (dists as isize - nfloors as isize)) as usize
     }
-
 }
 
 /// Pull in the problem description.
@@ -226,50 +226,50 @@ fn read_start_state() -> State {
         // Check for top floor (or greater).
         assert!(floor < NFLOORS);
         if floor == NFLOORS - 1 {
-            let top_floor =
-                format!("The {} floor contains nothing relevant.",
-                        floors[NFLOORS - 1]);
+            let top_floor = format!(
+                "The {} floor contains nothing relevant.",
+                floors[NFLOORS - 1]
+            );
             assert!(target == top_floor);
             continue;
         };
 
         // Get the list of stuff on the floor.
-        let floor_pat =
-            regex::Regex::new(&format!(
-                r"^The {} floor contains .*\.$", floors[floor]
-            )).expect("main: could not compile floor pattern");
+        let floor_pat = regex::Regex::new(&format!(r"^The {} floor contains .*\.$", floors[floor]))
+            .expect("main: could not compile floor pattern");
         assert!(floor_pat.is_match(&target));
 
         // Add all the stuff on the floor.
         for parts in device_pat.captures_iter(&target) {
             // Get the device type and class.
-            let dev_desc = parts.at(1)
+            let dev_desc = parts
+                .at(1)
                 .expect("main: could not find device description");
             let dev_mat = String::from(
-                compatible_pat.captures(dev_desc)
-                .expect("main: could not parse device description")
-                .at(1).expect("main: could not find device description")
+                compatible_pat
+                    .captures(dev_desc)
+                    .expect("main: could not parse device description")
+                    .at(1)
+                    .expect("main: could not find device description"),
             );
-            let dev_class = parts.at(2)
-                            .expect("main: could not find device class");
+            let dev_class = parts.at(2).expect("main: could not find device class");
 
             // Build the device.
-            let dev =
-                if dev_class == "generator" {
-                    Dev::Gen(dev_mat)
-                } else if dev_class == "microchip" {
-                    Dev::Chip(dev_mat)
-                } else {
-                    panic!("main: unknown device")
-                };
+            let dev = if dev_class == "generator" {
+                Dev::Gen(dev_mat)
+            } else if dev_class == "microchip" {
+                Dev::Chip(dev_mat)
+            } else {
+                panic!("main: unknown device")
+            };
 
             // Put the device on the floor.
             if !floors0[floor].insert(dev) {
                 panic!("main: device inserted twice");
             }
-        };
+        }
         floor += 1;
-    };
+    }
     State::start(floors0)
 }
 
@@ -286,27 +286,53 @@ fn test1() {
         aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()]),
         aoc::make_set(&[gen_hydrogen.clone()]),
         aoc::make_set(&[gen_lithium.clone()]),
-        BTreeSet::new() ]);
+        BTreeSet::new(),
+    ]);
     let steps: [(isize, BTreeSet<Dev>); 11] = [
-        ( 1, aoc::make_set(&[chip_hydrogen.clone()])),
-        ( 1, aoc::make_set(&[chip_hydrogen.clone(), gen_hydrogen.clone()])),
+        (1, aoc::make_set(&[chip_hydrogen.clone()])),
+        (
+            1,
+            aoc::make_set(&[chip_hydrogen.clone(), gen_hydrogen.clone()]),
+        ),
         (-1, aoc::make_set(&[chip_hydrogen.clone()])),
         (-1, aoc::make_set(&[chip_hydrogen.clone()])),
-        ( 1, aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()])),
-        ( 1, aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()])),
-        ( 1, aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()])),
-        ( -1, aoc::make_set(&[chip_hydrogen.clone()])),
-        ( 1, aoc::make_set(&[gen_hydrogen.clone(), gen_lithium.clone()])),
-        ( -1, aoc::make_set(&[chip_lithium.clone()])),
-        ( 1, aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()]))];
+        (
+            1,
+            aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()]),
+        ),
+        (
+            1,
+            aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()]),
+        ),
+        (
+            1,
+            aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()]),
+        ),
+        (-1, aoc::make_set(&[chip_hydrogen.clone()])),
+        (
+            1,
+            aoc::make_set(&[gen_hydrogen.clone(), gen_lithium.clone()]),
+        ),
+        (-1, aoc::make_set(&[chip_lithium.clone()])),
+        (
+            1,
+            aoc::make_set(&[chip_hydrogen.clone(), chip_lithium.clone()]),
+        ),
+    ];
     for step in steps.iter() {
         let (dirn, ref grab) = *step;
         match state.try_traverse(dirn, grab) {
-            Some(next_state) => { state = next_state; },
-            None => { panic!(format!("bad traverse {} {:?} in state {:?}",
-                                     dirn, *grab, state)); }
+            Some(next_state) => {
+                state = next_state;
+            }
+            None => {
+                panic!(format!(
+                    "bad traverse {} {:?} in state {:?}",
+                    dirn, *grab, state
+                ));
+            }
         };
-    };
+    }
     if !state.is_goal() {
         panic!("state {:?} is not goal\n", state);
     };
@@ -315,11 +341,17 @@ fn test1() {
 /// Grab the input, run the A\* search, show the result.
 pub fn main() {
     let args = aoc::get_args();
-    assert!(args.len() == 0);
+    assert!(args.is_empty());
     let start = read_start_state();
     match aoc::a_star(&(), &start, false) {
-        None => { panic!("no solution"); },
-        Some((cost, None)) => { println!("{}", cost); },
-        _ => { panic!("internal error: weird astar return"); }
+        None => {
+            panic!("no solution");
+        }
+        Some((cost, None)) => {
+            println!("{}", cost);
+        }
+        _ => {
+            panic!("internal error: weird astar return");
+        }
     };
 }
