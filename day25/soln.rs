@@ -15,7 +15,6 @@ const NSTEPS: usize = 1000000;
 
 extern crate aoc;
 
-
 /// Read the program and brute-force the input that will
 /// produce the correct output, or at least heuristically
 /// look for enough of said infinite output to get
@@ -30,7 +29,7 @@ pub fn main() {
     for _ in 0..NCYCLES {
         target.push(0);
         target.push(1);
-    };
+    }
 
     // Try executing program with successive keys,
     // failing that key when it produces an incorrect
@@ -56,7 +55,7 @@ pub fn main() {
                 old_nout = nout;
             };
             steps += 1;
-        };
-    };
+        }
+    }
     panic!("no solution found");
 }
