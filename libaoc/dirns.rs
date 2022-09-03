@@ -13,17 +13,16 @@
 //!
 //! ```rust
 //! use aoc::dirns::*;
-//! 
+//!
 //! let clip_box = GridBox::new(3, 4);
 //! let neighbors = clip_box.neighbors((2, 0))
 //!                 .collect::<Vec<_>>();
 //! assert_eq!(neighbors, vec![(2, 1), (1, 0)]);
 //! ```
 
-
 /// The cardinal directions: up, down, left, right in
 /// an x-y coordinate system where increasing y is down.
-pub static DIRNS: [(isize, isize);4] = [(0, -1), (0, 1), (-1, 0), (1, 0)];
+pub static DIRNS: [(isize, isize); 4] = [(0, -1), (0, 1), (-1, 0), (1, 0)];
 
 /// Type of unsigned coordinates.
 pub type Point = (usize, usize);
@@ -34,13 +33,12 @@ pub enum GridBox {
     /// Grid is clipped on bottom and right.
     ClipBox(Point),
     /// Grid is unclipped.
-    Unclipped
+    Unclipped,
 }
 
 use self::GridBox::*;
 
 impl GridBox {
-
     /// Create a clip box for neighbor calculations.
     #[allow(dead_code)]
     pub fn new(x_size: usize, y_size: usize) -> GridBox {
@@ -92,18 +90,17 @@ pub struct Neighbors {
     /// Source location.
     loc: Point,
     /// Iterator for cardinal directions.
-    dirns: Box<Iterator<Item=&'static (isize, isize)>>
+    dirns: Box<dyn Iterator<Item = &'static (isize, isize)>>,
 }
 
 impl Neighbors {
-
     /// Return an iterator over the neighbors of
     /// the given grid box starting at the given location.
     pub fn new(grid_box: GridBox, location: Point) -> Self {
         Neighbors {
             bounds: grid_box,
             loc: location,
-            dirns: Box::new(DIRNS.iter())
+            dirns: Box::new(DIRNS.iter()),
         }
     }
 }
@@ -120,7 +117,7 @@ impl Iterator for Neighbors {
                     if let Some(n) = self.bounds.clip(self.loc, d) {
                         return Some(n);
                     }
-                },
+                }
                 None => {
                     return None;
                 }

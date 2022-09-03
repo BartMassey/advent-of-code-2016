@@ -13,12 +13,11 @@
 /// `std::char::from_digit()`.
 #[inline]
 pub fn hex_digit(n: u8) -> char {
-    let d =
-        if n <= 9 {
-            n as u8 + b'0'
-        } else {
-            n as u8 - 10 + b'a'
-        };
+    let d = if n <= 9 {
+        n as u8 + b'0'
+    } else {
+        n as u8 - 10 + b'a'
+    };
     d as char
 }
 
@@ -29,6 +28,6 @@ pub fn hex_string(bytes: &[u8]) -> String {
     for b in bytes {
         s.push(hex_digit(b >> 4));
         s.push(hex_digit(b & 0xf));
-    };
+    }
     s
 }

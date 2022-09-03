@@ -12,10 +12,11 @@ description = "Library for Advent of Code 2016 solutions."
 repository = "http://github.com/BartMassey/advent-of-code-2016"
 readme = "README.md"
 license = "MIT"
+edition = "2021"
 
 [lib]
 name = "aoc"
 path = "mod.rs"
 
 [dev-dependencies]
-rand = "0.3"
+rand = "0.8.5"

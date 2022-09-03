@@ -16,8 +16,11 @@ use std;
 pub fn get_part() -> usize {
     let mut argv = std::env::args();
     assert!(argv.len() == 2);
-    let part = argv.nth(1).expect("get_part: bad part argument")
-               .parse().expect("get_part: part argument is not a number");
+    let part = argv
+        .nth(1)
+        .expect("get_part: bad part argument")
+        .parse()
+        .expect("get_part: part argument is not a number");
     assert!(part == 1 || part == 2);
     part
 }
@@ -27,8 +30,11 @@ pub fn get_part() -> usize {
 pub fn get_part_args() -> (usize, Vec<String>) {
     let mut argv = std::env::args();
     assert!(argv.len() >= 2);
-    let part = argv.nth(1).expect("get_part_args: bad part argument")
-               .parse().expect("get_part_args: part argument is not a number");
+    let part = argv
+        .nth(1)
+        .expect("get_part_args: bad part argument")
+        .parse()
+        .expect("get_part_args: part argument is not a number");
     assert!(part == 1 || part == 2);
     let args = argv.collect::<Vec<String>>();
     (part, args)
@@ -41,4 +47,3 @@ pub fn get_args() -> Vec<String> {
     argv.next();
     argv.collect::<Vec<String>>()
 }
-
