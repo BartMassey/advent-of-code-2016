@@ -14,12 +14,13 @@ extern crate aoc;
 fn ca_step(patv: &[bool]) -> bool {
     assert!(patv.len() == 3);
     let pat = (patv[0], patv[1], patv[2]);
+    #[allow(clippy::match_like_matches_macro)]
     match pat {
         (false, false, true) => false,
         (true, false, false) => false,
         (false, true, true) => false,
         (true, true, false) => false,
-        _ => true
+        _ => true,
     }
 }
 
@@ -43,7 +44,7 @@ fn count_ca(row0: &Vec<bool>, nrows: usize) -> usize {
             if *b {
                 count += 1;
             }
-        };
+        }
 
         // Start the next row.
         let mut next_row = Vec::new();
@@ -54,10 +55,10 @@ fn count_ca(row0: &Vec<bool>, nrows: usize) -> usize {
         next_row.push(cell);
 
         // Propagate the internal cells.
-        for posn in 1..ncells-1 {
-            let cell = ca_step(&cur_row[posn-1..posn+2]);
+        for posn in 1..ncells - 1 {
+            let cell = ca_step(&cur_row[posn - 1..posn + 2]);
             next_row.push(cell);
-        };
+        }
 
         // Propagate the rightmost cell.
         let right_pat = [cur_row[ncells - 2], cur_row[ncells - 1], true];
@@ -66,7 +67,7 @@ fn count_ca(row0: &Vec<bool>, nrows: usize) -> usize {
 
         // Save the propagated row.
         cur_row = next_row;
-    };
+    }
     count
 }
 
@@ -79,7 +80,7 @@ fn decode_row(row: &[bool]) -> String {
         } else {
             result.push('^');
         }
-    };
+    }
     result
 }
 
@@ -90,10 +91,12 @@ fn encode_row(row: &str) -> Vec<bool> {
         let e = match c {
             '^' => false,
             '.' => true,
-            _ => { panic!("unexpected char in row"); }
+            _ => {
+                panic!("unexpected char in row");
+            }
         };
         result.push(e);
-    };
+    }
     result
 }
 
@@ -104,7 +107,7 @@ pub fn main() {
     let nrows = args[0].parse().expect("could not parse nrows");
     let mut lines = aoc::input_lines();
     let row0 = lines.next().expect("could not read row");
-    if !lines.next().is_none() {
+    if lines.next().is_some() {
         panic!("more than one row");
     };
     println!("{}", count_ca(&encode_row(&row0), nrows));

@@ -12,12 +12,12 @@ extern crate aoc;
 fn max_index(elems: &[usize]) -> usize {
     let mut m = elems[0];
     let mut m_i = 0;
-    for i in 1..elems.len() {
-        if elems[i] > m {
-            m = elems[i];
+    for (i, &e) in elems.iter().enumerate().skip(1) {
+        if e > m {
+            m = e;
             m_i = i;
         }
-    };
+    }
     m_i
 }
 
@@ -26,17 +26,17 @@ fn max_index(elems: &[usize]) -> usize {
 fn min_index(elems: &[usize]) -> usize {
     let mut m = elems[0];
     let mut m_i = 0;
-    for i in 1..elems.len() {
-        if elems[i] > 0 {
+    for (i, &e) in elems.iter().enumerate().skip(1) {
+        if e > 0 {
             if m == 0 {
-                m = elems[i];
+                m = e;
             };
-            if elems[i] < m {
-                m = elems[i];
+            if e < m {
+                m = e;
                 m_i = i;
             }
         }
-    };
+    }
     m_i
 }
 
@@ -55,7 +55,7 @@ pub fn main() {
         if !inited {
             for _ in 0..l.len() {
                 counters.push(vec![0usize; 26]);
-            };
+            }
             inited = true;
         };
 
@@ -64,18 +64,17 @@ pub fn main() {
             let i = (c as u8 - b'a') as usize;
             counters[j][i] += 1;
         }
-    };
+    }
 
     // Find the appropriate characters from the counters
     // and display them.
     for c in &counters {
-        let i =
-            if part == 1 {
-                max_index(c)
-            } else {
-                min_index(c)
-            };
+        let i = if part == 1 {
+            max_index(c)
+        } else {
+            min_index(c)
+        };
         print!("{}", (i as u8 + b'a') as char);
     }
-    println!("");
+    println!();
 }

@@ -17,10 +17,10 @@ fn fill_step(src: String) -> String {
         let c = match src_chars[i] {
             '0' => '1',
             '1' => '0',
-            _ => panic!("unexpected char in data")
+            _ => panic!("unexpected char in data"),
         };
         dst.push(c);
-    };
+    }
     dst
 }
 
@@ -30,15 +30,15 @@ fn test_fill_step() {
         ("1", "100"),
         ("0", "001"),
         ("11111", "11111000000"),
-        ("111100001010", "1111000010100101011110000") ];
+        ("111100001010", "1111000010100101011110000"),
+    ];
     for &(src, dst) in tests.iter() {
         assert!(fill_step(src.to_string()) == dst.to_string());
-    };
+    }
 }
 
 /// Return the "checksum" of some data.
-pub fn checksum(src: String) -> String {
-    let mut sum = src.clone();
+pub fn checksum(mut sum: String) -> String {
     while sum.len() & 1 == 0 {
         let mut new_sum = String::new();
         let sum_chars = sum.chars().collect::<Vec<char>>();
@@ -48,13 +48,13 @@ pub fn checksum(src: String) -> String {
             let c = match (sum_chars[i << 1], sum_chars[(i << 1) + 1]) {
                 ('0', '0') | ('1', '1') => '1',
                 ('0', '1') | ('1', '0') => '0',
-                _ => panic!("unexpected pair in sum")
+                _ => panic!("unexpected pair in sum"),
             };
             new_sum.push(c);
-        };
+        }
         sum = new_sum;
-    };
-    sum 
+    }
+    sum
 }
 
 #[test]
@@ -72,7 +72,7 @@ pub fn main() {
     // Fill to specified size or more.
     while data.len() < fill {
         data = fill_step(data);
-    };
+    }
 
     // Truncate the fill to specified size.
     let data = &data[0..fill].to_string();

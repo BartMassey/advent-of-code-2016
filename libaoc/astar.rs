@@ -29,7 +29,7 @@
 //!
 //! ```rust
 //! struct Steps {
-//!     steps: Vec<(usize, Box<Fn(isize) -> isize>)>,
+//!     steps: Vec<(usize, Box<dyn Fn(isize) -> isize>)>,
 //!     goal: isize
 //! }
 //!
@@ -82,7 +82,7 @@ use std::collections::{BTreeSet, BinaryHeap};
 
 /// Node with state `S` in A\* search.
 #[derive(Clone, Debug)]
-struct PQElem<S:SearchState> {
+struct PQElem<S: SearchState> {
     /// Cost so far.
     cost: usize,
     /// Total heuristic cost.
@@ -90,10 +90,10 @@ struct PQElem<S:SearchState> {
     /// Actual state.
     state: S,
     /// Sequence of labels from start to current.
-    path: Option<Vec<S::Label>>
+    path: Option<Vec<S::Label>>,
 }
 
-impl <S: SearchState> PartialEq for PQElem<S> {
+impl<S: SearchState> PartialEq for PQElem<S> {
     /// From the search point of view, two nodes are
     /// the same if their heuristic cost and actual
     /// cost are both the same.
@@ -104,26 +104,25 @@ impl <S: SearchState> PartialEq for PQElem<S> {
 
 /// It would be nice to just derive this from `PartialEq`,
 /// but Rust derive does the other thing.
-impl <S: SearchState> Eq for PQElem<S> {}
+impl<S: SearchState> Eq for PQElem<S> {}
 
 /// It would be nice to just derive this from `Ord`,
 /// but Rust derive does the other thing.
-impl <S: SearchState> PartialOrd for PQElem<S> {
+impl<S: SearchState> PartialOrd for PQElem<S> {
     fn partial_cmp(&self, other: &PQElem<S>) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl <S: SearchState> Ord for PQElem<S> {
+impl<S: SearchState> Ord for PQElem<S> {
     /// A node is better than another if its heuristic
     /// cost is smaller. Ties are broken by preferring
     /// nodes with larger confirmed cost, since these
     /// are farther along the path to a solution.
     fn cmp(&self, other: &PQElem<S>) -> Ordering {
         match other.fcost.cmp(&self.fcost) {
-            Ordering::Equal =>
-                self.cost.cmp(&other.cost),
-            c => c
+            Ordering::Equal => self.cost.cmp(&other.cost),
+            c => c,
         }
     }
 }
@@ -171,7 +170,7 @@ pub trait SearchState {
     /// Return true if this is a goal state,
     /// given global information.
     fn is_goal(&self, global: &Self::Global) -> bool;
-    
+
     /// Return an [admissible][1] heuristic cost of reaching
     /// the least-cost goal node from the given state. The default
     /// implementation causes A\* search (as provided by
@@ -192,29 +191,35 @@ pub trait SearchState {
 /// given start state to some given goal, using
 /// supplied global data. The return value is the cost
 /// and path (sequence of states) if a path is found.
-pub fn a_star<S>(global: &S::Global, start: &S, save_path: bool)
--> Option<(usize, Option<Vec<S::Label>>)>
-where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
+pub fn a_star<S>(
+    global: &S::Global,
+    start: &S,
+    save_path: bool,
+) -> Option<(usize, Option<Vec<S::Label>>)>
+where
+    S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState,
+{
     let mut stop_list = BTreeSet::new();
     let mut pq = BinaryHeap::new();
-    pq.push(PQElem{
+    pq.push(PQElem {
         state: start.clone(),
         cost: 0,
         fcost: start.hcost(global),
-        path: if save_path { Some(Vec::new()) } else { None }
+        path: if save_path { Some(Vec::new()) } else { None },
     });
     loop {
         match pq.pop() {
-            Some(PQElem{cost, state, path, ..}) => {
-                let next_path =
-                    match path {
-                        None => None,
-                        Some(ref labels) => {
-                            let mut p = labels.clone();
-                            p.push(state.label());
-                            Some(p)
-                        }
-                    };
+            Some(PQElem {
+                cost, state, path, ..
+            }) => {
+                let next_path = match path {
+                    None => None,
+                    Some(ref labels) => {
+                        let mut p = labels.clone();
+                        p.push(state.label());
+                        Some(p)
+                    }
+                };
                 if state.is_goal(global) {
                     return Some((cost, next_path));
                 };
@@ -227,17 +232,15 @@ where S: Clone + PartialEq + Eq + PartialOrd + Ord + SearchState {
                             fcost: g + h,
                             cost: g,
                             state: (**next_state).clone(),
-                            path: next_path.clone()
+                            path: next_path.clone(),
                         };
                         pq.push(neighbor);
                     }
                 } else {
                     continue;
                 };
-            },
-            None => {
-                return None
             }
+            None => return None,
         }
-    };
+    }
 }

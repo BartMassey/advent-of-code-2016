@@ -11,25 +11,26 @@
 //! a bit of boilerplate removal and isolates a whole
 //! bunch of dependencies.
 
-use std::io::*;
 use std::fs::File;
+use std::io::*;
 
 /// The `std::io::Lines` iterator, wrapped so that
 /// it will `panic!()` on failure rather than returning
 /// a `std::io::Result`.
 pub struct InputLines<T: Read> {
-    lines: Lines<BufReader<T>>
+    lines: Lines<BufReader<T>>,
 }
 
-impl <T: Read> InputLines<T> {
-
+impl<T: Read> InputLines<T> {
     /// Return the wrapped `std::io::Lines` iterator.
     pub fn new(file: T) -> Self {
-        InputLines { lines: BufReader::new(file).lines() }
+        InputLines {
+            lines: BufReader::new(file).lines(),
+        }
     }
 }
 
-impl <T: Read> Iterator for InputLines<T> {
+impl<T: Read> Iterator for InputLines<T> {
     type Item = String;
     /// Return the next line if any.
     ///
@@ -38,10 +39,9 @@ impl <T: Read> Iterator for InputLines<T> {
     /// Errors in reading the next line (but not EOF) will
     /// cause a panic here.
     fn next(&mut self) -> Option<String> {
-        match self.lines.next() {
-            Some(result) => Some(result.expect("could not read input line")),
-            None => None
-        }
+        self.lines
+            .next()
+            .map(|result| result.expect("could not read input line"))
     }
 }
 
@@ -54,6 +54,6 @@ pub fn input_lines() -> InputLines<Stdin> {
 /// filename, returning an error on failure to open the
 /// file.
 pub fn input_file_lines(filename: &str) -> Result<InputLines<File>> {
-    let file = try!(File::open(filename));
+    let file = File::open(filename)?;
     Ok(InputLines::new(file))
 }

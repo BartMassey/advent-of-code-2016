@@ -56,16 +56,6 @@ and then
 
 to get markdown into the problem files for posterity.
 
-To generate the full rustdoc for a day, simply run this
-highly intuitive command:
-
-    cargo rustdoc --open -- --no-defaults --passes collapse-docs \
-      --passes unindent-comments --passes strip-priv-imports
-
-See Issue
-[1520](https://github.com/rust-lang/cargo/issues/1520)
-for an explanation.
-
 These solutions deserve a much more thorough top-level
 description than I have the energy to write at this point.
 I will revise this file in the indefinite future.
@@ -93,3 +83,16 @@ and I'll try to make it right.
 This work is licensed under the "MIT License".  Please see
 the file `COPYING` in the source distribution of this software
 for license terms.
+
+---
+
+*Update 2022-09-02:* Revisited this code after getting
+automatically warned that some of the ancient crate
+dependencies I'd used had security issues. Upgraded and
+updated everything, within reason. Added a new library
+`libcapturesat` to paper over a breaking `regex` crate
+change; added an `update` directory with the shell scripts I
+used to quickly go through all 25 days.
+
+Hopefully it's better now. I tagged the revision
+from 2017 as `v2` if you want to see the old stuff.

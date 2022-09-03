@@ -5,9 +5,9 @@
 
 //! Advent of Code Day 1.
 
+use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
-use std::collections::HashSet;
 
 extern crate aoc;
 
@@ -36,11 +36,11 @@ fn traverse(stop_short: bool) -> (isize, isize) {
     // Walk the turns.
     for t in s.trim().split(", ") {
         // Calculate the new facing and distance.
-        let turn = t.chars().nth(0).unwrap();
+        let turn = t.chars().next().unwrap();
         facing = match turn {
             'L' => (facing + 1) % 4,
             'R' => (facing + 3) % 4,
-            _ => panic!("bad direction")
+            _ => panic!("bad direction"),
         };
         let step: usize = (&t[1..]).parse().unwrap();
 
@@ -54,7 +54,7 @@ fn traverse(stop_short: bool) -> (isize, isize) {
             }
             trail.insert(position);
         }
-    };
+    }
     // Finish up.
     if stop_short {
         panic!("did not find self-intersection")

@@ -11,7 +11,7 @@ extern crate aoc;
 
 /// Return true if there is a wall at the given location.
 fn is_wall(k: usize, (x, y): aoc::Point) -> bool {
-    let h = x*x + 3*x + 2*x*y + y + y*y + k;
+    let h = x * x + 3 * x + 2 * x * y + y + y * y + k;
     let hc = aoc::popcount(h as u64);
     hc & 1 == 1
 }
@@ -26,9 +26,11 @@ struct Maze {
 /// Location within the maze. Has to be wrapped
 /// so that traits can be implemented on it.
 #[derive(Clone, Eq, PartialEq, PartialOrd, Ord)]
-enum State { Loc((usize, usize)) }
+enum State {
+    Loc((usize, usize)),
+}
 use self::State::*;
-        
+
 impl aoc::SearchState for State {
     /// We do not use labels here.
     type Label = ();
@@ -37,7 +39,7 @@ impl aoc::SearchState for State {
     type Global = Maze;
 
     /// We do not use labels here.
-    fn label(&self) -> () { () }
+    fn label(&self) {}
 
     /// State-space neighbors iterator.
     fn neighbors(&self, maze: &Maze) -> Vec<(usize, Box<State>)> {
@@ -49,7 +51,7 @@ impl aoc::SearchState for State {
                 continue;
             };
             result.push((1usize, Box::new(Loc(nb))));
-        };
+        }
         result
     }
 
@@ -70,15 +72,15 @@ impl aoc::SearchState for State {
 fn part1(key: usize, goal: (usize, usize)) -> usize {
     // Set up problem state.
     let maze = Maze {
-        key: key,
-        goal: goal,
-        grid_box: aoc::GridBox::new_grid()
+        key,
+        goal,
+        grid_box: aoc::GridBox::new_grid(),
     };
-        
+
     // Run the A\* search.
     match aoc::a_star(&maze, &Loc((1, 1)), false) {
         None => panic!("no solution"),
-        Some((dist, _)) => dist
+        Some((dist, _)) => dist,
     }
 }
 
@@ -112,15 +114,14 @@ fn part2(key: usize, max_g: usize) -> usize {
                 // Found a new location.
                 new_fringe.insert(nb);
                 stop.insert(nb);
-            };
-        };
+            }
+        }
 
         // Update the fringe.
         fringe = new_fringe;
-    };
+    }
     stop.len()
 }
-
 
 /// Read the problem description and run the search.
 pub fn main() {
@@ -130,19 +131,17 @@ pub fn main() {
     match part {
         1 => {
             assert!(args.len() == 3);
-            let goal_x =
-                args[1].parse::<usize>().expect("x not a number");
-            let goal_y =
-                args[2].parse::<usize>().expect("y not a number");
+            let goal_x = args[1].parse::<usize>().expect("x not a number");
+            let goal_y = args[2].parse::<usize>().expect("y not a number");
             let n = part1(key, (goal_x, goal_y));
             println!("{}", n);
-        },
+        }
         2 => {
             assert!(args.len() == 2);
             let max_g = args[1].parse::<usize>().expect("max_g not a number");
             let n = part2(key, max_g);
             println!("{}", n);
-        },
+        }
         _ => {
             panic!("unknown part");
         }

@@ -35,7 +35,7 @@ mod test {
 
     extern crate rand;
 
-    use self::rand::{Rand, SeedableRng, XorShiftRng};
+    use self::rand::prelude::*;
     use super::popcount;
 
     /// The obvious naive implementation of popcount.
@@ -44,7 +44,7 @@ mod test {
         for _ in 0..64 {
             count += (x & 1) as usize;
             x >>= 1;
-        };
+        }
         count
     }
 
@@ -60,16 +60,17 @@ mod test {
 
     #[test]
     fn test_popcount_random() {
-        let mut rng = XorShiftRng::from_seed([0xaa, 0xbb, 0xcc, 0xdd]);
+        let mut seed = [0; 32];
+        seed[0..4].copy_from_slice(&[0xaa, 0xbb, 0xcc, 0xdd]);
+        let mut rng = StdRng::from_seed(seed);
         let mut x: u64;
         for _ in 0..1000 {
-            x = Rand::rand(&mut rng);
+            x = rng.gen();
             let p = popcount(x);
             let pn = popcount_naive(x);
             if p != pn {
-                panic!(format!("popcount mismatch: x={}, p={}, px={}",
-                               x, p, pn));
+                panic!("popcount mismatch: x={}, p={}, px={}", x, p, pn);
             };
-        };
+        }
     }
 }

@@ -1,0 +1,11 @@
+[package]
+name = "libcapturesat"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "captures_at"
+path = "captures_at.rs"
+
+[dependencies]
+regex = "1.6.0"

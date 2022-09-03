@@ -20,7 +20,7 @@ fn read_ranges() -> Vec<(u64, u64)> {
         let start = desc[0].parse().expect("could not parse start");
         let end = desc[1].parse().expect("could not parse end");
         result.push((start, end));
-    };
+    }
     result
 }
 
@@ -34,15 +34,14 @@ fn merge_ranges(ranges: &mut Vec<(u64, u64)>) {
     *ranges = Vec::new();
     old_ranges.sort();
     let mut range_iter = old_ranges.iter();
-    let mut cur_range =
-        match range_iter.next() {
-            None => return,
-            Some(range) => *range
-        };
+    let mut cur_range = match range_iter.next() {
+        None => return,
+        Some(range) => *range,
+    };
 
     // Try to merge each successive range with the current
     // range.
-    for &(left, right) in range_iter  {
+    for &(left, right) in range_iter {
         let (cur_left, cur_right) = cur_range;
         if left > cur_right + 1 {
             ranges.push((cur_left, cur_right));
@@ -50,21 +49,15 @@ fn merge_ranges(ranges: &mut Vec<(u64, u64)>) {
         } else {
             cur_range = (cur_left, max(cur_right, right));
         };
-    };
+    }
     ranges.push(cur_range);
 }
 
 #[test]
 fn test_merge_ranges() {
-    let mut ranges = vec![
-        (11, 13),
-        (0, 2),
-        (3, 5),
-        (7, 8),
-        (6, 9),
-        (15, 15) ];
+    let mut ranges = vec![(11, 13), (0, 2), (3, 5), (7, 8), (6, 9), (15, 15)];
     merge_ranges(&mut ranges);
-    if ranges != vec![(0,9), (11, 13), (15, 15)] {
+    if ranges != vec![(0, 9), (11, 13), (15, 15)] {
         println!("{:?}", ranges);
         panic!("ranges mismatch");
     }
@@ -84,9 +77,9 @@ pub fn main() {
     } else {
         // Add up the blacklisted addresses.
         let mut count = 0;
-        for i in 0..ranges.len() {
-            count += ranges[i].1 - ranges[i].0 + 1;
-        };
+        for r in ranges {
+            count += r.1 - r.0 + 1;
+        }
 
         // The remaining addresses are open. Note that this
         // only works because `u64` since 4294967296 is
