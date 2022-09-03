@@ -5,8 +5,8 @@
 
 //! Advent of Code Day 4.
 
-extern crate regex;
 extern crate aoc;
+extern crate regex;
 
 /// Return the "checksum" of the given room name.
 fn name_checksum(room_name: &str) -> String {
@@ -21,16 +21,19 @@ fn name_checksum(room_name: &str) -> String {
             continue;
         }
         counts[c as usize - b'a' as usize] += 1;
-    };
+    }
     // XXX This is a pretty gross algorithm whose
     // only real merit is avoiding some sorting hassle.
-    let mut m: u32 = *counts.iter().max()
+    let mut m: u32 = *counts
+        .iter()
+        .max()
         .expect("name_checksum: could not find max count");
     if m == 0 {
         panic!("maximum is zero");
     }
     while nsum < 5 {
         let mut found_i = ncounts;
+        #[allow(clippy::needless_range_loop)]
         for i in 0..ncounts {
             if counts[i] == m {
                 found_i = i;
@@ -47,7 +50,7 @@ fn name_checksum(room_name: &str) -> String {
         sum[nsum] = (found_i as u8 + b'a') as char;
         counts[found_i] = 0;
         nsum += 1;
-    };
+    }
     sum.iter().cloned().collect::<String>()
 }
 
@@ -61,7 +64,7 @@ fn name_decrypt(room_name: &str, sector_id: u32) -> String {
             let shift = c as u32 - b'a' as u32 + sector_id;
             result.push(((shift % 26) as u8 + b'a') as char);
         };
-    };
+    }
     result.iter().cloned().collect::<String>()
 }
 
@@ -72,32 +75,36 @@ pub fn main() {
     let decrypt = part == 2;
 
     // Set up the regex for room encryption.
-    let room_pattern = regex::Regex::new(r"^(.*)-(\d+)\[(.*)\]$")
-        .expect("main: could not compile regex");
+    let room_pattern =
+        regex::Regex::new(r"^(.*)-(\d+)\[(.*)\]$").expect("main: could not compile regex");
 
     // Set up state.
     let mut sector_sum: u32 = 0;
 
     // Read strings from the input file and process them.
     for l in aoc::input_lines() {
-        let parts = room_pattern.captures(&l)
+        let parts = room_pattern
+            .captures(&l)
             .expect("main: could not match line");
-        let room_name = parts.at(1)
-            .expect("main: could not find room name");
+        let room_name = parts.get(1).expect("main: could not find room name").as_str();
         let computed_sum = name_checksum(room_name);
-        let given_sum = parts.at(3).expect("main: could not find checksum");
+        let given_sum = parts.get(3).expect("main: could not find checksum").as_str();
         if computed_sum != given_sum {
             continue;
         }
-        let sector_id = parts.at(2).expect("main: could not find sector id")
-            .parse().expect("main: could not parse sector id");
+        let sector_id = parts
+            .get(2)
+            .expect("main: could not find sector id")
+            .as_str()
+            .parse()
+            .expect("main: could not parse sector id");
 
         // Handle part 2 by printing all the decryptions.
         if decrypt {
-            println!("{} {}", name_decrypt(&room_name, sector_id), sector_id);
+            println!("{} {}", name_decrypt(room_name, sector_id), sector_id);
         }
         sector_sum += sector_id;
-    };
+    }
 
     // Handle part 1 by printing the sum.
     if !decrypt {
