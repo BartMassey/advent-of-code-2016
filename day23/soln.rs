@@ -22,7 +22,7 @@ pub fn main() {
     state.regs[0] = key;
     while state.pc < insns.len() {
         aoc::step(&mut insns, &mut state);
-    };
+    }
 
     // Show the contents of register a.
     println!("{}", state.regs[0]);
