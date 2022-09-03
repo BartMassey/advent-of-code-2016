@@ -5,8 +5,8 @@
 
 // Advent of Code Day 22.
 
-use std::collections::HashSet;
 use std::cmp::*;
+use std::collections::HashSet;
 
 extern crate aoc;
 extern crate regex;
@@ -20,13 +20,13 @@ struct Usage {
     /// In-use.
     used: usize,
     /// Free to use.
-    avail: usize
+    avail: usize,
 }
 
 /// Board information for search.
 struct Board {
     grid_box: aoc::GridBox,
-    tiles: HashSet<(usize, usize)>
+    tiles: HashSet<(usize, usize)>,
 }
 
 /// The game state is just the position of the
@@ -47,9 +47,7 @@ impl aoc::SearchState for State {
     type Global = Board;
 
     /// No labels.
-    fn label(&self) -> () {
-        ()
-    }
+    fn label(&self) {}
 
     /// Neighbors are valid tiles around blank.
     fn neighbors(&self, global: &Board) -> Vec<(usize, Box<Self>)> {
@@ -59,15 +57,15 @@ impl aoc::SearchState for State {
                 continue;
             };
             let mut next_goal_data = self.goal_data;
-            if next_blank ==  self.goal_data {
+            if next_blank == self.goal_data {
                 next_goal_data = self.blank;
             };
             let next_state = State {
                 goal_data: next_goal_data,
-                blank: next_blank
+                blank: next_blank,
             };
             result.push((1, Box::new(next_state)));
-        };
+        }
         result
     }
 
@@ -80,24 +78,24 @@ impl aoc::SearchState for State {
     /// getting the blank next to the data plus the cost of
     /// getting the data to the goal.
     fn hcost(&self, _: &Board) -> usize {
-        aoc::manhattan_distance(self.goal_data, self.blank) +
-        aoc::manhattan_distance(self.goal_data, (0,0))
+        aoc::manhattan_distance(self.goal_data, self.blank)
+            + aoc::manhattan_distance(self.goal_data, (0, 0))
     }
 }
 
 /// Try to match given regex, returning submatches if successful.
 fn try_pat(pat: &regex::Regex, target: &str) -> Option<Vec<String>> {
     match pat.captures(target) {
-        Some(parts) =>  {
+        Some(parts) => {
             let mut v = Vec::new();
             let mut iter = parts.iter();
             iter.next();
             for p in iter {
-                v.push(p.expect("part did not match").to_string());
-            };
+                v.push(p.expect("part did not match").as_str().to_string());
+            }
             Some(v)
-        },
-        None => None
+        }
+        None => None,
     }
 }
 
@@ -106,8 +104,7 @@ fn try_pat(pat: &regex::Regex, target: &str) -> Option<Vec<String>> {
 fn read_usages() -> Vec<(usize, usize, Usage)> {
     // Set up state.
     let usage_pat =
-        regex::Regex::new(
-            r"^/dev/grid/node-x(\d+)-y(\d+) *\d+T *(\d+)T *(\d+)T *\d+%$")
+        regex::Regex::new(r"^/dev/grid/node-x(\d+)-y(\d+) *\d+T *(\d+)T *(\d+)T *\d+%$")
             .expect("could not compile usage pattern");
     let mut usages = Vec::new();
 
@@ -115,14 +112,20 @@ fn read_usages() -> Vec<(usize, usize, Usage)> {
     for target in aoc::input_lines() {
         if let Some(args) = try_pat(&usage_pat, &target) {
             assert!(args.len() == 4);
-            let mut argv = [0usize;4];
+            let mut argv = [0usize; 4];
             for i in 0..4 {
                 argv[i] = args[i].parse::<usize>().unwrap();
             }
-            usages.push((argv[0], argv[1],
-                         Usage{ used: argv[2], avail: argv[3]}));
+            usages.push((
+                argv[0],
+                argv[1],
+                Usage {
+                    used: argv[2],
+                    avail: argv[3],
+                },
+            ));
         };
-    };
+    }
     usages
 }
 
@@ -137,31 +140,34 @@ fn count_viable_pairs(umap: &[Vec<Usage>]) -> usize {
 
     // Loop over source coordinates.
     for x0 in 0..len_x {
-    for y0 in 0..len_y {
-        // Get source use for later.
-        let used_a = umap[x0][y0].used;
+        for y0 in 0..len_y {
+            // Get source use for later.
+            let used_a = umap[x0][y0].used;
 
-        // Never pull from empty disc.
-        if used_a == 0 {
-            continue;
-        };
-
-        // Loop over destination coordinates.
-        for x1 in 0..len_x {
-        for y1 in 0..len_y {
-            // Source and dest must be different.
-            if x1 == x0 && y1 == y0 {
+            // Never pull from empty disc.
+            if used_a == 0 {
                 continue;
             };
 
-            // Get dest space, and bump count if source
-            // fits.
-            let avail_b = umap[x1][y1].avail;
-            if avail_b >= used_a {
-                viable_pairs += 1;
+            // Loop over destination coordinates.
+            #[allow(clippy::needless_range_loop)]
+            for x1 in 0..len_x {
+                for y1 in 0..len_y {
+                    // Source and dest must be different.
+                    if x1 == x0 && y1 == y0 {
+                        continue;
+                    };
+
+                    // Get dest space, and bump count if source
+                    // fits.
+                    let avail_b = umap[x1][y1].avail;
+                    if avail_b >= used_a {
+                        viable_pairs += 1;
+                    }
+                }
             }
-        }};
-    }};
+        }
+    }
     viable_pairs
 }
 
@@ -180,52 +186,57 @@ fn start_info(umap: &[Vec<Usage>]) -> (State, HashSet<(usize, usize)>) {
 
     // Loop over source coordinates.
     for x in 0..len_x {
-    for y in 0..len_y {
-        // An empty disc represents the blank. There can
-        // be only one.
-        if umap[x][y].used == 0 {
-            if blank.is_some() {
-                panic!("two blanks");
+        for y in 0..len_y {
+            // An empty disc represents the blank. There can
+            // be only one.
+            if umap[x][y].used == 0 {
+                if blank.is_some() {
+                    panic!("two blanks");
+                };
+                blank = Some((x, y));
+                continue;
             };
-            blank = Some((x, y));
-            continue;
-        };
 
-        // Heuristically decide whether the given square is
-        // a tile or a wall. Block because early return.
-        let is_tile = || {
-            // Loop over immediate neighbors.
-            for (x0, y0) in grid_box.neighbors((x, y)) {
-                // Heuristic: If this neighbor could not
-                // accept the data if empty, it is a wall.
-                let u = &umap[x0][y0];
-                if umap[x][y].used > u.used + u.avail {
-                    return false;
+            // Heuristically decide whether the given square is
+            // a tile or a wall. Block because early return.
+            let is_tile = || {
+                // Loop over immediate neighbors.
+                for (x0, y0) in grid_box.neighbors((x, y)) {
+                    // Heuristic: If this neighbor could not
+                    // accept the data if empty, it is a wall.
+                    let u = &umap[x0][y0];
+                    if umap[x][y].used > u.used + u.avail {
+                        return false;
+                    }
                 }
+                true
             };
-            true
-        };
 
-        // Run the block.
-        if is_tile() {
-            tiles.insert((x, y));
-        };
-    }};
+            // Run the block.
+            if is_tile() {
+                tiles.insert((x, y));
+            };
+        }
+    }
 
     // Check on the blank.
-    let blank =
-        match blank {
-            Some(xy) => xy,
-            None => panic!("no blank found")
-        };
+    let blank = match blank {
+        Some(xy) => xy,
+        None => panic!("no blank found"),
+    };
 
     // Return the new state and tiles.
-    (State { goal_data: (len_x - 1, 0), blank: blank }, tiles)
+    (
+        State {
+            goal_data: (len_x - 1, 0),
+            blank,
+        },
+        tiles,
+    )
 }
 
 // Display the part 2 map for debugging.
-fn print_map(s: &State, tiles: &HashSet<(usize, usize)>,
-             len_x: usize, len_y: usize) {
+fn print_map(s: &State, tiles: &HashSet<(usize, usize)>, len_x: usize, len_y: usize) {
     for y in 0..len_y {
         for x in 0..len_x {
             if (x, y) == s.blank {
@@ -237,9 +248,9 @@ fn print_map(s: &State, tiles: &HashSet<(usize, usize)>,
             } else {
                 print!("#");
             };
-        };
-        println!("");
-    };
+        }
+        println!();
+    }
 }
 
 // Do the appropriate search through the disc array.
@@ -258,18 +269,18 @@ pub fn main() {
         max_x = max(max_x, x);
         max_y = max(max_y, y);
         max_t = max(max_t, u.avail + u.used);
-    };
+    }
     let len_x = max_x + 1;
     let len_y = max_y + 1;
 
     // Build the map.
     let mut umap: Vec<Vec<Usage>> = Vec::new();
     let mut row = Vec::new();
-    row.resize(len_y, Usage{used: 0, avail: 0});
+    row.resize(len_y, Usage { used: 0, avail: 0 });
     umap.resize(len_x, row);
     for (x, y, u) in usages.iter().cloned() {
         umap[x][y] = u;
-    };
+    }
 
     if part == 1 {
         // Just count the pairs.
@@ -282,12 +293,12 @@ pub fn main() {
         };
         let board = Board {
             grid_box: aoc::GridBox::new_grid(),
-            tiles: tiles
+            tiles,
         };
         if let Some((g, _)) = aoc::a_star(&board, &start, false) {
             println!("{}", g);
         } else {
             println!("no solution");
-        };            
+        };
     };
 }
