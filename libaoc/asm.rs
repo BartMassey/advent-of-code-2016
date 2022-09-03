@@ -142,7 +142,7 @@ pub fn asm<T: Read>(lines: &mut InputLines<T>) -> Vec<Insn> {
                     assert!(words.len() == 2);
                     Out(parse_opnd(words[1]))
                 },
-                _ => panic!(format!("unrecognized insn {}", words[0]))
+                _ => panic!("unrecognized insn {}", words[0])
             };
         insns.push(insn);
     };

@@ -92,7 +92,7 @@ pub struct Neighbors {
     /// Source location.
     loc: Point,
     /// Iterator for cardinal directions.
-    dirns: Box<Iterator<Item=&'static (isize, isize)>>
+    dirns: Box<dyn Iterator<Item=&'static (isize, isize)>>
 }
 
 impl Neighbors {

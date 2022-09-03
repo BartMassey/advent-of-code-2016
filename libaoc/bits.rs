@@ -67,8 +67,8 @@ mod test {
             let p = popcount(x);
             let pn = popcount_naive(x);
             if p != pn {
-                panic!(format!("popcount mismatch: x={}, p={}, px={}",
-                               x, p, pn));
+                panic!("popcount mismatch: x={}, p={}, px={}",
+                               x, p, pn);
             };
         };
     }
