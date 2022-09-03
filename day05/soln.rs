@@ -4,7 +4,7 @@
 // for license terms.
 
 //! Advent of Code Day 5.
-//! 
+//!
 //! Portions of this code are inspired by.
 //! <http://gist.github.com/gkbrk/2e4835e3a17b3fb6e1e7>.
 
@@ -20,9 +20,10 @@ use self::crypto::digest::Digest;
 pub fn cinema_string(marquee: &[char]) {
     let marquee_string = marquee.iter().cloned().collect::<String>();
     print!("\r{}", marquee_string);
-    stdout().flush().expect("cinema_string: could not flush stdout");
+    stdout()
+        .flush()
+        .expect("cinema_string: could not flush stdout");
 }
-
 
 /// Find the password matching the room code, using the
 /// algorithm of part 2 of the problem if "positional" is
@@ -67,12 +68,11 @@ pub fn main() {
         }
 
         // Compute the current password position and digit.
-        let (posn, digit) =
-            if positional {
-                (digit_six, (output[3] >> 4) as usize)
-            } else {
-                (count, digit_six)
-            };
+        let (posn, digit) = if positional {
+            (digit_six, (output[3] >> 4) as usize)
+        } else {
+            (count, digit_six)
+        };
 
         // If the position is already filled, leave it.
         if password[posn] != '.' {
@@ -86,9 +86,9 @@ pub fn main() {
         // If we have all the characters, it's over.
         count += 1;
         if count >= password.len() {
-            println!("");
+            println!();
             return;
         }
-    };
+    }
     panic!("ran out of hashes");
 }
