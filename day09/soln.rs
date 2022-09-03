@@ -31,13 +31,15 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> u64 {
                 }
 
                 // Grab the "coords" out of the pattern.
-                let target: &str = str::from_utf8(&(*pat)[i+1..end])
+                let target: &str = str::from_utf8(&(*pat)[i + 1..end])
                     .expect("parse_expansion: invalid utf8 in target");
                 let coords = target.split('x').collect::<Vec<&str>>();
                 assert!(coords.len() == 2);
-                let replen: usize = coords[0].parse()
+                let replen: usize = coords[0]
+                    .parse()
                     .expect("parse_expansion: could not parse replen");
-                let repcount: usize = coords[1].parse()
+                let repcount: usize = coords[1]
+                    .parse()
                     .expect("parse_expansion: could not parse repcount");
 
                 // Advance over the pattern.
@@ -45,8 +47,7 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> u64 {
 
                 // Process the target text.
                 if recurse {
-                    let subemit =
-                        parse_expansion(&(*pat)[i..i + replen], true);
+                    let subemit = parse_expansion(&(*pat)[i..i + replen], true);
                     nemit += subemit * repcount as u64;
                 } else {
                     nemit += replen as u64 * repcount as u64;
@@ -54,19 +55,19 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> u64 {
 
                 // Advance over the target text.
                 i += replen;
-            },
+            }
             '\n' => {
                 // A newline at the end is harmless.
                 assert!(i == nchars - 1);
                 break;
-            },
+            }
             _ => {
                 // Just emit ordinary characters.
                 i += 1;
                 nemit += 1;
             }
         }
-    };
+    }
     // Report the amount of emitted text.
     nemit
 }
@@ -79,8 +80,9 @@ fn parse_expansion(pat: &[u8], recurse: bool) -> u64 {
 pub fn main() {
     let part = aoc::get_part();
     let mut chars = Vec::new();
-    let _ = io::stdin().read_to_end(&mut chars)
+    let _ = io::stdin()
+        .read_to_end(&mut chars)
         .expect("could not read all of stdin");
-    let nemit = parse_expansion(&chars, part==2);
+    let nemit = parse_expansion(&chars, part == 2);
     println!("{}", nemit);
 }
