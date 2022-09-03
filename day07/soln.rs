@@ -12,7 +12,7 @@ extern crate aoc;
 /// Return true iff given segment has an ABBA.
 fn segment_abba(segment: &str) -> bool {
     let c: Vec<char> = segment.chars().collect();
-    for i in 0usize .. c.len() - 3 {
+    for i in 0usize..c.len() - 3 {
         if c[i] != c[i + 1] && c[i + 1] == c[i + 2] && c[i] == c[i + 3] {
             return true;
         }
@@ -60,15 +60,15 @@ fn supports_tls(line: String) -> bool {
 /// be in reverse order.
 fn segment_abas(segment: &str, flip: bool, abas: &mut HashSet<String>) {
     let c: Vec<char> = segment.chars().collect();
-    for i in 0usize .. c.len() - 2 {
+    for i in 0usize..c.len() - 2 {
         if c[i] != c[i + 1] && c[i] == c[i + 2] {
             let mut aba = String::new();
             if flip {
-                aba.push(c[i+1]);
+                aba.push(c[i + 1]);
                 aba.push(c[i]);
             } else {
                 aba.push(c[i]);
-                aba.push(c[i+1]);
+                aba.push(c[i + 1]);
             };
             abas.insert(aba);
         }
@@ -102,7 +102,7 @@ fn supports_ssl(line: String) -> bool {
         } else {
             segment.push(c);
         }
-    };
+    }
 
     // Clean up and return result.
     assert!(!in_brackets);
