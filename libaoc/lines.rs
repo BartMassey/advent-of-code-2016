@@ -54,6 +54,6 @@ pub fn input_lines() -> InputLines<Stdin> {
 /// filename, returning an error on failure to open the
 /// file.
 pub fn input_file_lines(filename: &str) -> Result<InputLines<File>> {
-    let file = try!(File::open(filename));
+    let file = File::open(filename)?;
     Ok(InputLines::new(file))
 }
