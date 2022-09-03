@@ -17,7 +17,7 @@ pub fn main() {
     let mut state = aoc::ExecState::new();
     while state.pc < insns.len() {
         aoc::step(&mut insns, &mut state);
-    };
+    }
 
     // Show register a.
     println!("{}", state.regs[0]);
