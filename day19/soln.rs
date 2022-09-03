@@ -15,7 +15,7 @@ struct Elf {
     /// Number of presents currently held.
     npresents: usize,
     /// Elves are in a circularly-linked list of indices.
-    next_elf: usize
+    next_elf: usize,
 }
 
 /// Build the circularly-linked elf list and steal until
@@ -28,18 +28,16 @@ pub fn main() {
     // Build the list.
     let mut elves = Vec::new();
     for i in 0..nelves {
-        let elf = Elf { npresents: 1, next_elf: (i + 1) % nelves };
+        let elf = Elf {
+            npresents: 1,
+            next_elf: (i + 1) % nelves,
+        };
         elves.push(elf);
-    };
+    }
 
     // Set up the starting state.
     let mut cur_elf = 0;
-    let mut victim_parent =
-        if part == 1 {
-            0
-        } else {
-            (nelves >> 1) - 1
-        };
+    let mut victim_parent = if part == 1 { 0 } else { (nelves >> 1) - 1 };
     let mut living_elves = nelves;
 
     // Repeatedly steal.
@@ -65,7 +63,7 @@ pub fn main() {
         if part == 1 || living_elves & 1 == 0 {
             victim_parent = elves[victim_parent].next_elf;
         };
-    };
+    }
 
     // Show the result.
     assert!(elves[cur_elf].npresents == nelves);
