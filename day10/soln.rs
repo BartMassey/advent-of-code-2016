@@ -18,7 +18,7 @@ use std::collections::HashSet;
 extern crate regex;
 extern crate aoc;
 
-/// Instruction patterns.
+// Instruction patterns.
 lazy_static! {
     static ref VALUE_PAT: regex::Regex =
         regex::Regex::new(r"^value (\d+) goes to (.+)$")

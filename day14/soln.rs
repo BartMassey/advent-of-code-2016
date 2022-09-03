@@ -156,11 +156,11 @@ mod test_has_repeat {
         let mut output = [0u8;16];
         make_hash(0, &mut output);
         if aoc::hex_string(&output) != "577571be4de9dcce85a041ba0410f29f" {
-            panic!(aoc::hex_string(&output));
+            panic!("{}", aoc::hex_string(&output));
         };
         make_stretched_hash(0, &mut output);
         if aoc::hex_string(&output) != "a107ff634856bb300138cac6568c0f24" {
-            panic!(aoc::hex_string(&output));
+            panic!("{}", aoc::hex_string(&output));
         };
         assert!(has_rep_stretched(0, None, 3) == None);
     }
@@ -174,7 +174,7 @@ pub fn main() {
 
     // Set up state.
     let mut n: isize = 64;
-    let mut hasher: Box<Digest> =
+    let mut hasher: Box<dyn Digest> =
         if part == 1 {
             Box::new(crypto::md5::Md5::new())
         } else if part == 2 {

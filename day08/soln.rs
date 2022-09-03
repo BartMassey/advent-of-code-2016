@@ -12,7 +12,7 @@ extern crate aoc;
 #[macro_use] extern crate lazy_static;
 extern crate regex;
 
-/// Textual patterns for instructions.
+// Textual patterns for instructions.
 lazy_static! {
     static ref RECT_PATTERN: regex::Regex =
         regex::Regex::new(r"^rect (\d+)x(\d+)$")
