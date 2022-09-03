@@ -9,37 +9,44 @@
 const TRACING: bool = false;
 
 extern crate aoc;
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 extern crate regex;
+extern crate captures_at;
 
-/// Textual patterns for instructions.
+use captures_at::CapturesAtExt;
+
+// Textual patterns for instructions.
 lazy_static! {
     static ref RECT_PATTERN: regex::Regex =
-        regex::Regex::new(r"^rect (\d+)x(\d+)$")
-        .expect("could not compile rect pattern");
+        regex::Regex::new(r"^rect (\d+)x(\d+)$").expect("could not compile rect pattern");
     static ref ROTATE_ROW_PATTERN: regex::Regex =
-        regex::Regex::new(r"^rotate row y=(\d+) by (\d+)$")
-        .expect("could not compile row pattern");
+        regex::Regex::new(r"^rotate row y=(\d+) by (\d+)$").expect("could not compile row pattern");
     static ref ROTATE_COLUMN_PATTERN: regex::Regex =
         regex::Regex::new(r"^rotate column x=(\d+) by (\d+)$")
-        .expect("could not compile column pattern");
+            .expect("could not compile column pattern");
 }
 
 /// Try for instruction to draw a rectangle. Returns true
 /// iff successful.
-fn insn_rect(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
+fn insn_rect(insn: &str, m: &mut [Vec<char>]) -> bool {
     match (*self::RECT_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
             // Parse arguments.
-            let x: usize = parts.at(1)
+            let x: usize = parts
+                .at(1)
                 .expect("insn_rect: could not find x")
-                .parse().expect("insn_rect: could not parse x");
-            let y: usize = parts.at(2)
+                .parse()
+                .expect("insn_rect: could not parse x");
+            let y: usize = parts
+                .at(2)
                 .expect("insn_rect: could not find y")
-                .parse().expect("insn_rect: could not parse y");
+                .parse()
+                .expect("insn_rect: could not parse y");
 
             // Fill rectangle.
+            #[allow(clippy::needless_range_loop)]
             for i in 0..x {
                 for j in 0..y {
                     m[i][j] = '#';
@@ -52,24 +59,28 @@ fn insn_rect(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
 
 /// Try for instruction to rotate a row right. Returns true
 /// iff successful.
-fn insn_rotate_row(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
+fn insn_rotate_row(insn: &str, m: &mut [Vec<char>]) -> bool {
     match (*self::ROTATE_ROW_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
             // Parse arguments.
-            let y: usize = parts.at(1)
+            let y: usize = parts
+                .at(1)
                 .expect("insn_rotate_row: could not find y")
-                .parse().expect("insn_rotate_row: could not parse y");
-            let n: usize = parts.at(2)
+                .parse()
+                .expect("insn_rotate_row: could not parse y");
+            let n: usize = parts
+                .at(2)
                 .expect("insn_rotate_row: could not find n")
-                .parse().expect("insn_rotate_row: could not parse n");
+                .parse()
+                .expect("insn_rotate_row: could not parse n");
 
             // Rotate row.
             let d = m.len();
             for _ in 0..n {
-                let tmp = m[d-1][y];
+                let tmp = m[d - 1][y];
                 for x in (1..d).rev() {
-                    m[x][y] = m[x-1][y];
+                    m[x][y] = m[x - 1][y];
                 }
                 m[0][y] = tmp;
             }
@@ -80,24 +91,28 @@ fn insn_rotate_row(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
 
 /// Try for instruction to rotate a column down. Returns
 /// true iff successful.
-fn insn_rotate_column(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
+fn insn_rotate_column(insn: &str, m: &mut [Vec<char>]) -> bool {
     match (*self::ROTATE_COLUMN_PATTERN).captures(insn) {
         None => return false,
         Some(parts) => {
             // Parse arguments.
-            let x: usize = parts.at(1)
+            let x: usize = parts
+                .at(1)
                 .expect("insn_rotate_column: could not find x")
-                .parse().expect("insn_rotate_column: could not parse x");
-            let n: usize = parts.at(2)
+                .parse()
+                .expect("insn_rotate_column: could not parse x");
+            let n: usize = parts
+                .at(2)
                 .expect("insn_rotate_column: could not find n")
-                .parse().expect("insn_rotate_column: could not parse n");
+                .parse()
+                .expect("insn_rotate_column: could not parse n");
 
             // Rotate column.
             let d = m[0].len();
             for _ in 0..n {
-                let tmp = m[x][d-1];
+                let tmp = m[x][d - 1];
                 for y in (1..d).rev() {
-                    m[x][y] = m[x][y-1];
+                    m[x][y] = m[x][y - 1];
                 }
                 m[x][0] = tmp;
             }
@@ -108,11 +123,11 @@ fn insn_rotate_column(insn: &str, m: &mut Vec<Vec<char>>) -> bool {
 
 /// Display the given screen.
 fn display(m: &[Vec<char>]) {
-    for y in 0..m[0].len() {
-        for x in 0..m.len() {
-            print!("{}", m[x][y]);
-        };
-        println!("");
+    for r in m.iter() {
+        for c in r.iter() {
+            print!("{}", c);
+        }
+        println!();
     }
 }
 
@@ -144,28 +159,29 @@ fn main() {
             if f(&l, &mut m) {
                 processed = true;
                 if TRACING {
-                    println!("");
+                    println!();
                     display(&m);
                 };
                 break;
             }
-        };
+        }
         if !processed {
             panic!("undentified instruction");
         }
-    };
+    }
 
     // Count up and report the on pixels.
     let mut count = 0;
+    #[allow(clippy::needless_range_loop)]
     for x in 0..x_size {
         for y in 0..y_size {
             if m[x][y] == '#' {
                 count += 1;
             }
         }
-    };
+    }
     if TRACING {
-        println!("");
+        println!();
     };
 
     // Show final answer.
