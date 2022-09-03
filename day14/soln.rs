@@ -9,10 +9,10 @@ extern crate aoc;
 extern crate crypto;
 
 use self::crypto::digest::Digest;
-    
+
 /// "Stretched" hasher for part 2.
-enum StretchedMd5  {
-    Hasher(Box<crypto::md5::Md5>)
+enum StretchedMd5 {
+    Hasher(Box<crypto::md5::Md5>),
 }
 
 impl StretchedMd5 {
@@ -57,63 +57,62 @@ impl Digest for StretchedMd5 {
             let out_hex = &(s.as_bytes());
             h.input(out_hex);
             h.result(out);
-        };
+        }
     }
 }
 
 /// Look for `reps` consecutive repetitions of a `target`
 /// digit in a given `hash`. If `target` is `None`,
 /// repetitions of any digit count.
-fn has_repeat(hash: &[u8;16], target: Option<u8>, reps: usize) -> Option<u8> {
+fn has_repeat(hash: &[u8; 16], target: Option<u8>, reps: usize) -> Option<u8> {
     // Split up the input bytes into digits.
     let mut nybbles = [0u8; 32];
+    #[allow(clippy::needless_range_loop)]
     for i in 0..16 {
         let j = i << 1;
         nybbles[j] = (hash[i] >> 4) & 0xf;
-        nybbles[j+1] = hash[i] & 0xf;
-    };
+        nybbles[j + 1] = hash[i] & 0xf;
+    }
 
     // Look for repetitions of target. O(*mn*) where
     // *m* is the size of the input and *n* is the
     // desired repetition count.
-    for i in 0..32-reps {
-
+    for i in 0..32 - reps {
         // Look for repetitions at position *i*.
         // Implemented as a function to allow early return
         // for convenience.
         let has_reps = || {
             // Identify or select starting value.
-            let b0 =
-                match target {
-                    Some(b) => b,
-                    None => nybbles[i]
-                };
+            let b0 = match target {
+                Some(b) => b,
+                None => nybbles[i],
+            };
 
             // Check for consecutive matches of value.
             for j in 0..reps {
-                if nybbles[i+j] != b0 {
+                if nybbles[i + j] != b0 {
                     return false;
                 }
-            };
+            }
             true
         };
-        
+
         // Wrap the answer.
         if has_reps() {
             return Some(nybbles[i]);
         };
-    };
+    }
     None
 }
 
 #[cfg(test)]
 mod test_has_repeat {
 
+    use super::aoc;
     use crypto::digest::Digest;
     use crypto::md5;
-    use super::aoc;
 
-    fn make_hash(i: usize, output: &mut [u8;16]) {
+    fn make_hash(i: usize, output: &mut [u8; 16]) {
         let mut hasher = md5::Md5::new();
         hasher.input("abc".to_string().as_bytes());
         hasher.input(i.to_string().as_bytes());
@@ -121,7 +120,7 @@ mod test_has_repeat {
     }
 
     fn has_rep(i: usize, t: Option<u8>, n: usize) -> Option<u8> {
-        let mut output = [0u8;16];
+        let mut output = [0u8; 16];
         make_hash(i, &mut output);
         super::has_repeat(&output, t, n)
     }
@@ -138,7 +137,7 @@ mod test_has_repeat {
         assert!(has_rep(200, Some(0x9), 5) == Some(0x9));
     }
 
-    fn make_stretched_hash(i: usize, output: &mut [u8;16]) {
+    fn make_stretched_hash(i: usize, output: &mut [u8; 16]) {
         let mut hasher = super::StretchedMd5::new();
         hasher.input("abc".to_string().as_bytes());
         hasher.input(i.to_string().as_bytes());
@@ -146,21 +145,21 @@ mod test_has_repeat {
     }
 
     fn has_rep_stretched(i: usize, t: Option<u8>, n: usize) -> Option<u8> {
-        let mut output = [0u8;16];
+        let mut output = [0u8; 16];
         make_stretched_hash(i, &mut output);
         super::has_repeat(&output, t, n)
     }
 
     #[test]
     fn check_stretched_md5() {
-        let mut output = [0u8;16];
+        let mut output = [0u8; 16];
         make_hash(0, &mut output);
         if aoc::hex_string(&output) != "577571be4de9dcce85a041ba0410f29f" {
-            panic!(aoc::hex_string(&output));
+            panic!("{}", aoc::hex_string(&output));
         };
         make_stretched_hash(0, &mut output);
         if aoc::hex_string(&output) != "a107ff634856bb300138cac6568c0f24" {
-            panic!(aoc::hex_string(&output));
+            panic!("{}", aoc::hex_string(&output));
         };
         assert!(has_rep_stretched(0, None, 3) == None);
     }
@@ -174,16 +173,15 @@ pub fn main() {
 
     // Set up state.
     let mut n: isize = 64;
-    let mut hasher: Box<Digest> =
-        if part == 1 {
-            Box::new(crypto::md5::Md5::new())
-        } else if part == 2 {
-            Box::new(StretchedMd5::new())
-        } else {
-            panic!("unknown part");
-        };
-    let mut output = [0;16];
-    let mut hashbuf: Vec<[u8;16]> = Vec::new();
+    let mut hasher: Box<dyn Digest> = if part == 1 {
+        Box::new(crypto::md5::Md5::new())
+    } else if part == 2 {
+        Box::new(StretchedMd5::new())
+    } else {
+        panic!("unknown part");
+    };
+    let mut output = [0; 16];
+    let mut hashbuf: Vec<[u8; 16]> = Vec::new();
 
     // This loop should never finish.
     for i in 0..std::usize::MAX {
@@ -201,7 +199,7 @@ pub fn main() {
         // If we've found a repetition, look ahead up to 1001
         // steps for another of the same.
         if let Some(rep) = has_repeat(&output, None, 3) {
-            let mut output = [0;16];
+            let mut output = [0; 16];
             for j in 1..1001 {
                 // If hash is not already cached, cache it.
                 if i + j >= hashbuf.len() {
@@ -224,8 +222,8 @@ pub fn main() {
                     };
                     break;
                 };
-            };
+            }
         };
-    };
+    }
     panic!("no solution found");
 }
