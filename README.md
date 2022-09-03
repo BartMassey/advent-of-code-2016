@@ -94,5 +94,9 @@ updated everything, within reason. Added a new library
 change; added an `update` directory with the shell scripts I
 used to quickly go through all 25 days.
 
+I also updated the MD5 digest stuff from `rust-crypto`,
+which is very stale and has security warnings, to `md-5`,
+which is apparently fine.
+
 Hopefully it's better now. I tagged the revision
 from 2017 as `v2` if you want to see the old stuff.
