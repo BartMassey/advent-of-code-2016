@@ -9,8 +9,7 @@ extern crate aoc;
 
 /// Take a board, a starting point and a line of traversal
 /// instructions and return the ending position.
-fn walk_line(board: &[Vec<char>], n_start: (usize, usize),
-             insns: &str) -> (usize, usize) {
+fn walk_line(board: &[Vec<char>], n_start: (usize, usize), insns: &str) -> (usize, usize) {
     let mut n = n_start;
 
     // Walk over the instructions trying moves.
@@ -21,14 +20,14 @@ fn walk_line(board: &[Vec<char>], n_start: (usize, usize),
             'D' => (n.0, n.1 + 1),
             'L' => (n.0 - 1, n.1),
             'R' => (n.0 + 1, n.1),
-            _ => panic!("bad direction")
+            _ => panic!("bad direction"),
         };
 
         // Skip steps that would walk off the keypad.
         if board[next_n.1][next_n.0] != '.' {
             n = next_n;
         }
-    };
+    }
     n
 }
 
@@ -43,7 +42,7 @@ pub fn print_code(board: &[Vec<char>]) {
         n = walk_line(board, n, &line);
         print!("{}", board[n.1][n.0]);
     }
-    println!("");
+    println!();
 }
 
 /// Read the board for the part, returning a nested
@@ -53,8 +52,7 @@ pub fn read_board(part: usize) -> Vec<Vec<char>> {
     let mut result = Vec::new();
     // Read each line of the board file.
     let board_lines =
-        aoc::input_file_lines(&format!("board{}.txt", part))
-        .expect("could not open board file");
+        aoc::input_file_lines(&format!("board{}.txt", part)).expect("could not open board file");
     for line in board_lines {
         // Start a new row, add left boundary.
         let mut row = Vec::new();
@@ -67,7 +65,7 @@ pub fn read_board(part: usize) -> Vec<Vec<char>> {
         // Push the right boundary and save the row.
         row.push('.');
         result.push(row);
-    };
+    }
 
     // Add the top and bottom boundaries.
     if result.is_empty() {
