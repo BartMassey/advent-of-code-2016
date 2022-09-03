@@ -5,7 +5,7 @@
 
 //! Advent of Code Day 24.
 
-use std::collections::{HashSet, BTreeSet, HashMap};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 extern crate aoc;
 
@@ -15,7 +15,7 @@ struct Map {
     goals: HashMap<aoc::Point, u32>,
     grid_box: aoc::GridBox,
     part: usize,
-    start_posn: aoc::Point
+    start_posn: aoc::Point,
 }
 
 /// Problem state.
@@ -24,16 +24,14 @@ struct State {
     /// Current position.
     posn: aoc::Point,
     /// Set of previously-visited positions.
-    visited: BTreeSet<u32>
+    visited: BTreeSet<u32>,
 }
 
 impl aoc::SearchState for State {
     type Label = ();
     type Global = Map;
 
-    fn label(&self) -> () {
-        ()
-    }
+    fn label(&self) {}
 
     fn neighbors(&self, global: &Self::Global) -> Vec<(usize, Box<Self>)> {
         let mut result = Vec::new();
@@ -53,18 +51,20 @@ impl aoc::SearchState for State {
             };
 
             // Push the neighbor state.
-            let next_state = State{ posn: next_posn,
-                                    visited: next_visited };
+            let next_state = State {
+                posn: next_posn,
+                visited: next_visited,
+            };
             result.push((1, Box::new(next_state)))
-        };
+        }
         result
     }
 
     /// Stop when everything has been visited,
     /// but in part 2 only when we then get home.
     fn is_goal(&self, global: &Map) -> bool {
-        self.visited.len() == global.goals.len() &&
-        (global.part == 1 || self.posn == global.start_posn)
+        self.visited.len() == global.goals.len()
+            && (global.part == 1 || self.posn == global.start_posn)
     }
 }
 
@@ -78,28 +78,32 @@ pub fn main() {
     let mut goals: HashMap<aoc::Point, u32> = HashMap::new();
     let mut goal_labels: BTreeSet<u32> = BTreeSet::new();
     let mut maybe_start: Option<aoc::Point> = None;
+    // Process the map.
     let mut x = 0;
     let mut y = 0;
-    // Process the map.
+    // XXX `x` and `y` are flipped when incrementing.
+    #[allow(clippy::explicit_counter_loop)]
     for row in aoc::input_lines() {
         for c in row.chars() {
             match c {
-                '.' => { open.insert((x, y)); },
+                '.' => {
+                    open.insert((x, y));
+                }
                 '#' => (),
-                dc if dc.is_digit(10) => {
+                dc if dc.is_ascii_digit() => {
                     match dc.to_digit(10).unwrap() {
                         0 => {
                             // Location 0 is special.
                             maybe_start = Some((x, y));
                             open.insert((x, y));
-                        },
+                        }
                         d => {
                             goals.insert((x, y), d);
                             goal_labels.insert(d);
                             open.insert((x, y));
                         }
                     }
-                },
+                }
                 _ => {
                     panic!("bad char in input");
                 }
@@ -108,24 +112,24 @@ pub fn main() {
         }
         x = 0;
         y += 1;
-    };
+    }
     let start_posn = match maybe_start {
         Some(p) => p,
-        None => panic!("no start position found")
+        None => panic!("no start position found"),
     };
     let map = Map {
-        open: open,
-        goals: goals,
+        open,
+        goals,
         grid_box: aoc::GridBox::new_grid(),
-        part: part,
-        start_posn: start_posn
+        part,
+        start_posn,
     };
     let start_state = State {
         posn: start_posn,
-        visited: BTreeSet::new()
+        visited: BTreeSet::new(),
     };
     match aoc::a_star(&map, &start_state, false) {
         Some((g, _)) => println!("{}", g),
-        None => panic!("no solution")
+        None => panic!("no solution"),
     };
 }
