@@ -58,15 +58,14 @@ fn test_open_doors() {
 /// Depth-First search for a path to a given location. The
 /// goal position is `posn`, the path to this point is
 /// `path`. Search will be for a longest path if
-/// `find_longest` is true: otherwise it will be for the
+/// `limit` is `None`: otherwise it will be for the
 /// first-found path of depth `limit` or less.
 fn dfs(
     grid_box: &aoc::GridBox,
     hasher0: &Md5,
-    limit: usize,
+    limit: Option<usize>,
     posn: aoc::Point,
     path: String,
-    find_longest: bool,
 ) -> Explo {
     // Stop at the goal.
     if posn == (3, 3) {
@@ -74,9 +73,10 @@ fn dfs(
     };
 
     // Stop if depth limited.
-    if !find_longest && limit == 0 {
+    if limit == Some(0) {
         return Stopped;
     }
+    let find_longest = limit.is_none();
 
     // Set up the state and check the doors.
     let dirns = [('U', (0, -1)), ('D', (0, 1)), ('L', (-1, 0)), ('R', (1, 0))];
@@ -110,10 +110,9 @@ fn dfs(
                 let subresult = dfs(
                     grid_box,
                     &hasher,
-                    limit - 1,
+                    limit.map(|l| l - 1),
                     next_loc,
                     next_path,
-                    find_longest,
                 );
 
                 // Combine the subsearch result with the existing
@@ -173,7 +172,7 @@ pub fn main() {
 
     // For part 2, do a single search for longest path.
     if part == 2 {
-        let result = dfs(&grid_box, &hasher0, 0, (0, 0), "".to_string(), true);
+        let result = dfs(&grid_box, &hasher0, None, (0, 0), "".to_string());
         match result {
             Completed(soln) => {
                 println!("{}", soln.len());
@@ -192,7 +191,7 @@ pub fn main() {
     // find a shortest path.
     assert!(part == 1);
     for limit in 0..std::usize::MAX {
-        let result = dfs(&grid_box, &hasher0, limit, (0, 0), "".to_string(), false);
+        let result = dfs(&grid_box, &hasher0, Some(limit), (0, 0), "".to_string());
         match result {
             Completed(soln) => {
                 println!("{}", soln);
